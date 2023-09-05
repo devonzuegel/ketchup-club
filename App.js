@@ -1,8 +1,29 @@
 import {StatusBar} from 'expo-status-bar'
-import {StyleSheet, Text, View} from 'react-native'
+import {StyleSheet, Dimensions, Text, View} from 'react-native'
 
 // TODO: only call this when  ios/android; move to different file
-import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps'
+import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
+
+let {height, width} = Dimensions.get('window')
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  map: {
+    // ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'pink',
+    height: height,
+    width: width,
+  },
+})
 
 export default function App() {
   let location = {
@@ -14,36 +35,13 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <Text>---------</Text>
-      <Text>MapView:</Text>
-
-      <Text>{JSON.stringify(StyleSheet.absoluteFill, null, 2)}</Text>
-
       <MapView
-        styles={styles.map}
-        provider={PROVIDER_GOOGLE}
-        mapType="hybrid"
+        style={styles.map}
+        provider={PROVIDER_DEFAULT}
+        mapType="standard"
         region={location}>
         <Marker coordinate={{latitude: 23.25, longitude: 77.41}} />
       </MapView>
-
-      {/* <StatusBar style="auto" /> */}
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-    border: '1px solid red',
-    height: 400,
-    width: 400,
-  },
-})
