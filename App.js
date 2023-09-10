@@ -339,45 +339,8 @@ const sanFrancisco = {
   latitude: 37.7749,
   longitude: -122.4194,
 }
-// let points = [
-//   {latitude: 25.770654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.771654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.772654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.773654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.774654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.775654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.776654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.777654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.778654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.779654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.780654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.781654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.782654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.783654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.784654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.785654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.786654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.787654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.788654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.789654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.790654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.791654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.792654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.793654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.794654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.795654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.796654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.797654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.798654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.799654, longitude: -80.1400455, weight: 1},
-//   {latitude: 25.800654, longitude: -80.1400455, weight: 1},
-// ]
-
-let text = 'Waiting...'
 
 export default function App() {
-  const [location, setRegion] = useState(null)
-  const [errorMsg, setErrorMsg] = useState(null)
   const [points, setPoints] = useState([])
   const mapRef = useRef()
 
@@ -408,7 +371,6 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Your location is: {text}</Text>
       <Button
         style={styles.button}
         title="San Francisco"
@@ -462,14 +424,6 @@ export default function App() {
           }}
           points={points}
         />
-        {/* <Heatmap
-          points={points}
-          opacity={1}
-          radius={20000}
-          maxIntensity={100}
-          gradientSmoothing={100}
-          heatmapMode="POINTS_DENSITY"
-        /> */}
       </MapView>
     </View>
   )
