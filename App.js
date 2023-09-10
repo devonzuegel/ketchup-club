@@ -37,33 +37,35 @@ const styles = StyleSheet.create({
   },
 })
 
+const miamiBeach = {
+  latitude: 25.790654,
+  longitude: -80.1300455,
+}
+const sanFrancisco = {
+  latitude: 37.7749,
+  longitude: -122.4194,
+}
+
+let text = 'Waiting...'
+
 export default function App() {
   const [location, setRegion] = useState(null)
   const [errorMsg, setErrorMsg] = useState(null)
   const mapRef = useRef()
 
-  const miamiBeach = {
-    latitude: 25.790654,
-    longitude: -80.1300455,
-  }
-
-  const sanFrancisco = {
-    latitude: 37.7749,
-    longitude: -122.4194,
-  }
-
   // Function to generate a random location within a specified radius (in meters)
   getCurrentLocation = async () => {
     try {
       const {status} = await Location.requestForegroundPermissionsAsync()
-      if (status !== 'granted') throw new Error('Location permission denied')
-      else console.log('Location permission granted')
+      if (status !== 'granted') {
+        throw new Error('🔴 Location permission denied')
+      } else {
+        console.log('🟢 Location permission granted')
+      }
 
       const result = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Low,
+        accuracy: Location.Accuracy.Low, // lower accuracy = faster response time
       })
-
-      console.log('result: ' + JSON.stringify(result, null, 2))
 
       return {
         latitude: result.coords.latitude,
@@ -74,13 +76,6 @@ export default function App() {
       // Handle the error or return a default value
       return null
     }
-  }
-
-  let text = 'Waiting...'
-  if (errorMsg) {
-    text = errorMsg
-  } else if (location) {
-    text = JSON.stringify(location)
   }
 
   return (
@@ -109,13 +104,16 @@ export default function App() {
       <Button
         style={styles.button}
         title="Current location"
-        onPress={
-          () => console.log(getCurrentLocation())
-          // mapRef.current.animateCamera({
-          //   center: miamiBeach,
-          //   altitude: 10000000,
-          // })
-        }
+        onPress={async () => {
+          try {
+            mapRef.current.animateCamera({
+              center: await getCurrentLocation(),
+              altitude: 10000000,
+            })
+          } catch (error) {
+            console.log('Error:', error.message)
+          }
+        }}
       />
       <MapView
         ref={mapRef}
