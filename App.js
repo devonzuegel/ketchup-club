@@ -12,25 +12,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
+    alignItems: 'left',
     justifyContent: 'center',
-  },
-  text: {
-    marginTop: 12,
-    marginBottom: 12,
-    marginLeft: 24,
-    marginRight: 24,
   },
   map: {
     // ...StyleSheet.absoluteFillObject,
-    height: (1.5 * height) / 2,
+    height: (1.35 * height) / 2,
     width: width,
     marginTop: 12,
-  },
-  button: {
-    padding: 10,
-    elevation: 2,
-    alignItems: 'center',
   },
 })
 
@@ -340,6 +329,26 @@ const sanFrancisco = {
   longitude: -122.4194,
 }
 
+export function LocationButton({title, getLocation, setPoints, mapRef}) {
+  return (
+    <Button
+      title={title}
+      onPress={async () => {
+        try {
+          const result = await getLocation()
+          setPoints((prevPoints) => [...prevPoints, result])
+          mapRef.current.animateCamera({
+            center: result,
+            altitude: 10000000,
+          })
+        } catch (error) {
+          console.log('Error:', error.message)
+        }
+      }}
+    />
+  )
+}
+
 export default function App() {
   const [points, setPoints] = useState([])
   const mapRef = useRef()
@@ -371,41 +380,23 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Button
-        style={styles.button}
-        title="San Francisco"
-        onPress={() =>
-          mapRef.current.animateCamera({
-            center: sanFrancisco,
-            altitude: 10000000,
-          })
-        }
+      <LocationButton
+        title="🌉 San Francisco"
+        setPoints={setPoints}
+        mapRef={mapRef}
+        getLocation={async () => sanFrancisco}
       />
-      <Button
-        style={styles.button}
-        title="Miami Beach"
-        onPress={() =>
-          mapRef.current.animateCamera({
-            center: miamiBeach,
-            altitude: 10000000,
-          })
-        }
+      <LocationButton
+        title="🌺 Miami Beach"
+        setPoints={setPoints}
+        mapRef={mapRef}
+        getLocation={async () => miamiBeach}
       />
-      <Button
-        style={styles.button}
-        title="Current location"
-        onPress={async () => {
-          try {
-            const result = await getCurrentLocation()
-            setPoints((prevPoints) => [...prevPoints, result])
-            mapRef.current.animateCamera({
-              center: result,
-              altitude: 10000000,
-            })
-          } catch (error) {
-            console.log('Error:', error.message)
-          }
-        }}
+      <LocationButton
+        title="📍 Current location"
+        setPoints={setPoints}
+        mapRef={mapRef}
+        getLocation={getCurrentLocation}
       />
       <MapView
         ref={mapRef}
