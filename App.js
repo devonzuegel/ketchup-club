@@ -5,7 +5,7 @@ import React, {useState, useEffect, useRef} from 'react'
 import * as Location from 'expo-location'
 
 // TODO: only call this when  ios/android; move to different file
-import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
+import MapView, {Heatmap, Marker, PROVIDER_GOOGLE} from 'react-native-maps'
 
 let {height, width} = Dimensions.get('window')
 
@@ -53,44 +53,96 @@ export default function App() {
     longitude: -122.4194,
   }
 
-  // Function to generate a random number within a specified range
-  function getRandomNumberInRange(min, max) {
-    return Math.random() * (max - min) + min
-  }
+  const points = [
+    {latitude: 6.83646681, longitude: 79.77121907, weight: 1},
+    {latitude: 6.82776681, longitude: 79.871319, weight: 1},
+    {latitude: 6.82176681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83176681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83976681, longitude: 79.861319, weight: 1},
+    {latitude: 6.83076681, longitude: 79.861319, weight: 1},
+    {latitude: 6.82776681, longitude: 79.861319, weight: 1},
+    {latitude: 6.82076681, longitude: 79.871319, weight: 1},
+    {latitude: 6.82076681, longitude: 79.861319, weight: 1},
+    {latitude: 6.81076681, longitude: 79.861319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.869319, weight: 1},
+    {latitude: 6.83276681, longitude: 79.869319, weight: 1},
+    {latitude: 6.81976681, longitude: 79.869319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.867319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.865319, weight: 1},
+    {latitude: 6.83646681, longitude: 79.77121907, weight: 1},
+    {latitude: 6.82776681, longitude: 79.871319, weight: 1},
+    {latitude: 6.82176681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83176681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83976681, longitude: 79.861319, weight: 1},
+    {latitude: 6.83076681, longitude: 79.861319, weight: 1},
+    {latitude: 6.82776681, longitude: 79.861319, weight: 1},
+    {latitude: 6.82076681, longitude: 79.871319, weight: 1},
+    {latitude: 6.82076681, longitude: 79.861319, weight: 1},
+    {latitude: 6.81076681, longitude: 79.861319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.869319, weight: 1},
+    {latitude: 6.83276681, longitude: 79.869319, weight: 1},
+    {latitude: 6.81976681, longitude: 79.869319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.867319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.865319, weight: 1},
+    {latitude: 6.84076681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83646681, longitude: 79.77121907, weight: 1},
+    {latitude: 6.82776681, longitude: 79.871319, weight: 1},
+    {latitude: 6.82176681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83176681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83976681, longitude: 79.861319, weight: 1},
+    {latitude: 6.83076681, longitude: 79.861319, weight: 1},
+    {latitude: 6.82776681, longitude: 79.861319, weight: 1},
+    {latitude: 6.82076681, longitude: 79.871319, weight: 1},
+    {latitude: 6.82076681, longitude: 79.861319, weight: 1},
+    {latitude: 6.81076681, longitude: 79.861319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.869319, weight: 1},
+    {latitude: 6.83276681, longitude: 79.869319, weight: 1},
+    {latitude: 6.81976681, longitude: 79.869319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.867319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.865319, weight: 1},
+    {latitude: 6.84076681, longitude: 79.871319, weight: 1},
+    {latitude: 6.841776681, longitude: 79.869319, weight: 1},
+    {latitude: 6.83646681, longitude: 79.77121907, weight: 1},
+    {latitude: 6.82776681, longitude: 79.871319, weight: 1},
+    {latitude: 6.82176681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83176681, longitude: 79.871319, weight: 1},
+    {latitude: 6.83976681, longitude: 79.861319, weight: 1},
+    {latitude: 6.83076681, longitude: 79.861319, weight: 1},
+    {latitude: 6.82776681, longitude: 79.861319, weight: 1},
+    {latitude: 6.82076681, longitude: 79.871319, weight: 1},
+    {latitude: 6.82076681, longitude: 79.861319, weight: 1},
+    {latitude: 6.81076681, longitude: 79.861319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.869319, weight: 1},
+    {latitude: 6.83276681, longitude: 79.869319, weight: 1},
+    {latitude: 6.81976681, longitude: 79.869319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.867319, weight: 1},
+    {latitude: 6.83776681, longitude: 79.865319, weight: 1},
+    {latitude: 6.84076681, longitude: 79.871319, weight: 1},
+    {latitude: 6.841776681, longitude: 79.869319, weight: 1},
+    {latitude: 6.84076681, longitude: 79.871319, weight: 1},
+  ]
+
   // Function to generate a random location within a specified radius (in meters)
-  getLocation = async (radius = 100000000000000) => {
+  getCurrentLocation = async (radius = 100000000000000) => {
     console.log('getting a location with radius ' + radius)
     try {
-      const {status} = await Location.set()
+      const {status} = await Location.requestForegroundPermissionsAsync()
+      if (status !== 'granted') throw new Error('Location permission denied')
+      else console.log('Location permission granted')
 
-      if (status !== 'granted') {
-        throw new Error('Location permission denied')
-      } else {
-        console.log('Location permission granted')
-      }
+      const result = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Low,
+      })
 
-      const currentPosition = await Location.getCurrentPositionAsync()
-      console.log('currentPosition', currentPosition)
-      const {latitude, longitude} = currentPosition.coords
-      console.log('latitude', latitude)
-      console.log('longitude', longitude)
-
-      // Convert radius from meters to degrees
-      const radiusInDegrees = radius / 111300
-
-      // Generate a random angle (in radians)
-      const randomAngle = Math.random() * 2 * Math.PI
-
-      // Generate a random distance within the specified radius
-      const randomDistance = getRandomNumberInRange(0, radiusInDegrees)
-
-      // Calculate the new latitude and longitude coordinates
-      const newLatitude = latitude + randomDistance * Math.cos(randomAngle)
-      const newLongitude = longitude + randomDistance * Math.sin(randomAngle)
+      console.log('result: ' + JSON.stringify(result, null, 2))
 
       return {
-        latitude: newLatitude,
-        longitude: newLongitude,
+        latitude: result.coords.latitude,
+        longitude: result.coords.longitude,
       }
     } catch (error) {
       console.log('Error:', error.message)
@@ -132,17 +184,36 @@ export default function App() {
           })
         }
       />
+      <Button
+        style={styles.button}
+        title="Current location"
+        onPress={
+          () => console.log(getCurrentLocation())
+          // mapRef.current.animateCamera({
+          //   center: miamiBeach,
+          //   altitude: 10000000,
+          // })
+        }
+      />
       <MapView
         ref={mapRef}
         style={styles.map}
-        provider={PROVIDER_DEFAULT}
+        provider={PROVIDER_GOOGLE}
         mapType="standard"
         // onRegionChange={(region) => console.log('region changed to: ' + region)}
         region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
-        {/* <Marker
+        <Marker
           coordinate={miamiBeach}
           title="Miami Beach"
           description="Florida, USA"
+        />
+        {/* <Heatmap
+          points={points}
+          opacity={1}
+          radius={20000}
+          maxIntensity={100}
+          gradientSmoothing={10}
+          heatmapMode="POINTS_DENSITY"
         /> */}
       </MapView>
     </View>
