@@ -1,11 +1,10 @@
-import {StatusBar} from 'expo-status-bar'
 import {StyleSheet, Dimensions, Text, View, Button} from 'react-native'
 
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useRef} from 'react'
 import * as Location from 'expo-location'
 
 // TODO: only call this when  ios/android; move to different file
-import MapView, {Heatmap, Marker, PROVIDER_GOOGLE} from 'react-native-maps'
+import MapView, {Heatmap, PROVIDER_GOOGLE} from 'react-native-maps'
 
 let {height, width} = Dimensions.get('window')
 
@@ -54,8 +53,7 @@ export default function App() {
   }
 
   // Function to generate a random location within a specified radius (in meters)
-  getCurrentLocation = async (radius = 100000000000000) => {
-    console.log('getting a location with radius ' + radius)
+  getCurrentLocation = async () => {
     try {
       const {status} = await Location.requestForegroundPermissionsAsync()
       if (status !== 'granted') throw new Error('Location permission denied')
@@ -78,8 +76,6 @@ export default function App() {
     }
   }
 
-  // useEffect(getLocation, [])
-
   let text = 'Waiting...'
   if (errorMsg) {
     text = errorMsg
@@ -89,7 +85,6 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Hello World</Text>
       <Text style={styles.text}>Your location is: {text}</Text>
       <Button
         style={styles.button}
@@ -127,13 +122,7 @@ export default function App() {
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         mapType="standard"
-        // onRegionChange={(region) => console.log('region changed to: ' + region)}
         region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
-        {/* <Marker
-          coordinate={miamiBeach}
-          title="Miami Beach"
-          description="Florida, USA"
-        /> */}
         <Heatmap
           opacity={0.95}
           radius={100}
