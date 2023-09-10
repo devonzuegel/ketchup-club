@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   map: {
     // ...StyleSheet.absoluteFillObject,
     backgroundColor: 'pink',
-    height: height / 2,
+    height: (1.5 * height) / 2,
     width: width,
     marginTop: 12,
   },
@@ -52,79 +52,6 @@ export default function App() {
     latitude: 37.7749,
     longitude: -122.4194,
   }
-
-  const points = [
-    {latitude: 6.83646681, longitude: 79.77121907, weight: 1},
-    {latitude: 6.82776681, longitude: 79.871319, weight: 1},
-    {latitude: 6.82176681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83176681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83976681, longitude: 79.861319, weight: 1},
-    {latitude: 6.83076681, longitude: 79.861319, weight: 1},
-    {latitude: 6.82776681, longitude: 79.861319, weight: 1},
-    {latitude: 6.82076681, longitude: 79.871319, weight: 1},
-    {latitude: 6.82076681, longitude: 79.861319, weight: 1},
-    {latitude: 6.81076681, longitude: 79.861319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.869319, weight: 1},
-    {latitude: 6.83276681, longitude: 79.869319, weight: 1},
-    {latitude: 6.81976681, longitude: 79.869319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.867319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.865319, weight: 1},
-    {latitude: 6.83646681, longitude: 79.77121907, weight: 1},
-    {latitude: 6.82776681, longitude: 79.871319, weight: 1},
-    {latitude: 6.82176681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83176681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83976681, longitude: 79.861319, weight: 1},
-    {latitude: 6.83076681, longitude: 79.861319, weight: 1},
-    {latitude: 6.82776681, longitude: 79.861319, weight: 1},
-    {latitude: 6.82076681, longitude: 79.871319, weight: 1},
-    {latitude: 6.82076681, longitude: 79.861319, weight: 1},
-    {latitude: 6.81076681, longitude: 79.861319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.869319, weight: 1},
-    {latitude: 6.83276681, longitude: 79.869319, weight: 1},
-    {latitude: 6.81976681, longitude: 79.869319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.867319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.865319, weight: 1},
-    {latitude: 6.84076681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83646681, longitude: 79.77121907, weight: 1},
-    {latitude: 6.82776681, longitude: 79.871319, weight: 1},
-    {latitude: 6.82176681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83176681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83976681, longitude: 79.861319, weight: 1},
-    {latitude: 6.83076681, longitude: 79.861319, weight: 1},
-    {latitude: 6.82776681, longitude: 79.861319, weight: 1},
-    {latitude: 6.82076681, longitude: 79.871319, weight: 1},
-    {latitude: 6.82076681, longitude: 79.861319, weight: 1},
-    {latitude: 6.81076681, longitude: 79.861319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.869319, weight: 1},
-    {latitude: 6.83276681, longitude: 79.869319, weight: 1},
-    {latitude: 6.81976681, longitude: 79.869319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.867319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.865319, weight: 1},
-    {latitude: 6.84076681, longitude: 79.871319, weight: 1},
-    {latitude: 6.841776681, longitude: 79.869319, weight: 1},
-    {latitude: 6.83646681, longitude: 79.77121907, weight: 1},
-    {latitude: 6.82776681, longitude: 79.871319, weight: 1},
-    {latitude: 6.82176681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83176681, longitude: 79.871319, weight: 1},
-    {latitude: 6.83976681, longitude: 79.861319, weight: 1},
-    {latitude: 6.83076681, longitude: 79.861319, weight: 1},
-    {latitude: 6.82776681, longitude: 79.861319, weight: 1},
-    {latitude: 6.82076681, longitude: 79.871319, weight: 1},
-    {latitude: 6.82076681, longitude: 79.861319, weight: 1},
-    {latitude: 6.81076681, longitude: 79.861319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.869319, weight: 1},
-    {latitude: 6.83276681, longitude: 79.869319, weight: 1},
-    {latitude: 6.81976681, longitude: 79.869319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.867319, weight: 1},
-    {latitude: 6.83776681, longitude: 79.865319, weight: 1},
-    {latitude: 6.84076681, longitude: 79.871319, weight: 1},
-    {latitude: 6.841776681, longitude: 79.869319, weight: 1},
-    {latitude: 6.84076681, longitude: 79.871319, weight: 1},
-  ]
 
   // Function to generate a random location within a specified radius (in meters)
   getCurrentLocation = async (radius = 100000000000000) => {
@@ -202,10 +129,27 @@ export default function App() {
         mapType="standard"
         // onRegionChange={(region) => console.log('region changed to: ' + region)}
         region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
-        <Marker
+        {/* <Marker
           coordinate={miamiBeach}
           title="Miami Beach"
           description="Florida, USA"
+        /> */}
+        <Heatmap
+          opacity={0.95}
+          radius={100}
+          gradient={{
+            colors: ['white'],
+            startPoints: [0.1],
+            colorMapSize: 1000,
+          }}
+          points={[
+            {latitude: 25.770654, longitude: -80.1400455, weight: 1},
+            {latitude: 25.775654, longitude: -80.1400455, weight: 1},
+            {latitude: 25.780654, longitude: -80.1400455, weight: 1},
+            {latitude: 25.785654, longitude: -80.1400455, weight: 1},
+            {latitude: 25.790654, longitude: -80.1400455, weight: 1},
+            {latitude: 25.795654, longitude: -80.1400455, weight: 1},
+          ]}
         />
         {/* <Heatmap
           points={points}
