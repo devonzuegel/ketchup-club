@@ -12,12 +12,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'left',
-    justifyContent: 'center',
   },
   map: {
     // ...StyleSheet.absoluteFillObject,
-    height: (1.35 * height) / 2,
+    height: (1.6 * height) / 2,
     width: width,
     marginTop: 12,
   },
@@ -339,7 +337,7 @@ export function LocationButton({title, getLocation, setPoints, mapRef}) {
           setPoints((prevPoints) => [...prevPoints, result])
           mapRef.current.animateCamera({
             center: result,
-            altitude: 10000000,
+            zoom: 14,
           })
         } catch (error) {
           console.log('Error:', error.message)
@@ -368,18 +366,26 @@ export default function App() {
       })
 
       return {
-        latitude: result.coords.latitude,
-        longitude: result.coords.longitude,
+        latitude: result.coords.latitude + Math.random() / 100,
+        longitude: result.coords.longitude + Math.random() / 100,
       }
     } catch (error) {
       console.log('Error:', error.message)
-      // Handle the error or return a default value
-      return null
+      return null // TODO: handle the error or return a default value
     }
   }
 
   return (
     <View style={styles.container}>
+      <MapView
+        ref={mapRef}
+        style={styles.map}
+        provider={PROVIDER_GOOGLE}
+        mapType="standard"
+        customMapStyle={customMapStyle}
+        region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
+        <Heatmap opacity={0.6} radius={50} points={points} />
+      </MapView>
       <LocationButton
         title="🌉 San Francisco"
         setPoints={setPoints}
@@ -398,24 +404,6 @@ export default function App() {
         mapRef={mapRef}
         getLocation={getCurrentLocation}
       />
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        mapType="standard"
-        customMapStyle={customMapStyle}
-        region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
-        <Heatmap
-          opacity={0.5}
-          radius={100}
-          gradient={{
-            colors: ['grey'],
-            startPoints: [0.1],
-            colorMapSize: 500,
-          }}
-          points={points}
-        />
-      </MapView>
     </View>
   )
 }
