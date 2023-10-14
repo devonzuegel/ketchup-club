@@ -1,10 +1,25 @@
 import {StyleSheet, Dimensions, Text, View, Button} from 'react-native'
+import * as SQLite from 'expo-sqlite'
 
 import React, {useState, useRef} from 'react'
 import * as Location from 'expo-location'
 
 // TODO: only call this when  ios/android; move to different file
 import MapView, {Heatmap, PROVIDER_GOOGLE} from 'react-native-maps'
+
+// open or create a database
+const db = SQLite.openDatabase('smallworld.db')
+
+db.transaction((tx) => {
+  tx.executeSql(
+    'CREATE TABLE IF NOT EXISTS locations (id INTEGER PRIMARY KEY AUTOINCREMENT, latitude REAL, longitude REAL, timestamp INTEGER)'
+  )
+  tx.executeSql(
+    'SELECT name FROM sqlite_master WHERE type="table"',
+    [],
+    (_, {rows}) => console.log('tables:', rows._array)
+  )
+})
 
 let {height, width} = Dimensions.get('window')
 
@@ -15,7 +30,7 @@ const styles = StyleSheet.create({
   },
   map: {
     // ...StyleSheet.absoluteFillObject,
-    height: (1.6 * height) / 2,
+    height: (1.3 * height) / 2,
     width: width,
     marginTop: 12,
   },
@@ -327,13 +342,14 @@ const sanFrancisco = {
   longitude: -122.4194,
 }
 
-export function LocationButton({title, getLocation, setPoints, mapRef}) {
+function LocationButton({title, getLocation, setPoints, mapRef}) {
   return (
     <Button
       title={title}
       onPress={async () => {
         try {
           const result = await getLocation()
+          storeLocation(result)
           setPoints((prevPoints) => [...prevPoints, result])
           mapRef.current.animateCamera({
             center: result,
@@ -345,6 +361,18 @@ export function LocationButton({title, getLocation, setPoints, mapRef}) {
       }}
     />
   )
+}
+
+function storeLocation(result) {
+  db.transaction((tx) => {
+    tx.executeSql(
+      'INSERT INTO locations (latitude, longitude, timestamp) VALUES (?, ?, ?)',
+      [result.latitude, result.longitude, Date.now()]
+    )
+    tx.executeSql('SELECT * FROM locations', [], (_, {rows}) => {
+      console.log('locations count:', rows._array.length)
+    })
+  })
 }
 
 export default function App() {
@@ -364,6 +392,8 @@ export default function App() {
       const result = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Low, // lower accuracy = faster response time
       })
+
+      console.log('getCurrentLocation:', result)
 
       return {
         latitude: result.coords.latitude + Math.random() / 100,
@@ -403,6 +433,31 @@ export default function App() {
         setPoints={setPoints}
         mapRef={mapRef}
         getLocation={getCurrentLocation}
+      />
+      <Button
+        title="Clear locations from map"
+        onPress={async () => {
+          setPoints(() => [])
+        }}
+      />
+      <Button
+        title="Load locations from db into map"
+        onPress={async () => {
+          db.transaction((tx) => {
+            tx.executeSql('SELECT * FROM locations', [], (_, {rows}) => {
+              setPoints(() => rows._array)
+            })
+          })
+        }}
+      />
+      <Button
+        title="Delete locations from db & clear map"
+        onPress={async () => {
+          db.transaction((tx) => {
+            tx.executeSql('DELETE FROM locations')
+          })
+          setPoints(() => [])
+        }}
       />
     </View>
   )
