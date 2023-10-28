@@ -14,11 +14,7 @@ db.transaction((tx) => {
   tx.executeSql(
     'CREATE TABLE IF NOT EXISTS locations (id INTEGER PRIMARY KEY AUTOINCREMENT, latitude REAL, longitude REAL, timestamp INTEGER)'
   )
-  tx.executeSql(
-    'SELECT name FROM sqlite_master WHERE type="table"',
-    [],
-    (_, {rows}) => console.log('tables:', rows._array)
-  )
+  tx.executeSql('SELECT name FROM sqlite_master WHERE type="table"', [], (_, {rows}) => console.log('tables:', rows._array))
 })
 
 let {height, width} = Dimensions.get('window')
@@ -33,6 +29,8 @@ const styles = StyleSheet.create({
     height: (1.3 * height) / 2,
     width: width,
     marginTop: 12,
+    opacity: 0.5,
+    border: '10px solid black',
   },
 })
 
@@ -365,10 +363,11 @@ function LocationButton({title, getLocation, setPoints, mapRef}) {
 
 function storeLocation(result) {
   db.transaction((tx) => {
-    tx.executeSql(
-      'INSERT INTO locations (latitude, longitude, timestamp) VALUES (?, ?, ?)',
-      [result.latitude, result.longitude, Date.now()]
-    )
+    tx.executeSql('INSERT INTO locations (latitude, longitude, timestamp) VALUES (?, ?, ?)', [
+      result.latitude,
+      result.longitude,
+      Date.now(),
+    ])
     tx.executeSql('SELECT * FROM locations', [], (_, {rows}) => {
       console.log('locations count:', rows._array.length)
     })
@@ -407,33 +406,20 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        mapType="standard"
-        customMapStyle={customMapStyle}
-        region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
-        <Heatmap opacity={0.6} radius={50} points={points} />
-      </MapView>
-      <LocationButton
-        title="🌉 San Francisco"
-        setPoints={setPoints}
-        mapRef={mapRef}
-        getLocation={async () => sanFrancisco}
-      />
-      <LocationButton
-        title="🌺 Miami Beach"
-        setPoints={setPoints}
-        mapRef={mapRef}
-        getLocation={async () => miamiBeach}
-      />
-      <LocationButton
-        title="📍 Current location"
-        setPoints={setPoints}
-        mapRef={mapRef}
-        getLocation={getCurrentLocation}
-      />
+      <View style={{border: '3px solid red', backgroundColor: 'blue', marginTop: 30}}>
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          provider={PROVIDER_GOOGLE}
+          mapType="standard"
+          customMapStyle={customMapStyle}
+          region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
+          <Heatmap opacity={0.6} radius={50} points={points} />
+        </MapView>
+      </View>
+      <LocationButton title="🌉 San Francisco" setPoints={setPoints} mapRef={mapRef} getLocation={async () => sanFrancisco} />
+      <LocationButton title="🌺 Miami Beach" setPoints={setPoints} mapRef={mapRef} getLocation={async () => miamiBeach} />
+      <LocationButton title="📍 Current location" setPoints={setPoints} mapRef={mapRef} getLocation={getCurrentLocation} />
       <Button
         title="Clear locations from map"
         onPress={async () => {
