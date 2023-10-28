@@ -5,7 +5,7 @@ import React, {useState, useRef} from 'react'
 import * as Location from 'expo-location'
 
 // TODO: only call this when  ios/android; move to different file
-import MapView, {Heatmap, PROVIDER_GOOGLE} from 'react-native-maps'
+import MapView, {/*Heatmap,*/ PROVIDER_DEFAULT} from 'react-native-maps'
 
 // open or create a database
 const db = SQLite.openDatabase('smallworld.db')
@@ -17,7 +17,7 @@ db.transaction((tx) => {
   tx.executeSql('SELECT name FROM sqlite_master WHERE type="table"', [], (_, {rows}) => console.log('tables:', rows._array))
 })
 
-let {height, width} = Dimensions.get('window')
+// let {height, width} = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   container: {
@@ -26,11 +26,10 @@ const styles = StyleSheet.create({
   },
   map: {
     // ...StyleSheet.absoluteFillObject,
-    height: height / 2,
-    width: width,
+    height: 90,
+    width: 300,
     marginTop: 12,
     marginBottom: 12,
-    opacity: 0.5,
     border: '10px solid black',
   },
 })
@@ -412,11 +411,11 @@ export default function App() {
         <MapView
           ref={mapRef}
           style={styles.map}
-          provider={PROVIDER_GOOGLE}
+          provider={PROVIDER_DEFAULT}
           mapType="standard"
           customMapStyle={customMapStyle}
           region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
-          <Heatmap opacity={0.6} radius={50} points={points} />
+          {/* <Heatmap opacity={0.6} radius={50} points={points} /> */}
         </MapView>
         <Text>This is right BELOW the map</Text>
       </View>
