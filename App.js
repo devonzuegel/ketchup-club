@@ -5,7 +5,7 @@ import React, {useState, useRef} from 'react'
 import * as Location from 'expo-location'
 
 // TODO: only call this when  ios/android; move to different file
-import MapView, {/*Heatmap,*/ PROVIDER_DEFAULT} from 'react-native-maps'
+import MapView, {/*Heatmap,*/ PROVIDER_GOOGLE} from 'react-native-maps'
 
 // open or create a database
 const db = SQLite.openDatabase('smallworld.db')
@@ -411,7 +411,7 @@ export default function App() {
         <MapView
           ref={mapRef}
           style={styles.map}
-          provider={PROVIDER_DEFAULT}
+          provider={PROVIDER_GOOGLE}
           mapType="standard"
           customMapStyle={customMapStyle}
           region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
