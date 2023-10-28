@@ -26,9 +26,10 @@ const styles = StyleSheet.create({
   },
   map: {
     // ...StyleSheet.absoluteFillObject,
-    height: (1.3 * height) / 2,
+    height: height / 2,
     width: width,
     marginTop: 12,
+    marginBottom: 12,
     opacity: 0.5,
     border: '10px solid black',
   },
@@ -406,7 +407,8 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <View style={{border: '3px solid red', backgroundColor: 'blue', marginTop: 30}}>
+      <View style={{border: '3px solid red', backgroundColor: 'blue', marginTop: 30, paddingTop: 12, paddingBottom: 12}}>
+        <Text>This is right ABOVE the map</Text>
         <MapView
           ref={mapRef}
           style={styles.map}
@@ -416,6 +418,7 @@ export default function App() {
           region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
           <Heatmap opacity={0.6} radius={50} points={points} />
         </MapView>
+        <Text>This is right BELOW the map</Text>
       </View>
       <LocationButton title="🌉 San Francisco" setPoints={setPoints} mapRef={mapRef} getLocation={async () => sanFrancisco} />
       <LocationButton title="🌺 Miami Beach" setPoints={setPoints} mapRef={mapRef} getLocation={async () => miamiBeach} />
