@@ -448,6 +448,13 @@ export default function App() {
           setPoints(() => [])
         }}
       />
+
+      <Text>Point(s):</Text>
+      {points.map((point, index) => (
+        <Text key={index}>
+          - {index + 1}: {point.latitude}, {point.longitude}
+        </Text>
+      ))}
     </View>
   )
 }
