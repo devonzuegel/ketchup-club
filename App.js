@@ -17,17 +17,17 @@ db.transaction((tx) => {
   tx.executeSql('SELECT name FROM sqlite_master WHERE type="table"', [], (_, {rows}) => console.log('tables:', rows._array))
 })
 
-// let {height, width} = Dimensions.get('window')
+let {height: windowHeight, width: windowWidth} = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'black',
   },
   map: {
-    // ...StyleSheet.absoluteFillObject,
-    height: 90,
-    width: 300,
+    height: windowHeight / 3,
+
+    width: windowWidth,
     marginTop: 12,
     marginBottom: 12,
     border: '10px solid black',
