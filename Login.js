@@ -17,6 +17,7 @@ export const LoginScreen = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [token, setToken] = useState('')
 
   const handleLogin = async () => {
     if (username === '' && password === '') return setError("Oops, username and password can't be blank!")
@@ -36,13 +37,27 @@ export const LoginScreen = () => {
 
       if (response.data.success) {
         const token = response.data.token
-        await AsyncStorage.setItem('token', token) // save JWT authentication token locally
+        setToken(token)
+        // await AsyncStorage.setItem('token', token) // save JWT authentication token locally
       } else {
-        // TODO: Handle login failure
+        throw new Error(response.data)
       }
     } catch (error) {
-      // TODO: Handle error
-      console.log('error: ', error)
+      console.error(error)
+      setError('Oops, something went wrong. Please try again.')
+    }
+  }
+
+  const authenticatedRequest = (theToken) => async () => {
+    try {
+      console.log('=======================================\nbeginning authenticated request...')
+      console.log('token: ', theToken)
+      const response = await axios.get('https://f5f6-132-147-43-111.ngrok-free.app/api/v2/protected', {
+        headers: {Authorization: `Bearer ${theToken}`},
+      })
+      console.log(response.data)
+    } catch (error) {
+      console.error(error)
     }
   }
 
@@ -52,8 +67,8 @@ export const LoginScreen = () => {
       <TextInput style={style.textInput} placeholder="Username" value={username} onChangeText={setUsername} />
       <TextInput style={style.textInput} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
       <Button title="Login" onPress={handleLogin} />
-      <Text style={{color: 'white'}}>username: "{username}"</Text>
-      <Text style={{color: 'white'}}>password: "{password}"</Text>
+      <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(token)} />
+      <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} />
     </View>
   )
 }
