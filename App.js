@@ -7,6 +7,7 @@ import * as Location from 'expo-location'
 
 // TODO: only call this when  ios/android; move to different file
 import MapView, {/*Heatmap,*/ PROVIDER_DEFAULT} from 'react-native-maps'
+import LoginScreen from './Login'
 
 // open or create a database
 const db = SQLite.openDatabase('smallworld.db')
@@ -24,6 +25,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'black',
+    color: 'white',
   },
   map: {
     height: windowHeight / 3,
@@ -355,9 +357,14 @@ function LocationButton({title, getLocation, setPoints, mapRef}) {
             zoom: 14,
           })
 
+          // post with params
           axios
-            // .get('https://smallworld.kiwi/api/v1/login')
-            .get('https://ba97-132-147-43-111.ngrok-free.app/api/v1/wip')
+            .post('https://ba97-132-147-43-111.ngrok-free.app/api/v2/login', null, {
+              params: {
+                username: 'TODO: username',
+                password: 'TODO: password',
+              },
+            })
             .then((response) => {
               console.log('response:')
               console.log(JSON.stringify(response, null, 2))
@@ -421,6 +428,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <LoginScreen />
       <View style={{border: '3px solid red', backgroundColor: 'blue', marginTop: 30, paddingTop: 12, paddingBottom: 12}}>
         <Text>This is right ABOVE the map</Text>
         <MapView
