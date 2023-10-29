@@ -1,5 +1,6 @@
 import {StyleSheet, Dimensions, Text, View, Button} from 'react-native'
 import * as SQLite from 'expo-sqlite'
+import axios from 'axios'
 
 import React, {useState, useRef} from 'react'
 import * as Location from 'expo-location'
@@ -353,6 +354,20 @@ function LocationButton({title, getLocation, setPoints, mapRef}) {
             center: result,
             zoom: 14,
           })
+
+          axios
+            // .get('https://smallworld.kiwi/api/v1/login')
+            .get('https://ba97-132-147-43-111.ngrok-free.app/api/v1/wip')
+            .then((response) => {
+              console.log('response:')
+              console.log(JSON.stringify(response, null, 2))
+              console.log('response.data:')
+              console.log(response.data)
+            })
+            .catch((error) => {
+              console.log('error:')
+              console.log(error)
+            })
         } catch (error) {
           console.log('Error:', error.message)
         }
