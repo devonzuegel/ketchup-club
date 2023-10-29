@@ -7,7 +7,7 @@ import * as Location from 'expo-location'
 
 // TODO: only call this when  ios/android; move to different file
 import MapView, {/*Heatmap,*/ PROVIDER_DEFAULT} from 'react-native-maps'
-import LoginScreen from './Login'
+import {LoginScreen} from './Login'
 
 // open or create a database
 const db = SQLite.openDatabase('smallworld.db')
@@ -19,18 +19,17 @@ db.transaction((tx) => {
   tx.executeSql('SELECT name FROM sqlite_master WHERE type="table"', [], (_, {rows}) => console.log('tables:', rows._array))
 })
 
-let {height: windowHeight, width: windowWidth} = Dimensions.get('window')
+// let {height, width} = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'black',
-    color: 'white',
   },
   map: {
-    height: windowHeight / 3,
-
-    width: windowWidth,
+    // ...StyleSheet.absoluteFillObject,
+    height: 90,
+    width: 300,
     marginTop: 12,
     marginBottom: 12,
     border: '10px solid black',
@@ -357,14 +356,8 @@ function LocationButton({title, getLocation, setPoints, mapRef}) {
             zoom: 14,
           })
 
-          // post with params
           axios
-            .post('https://ba97-132-147-43-111.ngrok-free.app/api/v2/login', null, {
-              params: {
-                username: 'TODO: username',
-                password: 'TODO: password',
-              },
-            })
+            .get('https://smallworld.kiwi/api/v1/login')
             .then((response) => {
               console.log('response:')
               console.log(JSON.stringify(response, null, 2))

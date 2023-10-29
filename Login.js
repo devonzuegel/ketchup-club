@@ -12,37 +12,37 @@ const style = {
     color: 'white',
   },
 }
-const LoginScreen = () => {
+
+export const LoginScreen = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
   const handleLogin = async () => {
-    console.log('handleLogin called')
-
     if (username === '' && password === '') return setError("Oops, username and password can't be blank!")
     if (username === '') return setError("Oops, username can't be blank!")
     if (password === '') return setError("Oops, password can't be blank!")
     setError(null) // clear error
 
     try {
-      const response = await axios.post('https://ba97-132-147-43-111.ngrok-free.app/api/v2/login', null, {
+      console.log('beginning axios.get...')
+      const response = await axios.post('https://f5f6-132-147-43-111.ngrok-free.app/api/v2/login', null, {
         params: {username, password},
       })
+      console.log('\n\n              response: ', response)
+      console.log('\n\n         response.data: ', response.data)
+      console.log('\n\n response.data.success: ', response.data.success)
+      console.log('\n\n   response.data.token: ', response.data.token)
 
-      console.log('\n\n        response: ', response)
-      console.log('\n\nresponse.headers: ', response.headers)
-      console.log('\n\n   response.data: ', response.data)
       if (response.data.success) {
-        // Save session identifier locally
-        await AsyncStorage.setItem('userSession', response.headers['set-cookie'])
+        const token = response.data.token
+        await AsyncStorage.setItem('token', token) // save JWT authentication token locally
       } else {
         // TODO: Handle login failure
-        // ...
       }
     } catch (error) {
       // TODO: Handle error
-      // ...
+      console.log('error: ', error)
     }
   }
 
@@ -57,5 +57,3 @@ const LoginScreen = () => {
     </View>
   )
 }
-
-export default LoginScreen
