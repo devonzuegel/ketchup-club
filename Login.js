@@ -13,6 +13,10 @@ const style = {
   },
 }
 
+const api = axios.create({
+  baseURL: 'https://f5f6-132-147-43-111.ngrok-free.app/api/v2',
+})
+
 export const LoginScreen = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -23,17 +27,11 @@ export const LoginScreen = () => {
     if (username === '' && password === '') return setError("Oops, username and password can't be blank!")
     if (username === '') return setError("Oops, username can't be blank!")
     if (password === '') return setError("Oops, password can't be blank!")
-    setError(null) // clear error
+    setError(null) // clear errors from screen
 
     try {
-      console.log('beginning axios.get...')
-      const response = await axios.post('https://f5f6-132-147-43-111.ngrok-free.app/api/v2/login', null, {
-        params: {username, password},
-      })
-      console.log('\n\n              response: ', response)
-      console.log('\n\n         response.data: ', response.data)
-      console.log('\n\n response.data.success: ', response.data.success)
-      console.log('\n\n   response.data.token: ', response.data.token)
+      const response = await api.post('/login', {params: {username, password}})
+      console.log('\n\nresponse.data: ', JSON.stringify(response.data, null, 2))
 
       if (response.data.success) {
         const token = response.data.token
@@ -50,11 +48,9 @@ export const LoginScreen = () => {
 
   const authenticatedRequest = (theToken) => async () => {
     try {
-      console.log('=======================================\nbeginning authenticated request...')
-      console.log('token: ', theToken)
-      const response = await axios.get('https://f5f6-132-147-43-111.ngrok-free.app/api/v2/protected', {
-        headers: {Authorization: `Bearer ${theToken}`},
-      })
+      console.log('===========================================================')
+      console.log('token:', theToken)
+      const response = await api.get('/protected', {headers: {Authorization: `Bearer ${theToken}`}})
       console.log(response.data)
     } catch (error) {
       console.error(error)
