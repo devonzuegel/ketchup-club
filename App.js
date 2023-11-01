@@ -1,7 +1,7 @@
 import axios from 'axios'
 import * as SQLite from 'expo-sqlite'
 import {StyleSheet, Text as RNText, View} from 'react-native'
-import {Button} from './Button'
+import {Button, fonts} from './Utils'
 
 import * as Location from 'expo-location'
 import React, {useRef, useState} from 'react'
@@ -354,7 +354,7 @@ const sanFrancisco = {
 function LocationButton({title, getLocation, setPoints, mapRef}) {
   return (
     <Button
-      title={title + '!'}
+      title={title}
       titleStyle={{fontFamily: 'SFCompactRounded_Medium'}}
       fontFamily="SFCompactRounded"
       onPress={async () => {
@@ -430,16 +430,7 @@ export default function App() {
     }
   }
 
-  const [fontsLoaded] = useFonts({
-    SFCompactRounded_Thin: require('./assets/fonts/SF-Compact-Rounded-Thin.otf'),
-    SFCompactRounded_Light: require('./assets/fonts/SF-Compact-Rounded-Light.otf'),
-    SFCompactRounded_Regular: require('./assets/fonts/SF-Compact-Rounded-Regular.otf'),
-    SFCompactRounded_Medium: require('./assets/fonts/SF-Compact-Rounded-Medium.otf'),
-    SFCompactRounded_Semibold: require('./assets/fonts/SF-Compact-Rounded-Semibold.otf'),
-    SFCompactRounded_Bold: require('./assets/fonts/SF-Compact-Rounded-Bold.otf'),
-    SFCompactRounded_Heavy: require('./assets/fonts/SF-Compact-Rounded-Heavy.otf'),
-    SFCompactRounded_Black: require('./assets/fonts/SF-Compact-Rounded-Black.otf'),
-  })
+  const [fontsLoaded] = useFonts(fonts)
 
   if (!fontsLoaded) return null
 

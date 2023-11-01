@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
-import {Button, TextInput, AsyncStorage, View, Text} from 'react-native'
+import {TextInput, AsyncStorage, View, Text} from 'react-native'
 import axios from 'axios'
+import {Button} from './Utils'
 
 const style = {
   textInput: {
@@ -10,6 +11,7 @@ const style = {
     margin: 10,
     padding: 10,
     color: 'white',
+    fontFamily: 'SFCompactRounded_Medium',
   },
 }
 
