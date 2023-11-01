@@ -1,6 +1,7 @@
 import axios from 'axios'
 import * as SQLite from 'expo-sqlite'
-import {Button, StyleSheet, Text as RNText, View} from 'react-native'
+import {StyleSheet, Text as RNText, View} from 'react-native'
+import {Button} from './Button'
 
 import * as Location from 'expo-location'
 import React, {useRef, useState} from 'react'
@@ -21,7 +22,7 @@ db.transaction((tx) => {
 })
 
 const Text = (props) => (
-  <RNText {...props} style={{fontFamily: 'SFCompactRounded', ...props.style}}>
+  <RNText {...props} style={{fontFamily: 'SFCompactRounded', color: 'white', ...props.style}}>
     {props.children}
   </RNText>
 )
@@ -430,7 +431,7 @@ export default function App() {
   }
 
   const [fontsLoaded] = useFonts({
-    SFCompactRounded: require('./assets/fonts/SF-Compact-Rounded-Black.otf'),
+    SFCompactRounded: require('./assets/fonts/SF-Compact-Rounded-Bold.otf'),
   })
 
   if (!fontsLoaded) return null
