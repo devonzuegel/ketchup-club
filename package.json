@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^1.6.0",
     "expo": "~49.0.8",
+    "expo-font": "~11.4.0",
     "expo-location": "^16.1.0",
     "expo-sqlite": "~11.3.3",
     "expo-status-bar": "~1.6.0",

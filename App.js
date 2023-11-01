@@ -1,9 +1,10 @@
-import {StyleSheet, Dimensions, Text, View, Button} from 'react-native'
-import * as SQLite from 'expo-sqlite'
 import axios from 'axios'
+import * as SQLite from 'expo-sqlite'
+import {Button, StyleSheet, Text as RNText, View} from 'react-native'
 
-import React, {useState, useRef} from 'react'
 import * as Location from 'expo-location'
+import React, {useRef, useState} from 'react'
+import {useFonts} from 'expo-font'
 
 // TODO: only call this when  ios/android; move to different file
 import MapView, {/*Heatmap,*/ PROVIDER_DEFAULT} from 'react-native-maps'
@@ -19,11 +20,18 @@ db.transaction((tx) => {
   tx.executeSql('SELECT name FROM sqlite_master WHERE type="table"', [], (_, {rows}) => console.log('tables:', rows._array))
 })
 
+const Text = (props) => (
+  <RNText {...props} style={{fontFamily: 'SFCompactRounded', ...props.style}}>
+    {props.children}
+  </RNText>
+)
+
 // let {height, width} = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    fontFamily: 'SFCompactRounded',
     backgroundColor: 'black',
   },
   map: {
@@ -345,7 +353,9 @@ const sanFrancisco = {
 function LocationButton({title, getLocation, setPoints, mapRef}) {
   return (
     <Button
-      title={title}
+      title={title + '!'}
+      titleStyle={{fontFamily: 'SFCompactRounded'}}
+      fontFamily="SFCompactRounded"
       onPress={async () => {
         try {
           const result = await getLocation()
@@ -419,10 +429,22 @@ export default function App() {
     }
   }
 
+  const [fontsLoaded] = useFonts({
+    SFCompactRounded: require('./assets/fonts/SF-Compact-Rounded-Black.otf'),
+  })
+
+  if (!fontsLoaded) return null
+
   return (
     <View style={styles.container}>
       <LoginScreen />
-      <View style={{border: '3px solid red', backgroundColor: 'blue', marginTop: 30, paddingTop: 12, paddingBottom: 12}}>
+      <View
+        style={{
+          backgroundColor: 'blue',
+          marginTop: 30,
+          paddingTop: 12,
+          paddingBottom: 12,
+        }}>
         <Text>This is right ABOVE the map</Text>
         <MapView
           ref={mapRef}
