@@ -23,6 +23,7 @@ export const LoginScreen = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
   const [token, setToken] = useState('')
 
   const handleLogin = async () => {
@@ -33,6 +34,7 @@ export const LoginScreen = () => {
 
     try {
       const response = await api.post('/login', {params: {username, password}})
+      setMessage(response.data.message)
       console.log('\n\nresponse.data: ', JSON.stringify(response.data, null, 2))
 
       if (response.data.success) {
@@ -62,6 +64,7 @@ export const LoginScreen = () => {
   return (
     <View style={{marginTop: 50, color: 'white'}}>
       <Text style={{color: 'red'}}>{error}</Text>
+      <Text style={{color: 'green'}}>{message}</Text>
       <TextInput style={style.textInput} placeholder="Username" value={username} onChangeText={setUsername} />
       <TextInput style={style.textInput} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
       <Button title="Login" onPress={handleLogin} />
