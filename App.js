@@ -22,7 +22,7 @@ db.transaction((tx) => {
 })
 
 const Text = (props) => (
-  <RNText {...props} style={{fontFamily: 'SFCompactRounded', color: 'white', ...props.style}}>
+  <RNText {...props} style={{fontFamily: 'SFCompactRounded_Medium', color: 'white', ...props.style}}>
     {props.children}
   </RNText>
 )
@@ -32,7 +32,7 @@ const Text = (props) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    fontFamily: 'SFCompactRounded',
+    fontFamily: 'SFCompactRounded_Medium',
     backgroundColor: 'black',
   },
   map: {
@@ -355,7 +355,7 @@ function LocationButton({title, getLocation, setPoints, mapRef}) {
   return (
     <Button
       title={title + '!'}
-      titleStyle={{fontFamily: 'SFCompactRounded'}}
+      titleStyle={{fontFamily: 'SFCompactRounded_Medium'}}
       fontFamily="SFCompactRounded"
       onPress={async () => {
         try {
@@ -431,7 +431,14 @@ export default function App() {
   }
 
   const [fontsLoaded] = useFonts({
-    SFCompactRounded: require('./assets/fonts/SF-Compact-Rounded-Bold.otf'),
+    SFCompactRounded_Thin: require('./assets/fonts/SF-Compact-Rounded-Thin.otf'),
+    SFCompactRounded_Light: require('./assets/fonts/SF-Compact-Rounded-Light.otf'),
+    SFCompactRounded_Regular: require('./assets/fonts/SF-Compact-Rounded-Regular.otf'),
+    SFCompactRounded_Medium: require('./assets/fonts/SF-Compact-Rounded-Medium.otf'),
+    SFCompactRounded_Semibold: require('./assets/fonts/SF-Compact-Rounded-Semibold.otf'),
+    SFCompactRounded_Bold: require('./assets/fonts/SF-Compact-Rounded-Bold.otf'),
+    SFCompactRounded_Heavy: require('./assets/fonts/SF-Compact-Rounded-Heavy.otf'),
+    SFCompactRounded_Black: require('./assets/fonts/SF-Compact-Rounded-Black.otf'),
   })
 
   if (!fontsLoaded) return null

@@ -5,7 +5,9 @@ import {LinearGradient} from 'expo-linear-gradient'
 TouchableOpacity.defaultProps = {activeOpacity: 0.8}
 
 const styles = StyleSheet.create({
-  appButtonText: {},
+  appButtonText: {
+    fontFamily: 'SFCompactRounded_Medium',
+  },
 })
 
 export const Button = ({onPress, title}) => (
