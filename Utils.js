@@ -1,19 +1,18 @@
 import React from 'react'
 import {View, Button as RNButton, StyleSheet, TouchableOpacity, Text} from 'react-native'
-import {LinearGradient} from 'expo-linear-gradient'
 
 TouchableOpacity.defaultProps = {activeOpacity: 0.8}
 
 const styles = StyleSheet.create({
   appButtonContainer: {
     elevation: 8,
-    // backgroundColor: '#009688',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
     ...Platform.select({
       ios: {
-        // backgroundColor: '#ffffff',
+        marginTop: 4,
+        marginBottom: 4,
         borderColor: '#007aff',
         borderWidth: 1,
       },
@@ -34,8 +33,8 @@ const styles = StyleSheet.create({
   },
 })
 
-export const Button = ({onPress, title}) => (
-  <TouchableOpacity onPress={onPress} style={styles.appButtonContainer}>
+export const Button = ({onPress, title, style}) => (
+  <TouchableOpacity onPress={onPress} style={{...styles.appButtonContainer, ...style}}>
     <Text style={styles.appButtonText}>{title}</Text>
   </TouchableOpacity>
 )

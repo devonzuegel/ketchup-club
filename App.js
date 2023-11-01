@@ -1,6 +1,6 @@
 import axios from 'axios'
 import * as SQLite from 'expo-sqlite'
-import {StyleSheet, Text as RNText, View} from 'react-native'
+import {StyleSheet, Text as RNText, View, Dimensions} from 'react-native'
 import {Button, fonts} from './Utils'
 
 import * as Location from 'expo-location'
@@ -27,7 +27,7 @@ const Text = (props) => (
   </RNText>
 )
 
-// let {height, width} = Dimensions.get('window')
+let {height, width} = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   container: {
@@ -38,10 +38,20 @@ const styles = StyleSheet.create({
   map: {
     // ...StyleSheet.absoluteFillObject,
     height: 90,
-    width: 300,
+    width: width,
     marginTop: 12,
     marginBottom: 12,
     border: '10px solid black',
+    borderRadius: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    columnGap: 8,
+  },
+  one_third_button: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 })
 
@@ -355,8 +365,7 @@ function LocationButton({title, getLocation, setPoints, mapRef}) {
   return (
     <Button
       title={title}
-      titleStyle={{fontFamily: 'SFCompactRounded_Medium'}}
-      fontFamily="SFCompactRounded"
+      style={styles.one_third_button}
       onPress={async () => {
         try {
           const result = await getLocation()
@@ -437,14 +446,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <LoginScreen />
-      <View
-        style={{
-          backgroundColor: 'blue',
-          marginTop: 30,
-          paddingTop: 12,
-          paddingBottom: 12,
-        }}>
-        <Text>This is right ABOVE the map</Text>
+      <View>
         <MapView
           ref={mapRef}
           style={styles.map}
@@ -454,11 +456,13 @@ export default function App() {
           region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
           {/* <Heatmap opacity={0.6} radius={50} points={points} /> */}
         </MapView>
-        <Text>This is right BELOW the map</Text>
       </View>
-      <LocationButton title="🌉 San Francisco" setPoints={setPoints} mapRef={mapRef} getLocation={async () => sanFrancisco} />
-      <LocationButton title="🌺 Miami Beach" setPoints={setPoints} mapRef={mapRef} getLocation={async () => miamiBeach} />
-      <LocationButton title="📍 Current location" setPoints={setPoints} mapRef={mapRef} getLocation={getCurrentLocation} />
+      <View style={styles.row}>
+        <LocationButton title="🌉 SF" setPoints={setPoints} mapRef={mapRef} getLocation={async () => sanFrancisco} />
+        <LocationButton title="🌺 MB" setPoints={setPoints} mapRef={mapRef} getLocation={async () => miamiBeach} />
+        <LocationButton title="📍 Now" setPoints={setPoints} mapRef={mapRef} getLocation={getCurrentLocation} />
+      </View>
+
       <Button
         title="Clear locations from map"
         onPress={async () => {
@@ -466,7 +470,7 @@ export default function App() {
         }}
       />
       <Button
-        title="Load locations from db into map"
+        title="Load locations from db"
         onPress={async () => {
           db.transaction((tx) => {
             tx.executeSql('SELECT * FROM locations', [], (_, {rows}) => {
