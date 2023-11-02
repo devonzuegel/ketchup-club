@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
-import {TextInput as RNTextInput, AsyncStorage, View} from 'react-native'
+import {TextInput as RNTextInput, View} from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
 import {Button, Text} from './Utils'
 
@@ -32,11 +33,21 @@ export const LoginScreen = () => {
   const [message, setMessage] = useState('')
   const [token, setToken] = useState('')
 
+  // when this component loads, check if we have a token in AsyncStorage
+  React.useEffect(() => {
+    async function fetchToken() {
+      const token = await AsyncStorage.getItem('token')
+      console.log('token from async storage: ', token || 'null')
+      setToken(token) // storing in the component state AND in AsyncStorage may cause confusion in the future...
+    }
+    fetchToken()
+  }, [])
+
   const handleLogin = async () => {
     if (email === '' && password === '') return setError("Oops, email and password can't be blank!")
     if (email === '') return setError("Oops, email can't be blank!")
     if (password === '') return setError("Oops, password can't be blank!")
-    setError(null) // clear errors from screen
+    setError(null) // clear error messages from screen
 
     try {
       const response = await api.post('/login', {params: {email: email, password}})
@@ -46,7 +57,7 @@ export const LoginScreen = () => {
       if (response.data.success) {
         const token = response.data.token
         setToken(token)
-        // await AsyncStorage.setItem('token', token) // save JWT authentication token locally
+        await AsyncStorage.setItem('token', token)
       } else {
         throw new Error(response.data)
       }
@@ -61,10 +72,30 @@ export const LoginScreen = () => {
       console.log('===========================================================')
       console.log('token: "' + theToken + '"')
       const response = await api.get('/protected', {headers: {Authorization: `Bearer ${theToken}`}})
-      console.log(response.data)
+      console.log('response.data:        ', response.data)
+      console.log('response.data.success:', response.data.success)
+      console.log('response.data.message:', response.data.message)
+      if (response.data.success) {
+        setMessage(response.data.message)
+      } else {
+        console.error(response.data.message)
+        setError('Please log in, then try again')
+      }
     } catch (error) {
-      console.error(error)
+      console.error(JSON.stringify(error, null, 2))
+      setError('Oops, something went wrong. Please try again')
     }
+  }
+
+  const clearTokenAndMessages = () => {
+    clearExceptAsyncStorage()
+    setMessage(null)
+  }
+
+  const clearExceptAsyncStorage = () => {
+    setToken(null)
+    setError(null)
+    setMessage(null)
   }
 
   return (
@@ -74,6 +105,8 @@ export const LoginScreen = () => {
       <Text style={{color: 'green'}}>{message}</Text>
       <TextInput placeholder="Email" value={email} onChangeText={setEmail} autoCapitalize="none" />
       <TextInput placeholder="Password" value={password} onChangeText={setPassword} autoCapitalize="none" secureTextEntry />
+      <Button title="Clear all" onPress={clearTokenAndMessages} />
+      <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
       <Button title="Login" onPress={handleLogin} />
       <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(token)} />
       <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} />
