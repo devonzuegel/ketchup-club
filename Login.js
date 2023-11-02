@@ -59,7 +59,7 @@ export const LoginScreen = () => {
   const authenticatedRequest = (theToken) => async () => {
     try {
       console.log('===========================================================')
-      console.log('token:', theToken)
+      console.log('token: "' + theToken + '"')
       const response = await api.get('/protected', {headers: {Authorization: `Bearer ${theToken}`}})
       console.log(response.data)
     } catch (error) {
