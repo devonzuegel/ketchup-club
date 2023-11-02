@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
-import {TextInput as RNTextInput, AsyncStorage, View, Text} from 'react-native'
+import {TextInput as RNTextInput, AsyncStorage, View} from 'react-native'
 import axios from 'axios'
-import {Button} from './Utils'
+import {Button, Text} from './Utils'
 
 const stylesheet = {
   textInput: {
@@ -69,6 +69,7 @@ export const LoginScreen = () => {
 
   return (
     <View style={{marginTop: 50, color: 'white'}}>
+      <Text>token: "{token}"</Text>
       <Text style={{color: 'red'}}>{error}</Text>
       <Text style={{color: 'green'}}>{message}</Text>
       <TextInput placeholder="Email" value={email} onChangeText={setEmail} autoCapitalize="none" />

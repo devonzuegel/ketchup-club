@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, Button as RNButton, StyleSheet, TouchableOpacity, Text} from 'react-native'
+import {View, Button as RNButton, StyleSheet, TouchableOpacity, Text as RNText} from 'react-native'
 
 TouchableOpacity.defaultProps = {activeOpacity: 0.8}
 
@@ -32,6 +32,12 @@ const styles = StyleSheet.create({
     }),
   },
 })
+
+export const Text = (props) => (
+  <RNText {...props} style={{fontFamily: 'SFCompactRounded_Medium', color: 'white', ...props.style}}>
+    {props.children}
+  </RNText>
+)
 
 export const Button = ({onPress, title, style}) => (
   <TouchableOpacity onPress={onPress} style={{...styles.appButtonContainer, ...style}}>

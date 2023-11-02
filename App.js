@@ -1,7 +1,7 @@
 import axios from 'axios'
 import * as SQLite from 'expo-sqlite'
 import {StyleSheet, Text as RNText, View, TouchableWithoutFeedback, Keyboard, Dimensions} from 'react-native'
-import {Button, fonts} from './Utils'
+import {Button, Text, fonts} from './Utils'
 
 import * as Location from 'expo-location'
 import React, {useRef, useState} from 'react'
@@ -20,12 +20,6 @@ db.transaction((tx) => {
   )
   tx.executeSql('SELECT name FROM sqlite_master WHERE type="table"', [], (_, {rows}) => console.log('tables:', rows._array))
 })
-
-const Text = (props) => (
-  <RNText {...props} style={{fontFamily: 'SFCompactRounded_Medium', color: 'white', ...props.style}}>
-    {props.children}
-  </RNText>
-)
 
 let {height, width} = Dimensions.get('window')
 const containerPadding = 16
