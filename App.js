@@ -1,9 +1,9 @@
 import {StyleSheet, View, TouchableWithoutFeedback, Keyboard} from 'react-native'
 import {fonts} from './Utils'
-import React from 'react'
+import React, {useState} from 'react'
 import {useFonts} from 'expo-font'
-import {LoginScreen} from './Login'
-import Map from './Map'
+import {LoginScreen, TokenContext} from './Login'
+// import Map from './Map'
 
 const containerPadding = 16
 
@@ -17,15 +17,19 @@ const styles = StyleSheet.create({
 })
 
 export default function App() {
+  const [token, setToken] = useState(null)
+
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <LoginScreen />
-        {/* <Map /> */}
-      </View>
-    </TouchableWithoutFeedback>
+    <TokenContext.Provider value={{token, setToken}}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
+          <LoginScreen />
+          {/* <Map /> */}
+        </View>
+      </TouchableWithoutFeedback>
+    </TokenContext.Provider>
   )
 }

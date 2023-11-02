@@ -18,6 +18,8 @@ const stylesheet = {
   },
 }
 
+export const TokenContext = React.createContext() // allows access to the auth token throughout the app
+
 const TextInput = (props) => (
   <RNTextInput style={stylesheet.textInput} placeholderTextColor="rgba(255, 255, 255, 0.4)" {...props} />
 )
@@ -31,7 +33,7 @@ export const LoginScreen = () => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const [token, setToken] = useState('')
+  const {token, setToken} = React.useContext(TokenContext)
 
   // when this component loads, check if we have a token in AsyncStorage
   React.useEffect(() => {
@@ -40,6 +42,7 @@ export const LoginScreen = () => {
       console.log('token from async storage: ', token || 'null')
       setToken(token) // storing in the component state AND in AsyncStorage may cause confusion in the future...
     }
+    console.log('fetching token from async storage..')
     fetchToken()
   }, [])
 
@@ -67,36 +70,36 @@ export const LoginScreen = () => {
     }
   }
 
-  const authenticatedRequest = (theToken) => async () => {
-    try {
-      console.log('===========================================================')
-      console.log('token: "' + theToken + '"')
-      const response = await api.get('/protected', {headers: {Authorization: `Bearer ${theToken}`}})
-      console.log('response.data:        ', response.data)
-      console.log('response.data.success:', response.data.success)
-      console.log('response.data.message:', response.data.message)
-      if (response.data.success) {
-        setMessage(response.data.message)
-      } else {
-        console.error(response.data.message)
-        setError('Please log in, then try again')
-      }
-    } catch (error) {
-      console.error(JSON.stringify(error, null, 2))
-      setError('Oops, something went wrong. Please try again')
-    }
-  }
+  // const authenticatedRequest = (theToken) => async () => {
+  //   try {
+  //     console.log('===========================================================')
+  //     console.log('token: "' + theToken + '"')
+  //     const response = await api.get('/protected', {headers: {Authorization: `Bearer ${theToken}`}})
+  //     console.log('response.data:        ', response.data)
+  //     console.log('response.data.success:', response.data.success)
+  //     console.log('response.data.message:', response.data.message)
+  //     if (response.data.success) {
+  //       setMessage(response.data.message)
+  //     } else {
+  //       console.error(response.data.message)
+  //       setError('Please log in, then try again')
+  //     }
+  //   } catch (error) {
+  //     console.error(JSON.stringify(error, null, 2))
+  //     setError('Oops, something went wrong. Please try again')
+  //   }
+  // }
 
-  const clearTokenAndMessages = () => {
-    clearExceptAsyncStorage()
-    setMessage(null)
-  }
+  // const clearTokenAndMessages = () => {
+  //   clearExceptAsyncStorage()
+  //   setMessage(null)
+  // }
 
-  const clearExceptAsyncStorage = () => {
-    setToken(null)
-    setError(null)
-    setMessage(null)
-  }
+  // const clearExceptAsyncStorage = () => {
+  //   setToken(null)
+  //   setError(null)
+  //   setMessage(null)
+  // }
 
   return (
     <View style={{marginTop: 50, color: 'white'}}>
@@ -105,11 +108,12 @@ export const LoginScreen = () => {
       <Text style={{color: 'green'}}>{message}</Text>
       <TextInput placeholder="Email" value={email} onChangeText={setEmail} autoCapitalize="none" />
       <TextInput placeholder="Password" value={password} onChangeText={setPassword} autoCapitalize="none" secureTextEntry />
-      <Button title="Clear all" onPress={clearTokenAndMessages} />
-      <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
       <Button title="Login" onPress={handleLogin} />
+
+      {/* <Button title="Clear all" onPress={clearTokenAndMessages} />
+      <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
       <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(token)} />
-      <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} />
+      <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} /> */}
     </View>
   )
 }
