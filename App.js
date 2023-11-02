@@ -1,6 +1,6 @@
 import axios from 'axios'
 import * as SQLite from 'expo-sqlite'
-import {StyleSheet, Text as RNText, View, Dimensions} from 'react-native'
+import {StyleSheet, Text as RNText, View, TouchableWithoutFeedback, Keyboard, Dimensions} from 'react-native'
 import {Button, fonts} from './Utils'
 
 import * as Location from 'expo-location'
@@ -445,57 +445,59 @@ export default function App() {
   if (!fontsLoaded) return null
 
   return (
-    <View style={styles.container}>
-      <LoginScreen />
-      <View>
-        <MapView
-          ref={mapRef}
-          style={styles.map}
-          provider={PROVIDER_DEFAULT}
-          mapType="standard"
-          customMapStyle={customMapStyle}
-          region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
-          {/* <Heatmap opacity={0.6} radius={50} points={points} /> */}
-        </MapView>
-      </View>
-      <View style={styles.row}>
-        <LocationButton title="🌉 SF" setPoints={setPoints} mapRef={mapRef} getLocation={async () => sanFrancisco} />
-        <LocationButton title="🌺 MB" setPoints={setPoints} mapRef={mapRef} getLocation={async () => miamiBeach} />
-        <LocationButton title="📍 Now" setPoints={setPoints} mapRef={mapRef} getLocation={getCurrentLocation} />
-      </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <LoginScreen />
+        <View>
+          <MapView
+            ref={mapRef}
+            style={styles.map}
+            provider={PROVIDER_DEFAULT}
+            mapType="standard"
+            customMapStyle={customMapStyle}
+            region={{...miamiBeach, longitudeDelta: 20, latitudeDelta: 20}}>
+            {/* <Heatmap opacity={0.6} radius={50} points={points} /> */}
+          </MapView>
+        </View>
+        <View style={styles.row}>
+          <LocationButton title="🌉 SF" setPoints={setPoints} mapRef={mapRef} getLocation={async () => sanFrancisco} />
+          <LocationButton title="🌺 MB" setPoints={setPoints} mapRef={mapRef} getLocation={async () => miamiBeach} />
+          <LocationButton title="📍 Now" setPoints={setPoints} mapRef={mapRef} getLocation={getCurrentLocation} />
+        </View>
 
-      <Button
-        title="Clear locations from map"
-        onPress={async () => {
-          setPoints(() => [])
-        }}
-      />
-      <Button
-        title="Load locations from db"
-        onPress={async () => {
-          db.transaction((tx) => {
-            tx.executeSql('SELECT * FROM locations', [], (_, {rows}) => {
-              setPoints(() => rows._array)
+        <Button
+          title="Clear locations from map"
+          onPress={async () => {
+            setPoints(() => [])
+          }}
+        />
+        <Button
+          title="Load locations from db"
+          onPress={async () => {
+            db.transaction((tx) => {
+              tx.executeSql('SELECT * FROM locations', [], (_, {rows}) => {
+                setPoints(() => rows._array)
+              })
             })
-          })
-        }}
-      />
-      <Button
-        title="Delete locations from db & clear map"
-        onPress={async () => {
-          db.transaction((tx) => {
-            tx.executeSql('DELETE FROM locations')
-          })
-          setPoints(() => [])
-        }}
-      />
+          }}
+        />
+        <Button
+          title="Delete locations from db & clear map"
+          onPress={async () => {
+            db.transaction((tx) => {
+              tx.executeSql('DELETE FROM locations')
+            })
+            setPoints(() => [])
+          }}
+        />
 
-      <Text>Point(s):</Text>
-      {points.map((point, index) => (
-        <Text key={index}>
-          - {index + 1}: {point.latitude}, {point.longitude}
-        </Text>
-      ))}
-    </View>
+        <Text>Point(s):</Text>
+        {points.map((point, index) => (
+          <Text key={index}>
+            - {index + 1}: {point.latitude}, {point.longitude}
+          </Text>
+        ))}
+      </View>
+    </TouchableWithoutFeedback>
   )
 }
