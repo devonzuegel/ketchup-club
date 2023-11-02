@@ -70,39 +70,40 @@ export const LoginScreen = () => {
     }
   }
 
-  const authenticatedRequest = (theAuthToken) => async () => {
-    try {
-      console.log('===========================================================')
-      console.log('authToken: "' + theAuthToken + '"')
-      const response = await api.get('/protected', {headers: {Authorization: `Bearer ${theAuthToken}`}})
-      console.log('response.data:        ', response.data)
-      console.log('response.data.success:', response.data.success)
-      console.log('response.data.message:', response.data.message)
-      if (response.data.success) {
-        setMessage(response.data.message)
-      } else {
-        console.error(response.data.message)
-        setError('Please log in, then try again')
-      }
-    } catch (error) {
-      console.error(JSON.stringify(error, null, 2))
-      setError('Oops, something went wrong. Please try again')
-    }
-  }
+  // const authenticatedRequest = (theAuthToken) => async () => {
+  //   try {
+  //     console.log('===========================================================')
+  //     console.log('authToken: "' + theAuthToken + '"')
+  //     const response = await api.get('/protected', {headers: {Authorization: `Bearer ${theAuthToken}`}})
+  //     console.log('response.data:        ', response.data)
+  //     console.log('response.data.success:', response.data.success)
+  //     console.log('response.data.message:', response.data.message)
+  //     if (response.data.success) {
+  //       setMessage(response.data.message)
+  //     } else {
+  //       console.error(response.data.message)
+  //       setError('Please log in, then try again')
+  //     }
+  //   } catch (error) {
+  //     console.error(JSON.stringify(error, null, 2))
+  //     setError('Oops, something went wrong. Please try again')
+  //   }
+  // }
 
-  const clearTokenAndMessages = () => {
-    clearExceptAsyncStorage()
-    setMessage(null)
-  }
+  // const clearTokenAndMessages = () => {
+  //   clearExceptAsyncStorage()
+  //   setMessage(null)
+  // }
 
-  const clearExceptAsyncStorage = () => {
-    setAuthToken(null)
-    setError(null)
-    setMessage(null)
-  }
+  // const clearExceptAsyncStorage = () => {
+  //   setAuthToken(null)
+  //   setError(null)
+  //   setMessage(null)
+  // }
 
   return (
     <View style={{marginTop: 50, color: 'white'}}>
+      <Text>[CHILD] logged in? {authToken ? ' yes\n' : ' no\n'}</Text>
       <Text>authToken: "{authToken}"</Text>
       <Text style={{color: 'red'}}>{error}</Text>
       <Text style={{color: 'green'}}>{message}</Text>
@@ -110,10 +111,10 @@ export const LoginScreen = () => {
       <TextInput placeholder="Password" value={password} onChangeText={setPassword} autoCapitalize="none" secureTextEntry />
       <Button title="Login" onPress={handleLogin} />
 
-      <Button title="Clear all" onPress={clearTokenAndMessages} />
+      {/* <Button title="Clear all" onPress={clearTokenAndMessages} />
       <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
       <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(authToken)} />
-      <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} />
+      <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} /> */}
     </View>
   )
 }

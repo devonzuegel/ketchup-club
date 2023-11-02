@@ -1,5 +1,5 @@
 import {StyleSheet, View, TouchableWithoutFeedback, Keyboard} from 'react-native'
-import {fonts} from './Utils'
+import {fonts, Text} from './Utils'
 import React, {useState} from 'react'
 import {useFonts} from 'expo-font'
 import {LoginScreen, AuthTokenContext} from './Login'
@@ -26,6 +26,11 @@ export default function App() {
     <AuthTokenContext.Provider value={{authToken, setAuthToken}}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
+          <Text />
+          <Text />
+          <Text />
+          <Text />
+          <Text>[PARENT] logged in? {authToken ? ' yes' : ' no'}</Text>
           <LoginScreen />
           {/* <Map /> */}
         </View>
