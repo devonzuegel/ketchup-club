@@ -105,10 +105,7 @@ export const LoginScreen = () => {
         onChangeText={setEmail}
         returnKeyType="done"
         blurOnSubmit={true}
-        onSubmitEditing={() => {
-          console.log(passwordFieldRef)
-          passwordFieldRef.current.focus()
-        }}
+        onSubmitEditing={() => passwordFieldRef.current.focus()}
         autoCorrect={true}
         numberOfLines={1}
         autoCapitalize="none"
