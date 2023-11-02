@@ -21,7 +21,12 @@ const stylesheet = {
 export const AuthTokenContext = React.createContext() // allows access to the auth token throughout the app
 
 const TextInput = forwardRef((props, ref) => (
-  <RNTextInput ref={ref} style={stylesheet.textInput} placeholderTextColor="rgba(255, 255, 255, 0.4)" {...props} />
+  <RNTextInput
+    ref={ref}
+    placeholderTextColor="rgba(255, 255, 255, 0.4)"
+    {...props}
+    style={{...stylesheet.textInput, ...props.style}}
+  />
 ))
 
 const api = axios.create({
@@ -105,6 +110,7 @@ export const LoginScreen = () => {
         onChangeText={setEmail}
         returnKeyType="done"
         blurOnSubmit={true}
+        style={{paddingTop: 10}}
         onSubmitEditing={() => passwordFieldRef.current.focus()}
         autoCorrect={true}
         numberOfLines={1}
