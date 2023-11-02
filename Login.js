@@ -90,20 +90,14 @@ export const LoginScreen = () => {
   //   }
   // }
 
-  // const clearTokenAndMessages = () => {
-  //   clearExceptAsyncStorage()
-  //   setMessage(null)
-  // }
-
-  // const clearExceptAsyncStorage = () => {
-  //   setAuthToken(null)
-  //   setError(null)
-  //   setMessage(null)
-  // }
+  const logout = () => {
+    setAuthToken(null)
+    AsyncStorage.removeItem('authToken')
+  }
 
   return (
-    <View style={{marginTop: 50, color: 'white'}}>
-      <Text>[CHILD] logged in? {authToken ? ' yes\n' : ' no\n'}</Text>
+    <View>
+      <Text style={{fontSize: 54, textAlign: 'center', marginTop: 48, marginBottom: 48}}>Ketchup Club</Text>
       <Text>authToken: "{authToken}"</Text>
       <Text style={{color: 'red'}}>{error}</Text>
       <Text style={{color: 'green'}}>{message}</Text>
@@ -111,8 +105,8 @@ export const LoginScreen = () => {
       <TextInput placeholder="Password" value={password} onChangeText={setPassword} autoCapitalize="none" secureTextEntry />
       <Button title="Login" onPress={handleLogin} />
 
-      {/* <Button title="Clear all" onPress={clearTokenAndMessages} />
-      <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
+      <Button title="Logout" onPress={logout} />
+      {/* <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
       <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(authToken)} />
       <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} /> */}
     </View>
