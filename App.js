@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: 'SFCompactRounded_Medium',
     backgroundColor: 'black',
+    padding: 20,
   },
   map: {
     // ...StyleSheet.absoluteFillObject,
