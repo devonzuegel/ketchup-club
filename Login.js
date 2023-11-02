@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useRef, forwardRef} from 'react'
 import {TextInput as RNTextInput, View} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
@@ -20,9 +20,9 @@ const stylesheet = {
 
 export const AuthTokenContext = React.createContext() // allows access to the auth token throughout the app
 
-const TextInput = (props) => (
-  <RNTextInput style={stylesheet.textInput} placeholderTextColor="rgba(255, 255, 255, 0.4)" {...props} />
-)
+const TextInput = forwardRef((props, ref) => (
+  <RNTextInput ref={ref} style={stylesheet.textInput} placeholderTextColor="rgba(255, 255, 255, 0.4)" {...props} />
+))
 
 const api = axios.create({
   baseURL: 'https://f5f6-132-147-43-111.ngrok-free.app/api/v2',
@@ -33,7 +33,8 @@ export const LoginScreen = () => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const {authToken, setAuthToken} = React.useContext(AuthTokenContext)
+  const {setAuthToken} = React.useContext(AuthTokenContext)
+  const passwordFieldRef = useRef()
 
   // when this component loads, check if we have a token in AsyncStorage
   React.useEffect(() => {
@@ -90,22 +91,39 @@ export const LoginScreen = () => {
   //   }
   // }
 
-  const logout = () => {
-    setAuthToken(null)
-    AsyncStorage.removeItem('authToken')
-  }
-
   return (
     <View>
       <Text style={{fontSize: 54, textAlign: 'center', marginTop: 48, marginBottom: 48}}>Ketchup Club</Text>
-      <Text>authToken: "{authToken}"</Text>
       <Text style={{color: 'red'}}>{error}</Text>
       <Text style={{color: 'green'}}>{message}</Text>
-      <TextInput placeholder="Email" value={email} onChangeText={setEmail} autoCapitalize="none" />
-      <TextInput placeholder="Password" value={password} onChangeText={setPassword} autoCapitalize="none" secureTextEntry />
+
+      <TextInput
+        placeholder="Email"
+        value={email}
+        multiline={true} // this is a fake multiline, it's only here to get around the fact that iOS Text Replacements don't work with single line text inputs
+        height={40}
+        onChangeText={setEmail}
+        returnKeyType="done"
+        blurOnSubmit={true}
+        onSubmitEditing={() => {
+          console.log(passwordFieldRef)
+          passwordFieldRef.current.focus()
+        }}
+        autoCorrect={true}
+        numberOfLines={1}
+        autoCapitalize="none"
+      />
+
+      <TextInput
+        placeholder="Password"
+        value={password}
+        ref={passwordFieldRef}
+        onChangeText={setPassword}
+        autoCapitalize="none"
+        secureTextEntry
+      />
       <Button title="Login" onPress={handleLogin} />
 
-      <Button title="Logout" onPress={logout} />
       {/* <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
       <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(authToken)} />
       <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} /> */}
