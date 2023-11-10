@@ -98,9 +98,14 @@ export const LoginScreen = () => {
 
   return (
     <View>
-      <Text style={{fontSize: 54, textAlign: 'center', marginTop: 48, marginBottom: 48}}>Ketchup Club</Text>
-      <Text style={{color: 'red'}}>{error}</Text>
-      <Text style={{color: 'green'}}>{message}</Text>
+      <View style={{marginTop: 100, marginBottom: 36}}>
+        <Text style={{fontSize: 24, textAlign: 'center'}}>Welcome to</Text>
+        <Text style={{fontSize: 54, textAlign: 'center'}}>Ketchup Club</Text>
+      </View>
+
+      {/* The spaces at the end of the "error" & "message" fields are to prevent the text from jumping */}
+      <Text style={{textAlign: 'center', color: 'red'}}>{error} </Text>
+      <Text style={{textAlign: 'center', color: 'green'}}>{message} </Text>
 
       <TextInput
         placeholder="Email"
@@ -116,7 +121,6 @@ export const LoginScreen = () => {
         numberOfLines={1}
         autoCapitalize="none"
       />
-
       <TextInput
         placeholder="Password"
         value={password}
@@ -126,7 +130,6 @@ export const LoginScreen = () => {
         secureTextEntry
       />
       <Button title="Login" onPress={handleLogin} />
-
       {/* <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
       <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(authToken)} />
       <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} /> */}
