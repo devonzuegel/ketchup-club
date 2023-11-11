@@ -3,6 +3,7 @@ import {TextInput as RNTextInput, View} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
 import {Button, Text, styles} from './Utils'
+import {Keyboard, TouchableWithoutFeedback} from 'react-native'
 
 const stylesheet = {
   textInput: {
@@ -97,42 +98,44 @@ export const LoginScreen = () => {
   // }
 
   return (
-    <View style={styles.container}>
-      <View>
-        <Text style={{fontSize: 24, textAlign: 'center', color: '#50606C', marginTop: 120}}>Welcome to</Text>
-        <Text style={{fontSize: 54, textAlign: 'center'}}>Ketchup Club</Text>
-      </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <View>
+          <Text style={{fontSize: 24, textAlign: 'center', color: '#50606C', marginTop: 120}}>Welcome to</Text>
+          <Text style={{fontSize: 54, textAlign: 'center'}}>Ketchup Club</Text>
+        </View>
 
-      {/* The spaces at the end of the "error" & "message" fields are to prevent the text from jumping */}
-      <Text style={{textAlign: 'center', color: 'red'}}>{error} </Text>
-      <Text style={{textAlign: 'center', color: 'green'}}>{message} </Text>
+        {/* The spaces at the end of the "error" & "message" fields are to prevent the text from jumping */}
+        <Text style={{textAlign: 'center', color: 'red'}}>{error} </Text>
+        <Text style={{textAlign: 'center', color: 'green'}}>{message} </Text>
 
-      <TextInput
-        placeholder="Email"
-        value={email}
-        multiline={true} // this is a fake multiline, it's only here to get around the fact that iOS Text Replacements don't work with single line text inputs
-        height={40}
-        onChangeText={setEmail}
-        returnKeyType="done"
-        blurOnSubmit={true}
-        style={{paddingTop: 10}}
-        onSubmitEditing={() => passwordFieldRef.current.focus()}
-        autoCorrect={true}
-        numberOfLines={1}
-        autoCapitalize="none"
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        ref={passwordFieldRef}
-        onChangeText={setPassword}
-        autoCapitalize="none"
-        secureTextEntry
-      />
-      <Button title="Login" onPress={handleLogin} />
-      {/* <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
+        <TextInput
+          placeholder="Email"
+          value={email}
+          multiline={true} // this is a fake multiline, it's only here to get around the fact that iOS Text Replacements don't work with single line text inputs
+          height={40}
+          onChangeText={setEmail}
+          returnKeyType="done"
+          blurOnSubmit={true}
+          style={{paddingTop: 10}}
+          onSubmitEditing={() => passwordFieldRef.current.focus()}
+          autoCorrect={true}
+          numberOfLines={1}
+          autoCapitalize="none"
+        />
+        <TextInput
+          placeholder="Password"
+          value={password}
+          ref={passwordFieldRef}
+          onChangeText={setPassword}
+          autoCapitalize="none"
+          secureTextEntry
+        />
+        <Button title="Login" onPress={handleLogin} />
+        {/* <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
       <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(authToken)} />
       <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} /> */}
-    </View>
+      </View>
+    </TouchableWithoutFeedback>
   )
 }

@@ -51,40 +51,42 @@ const Friend = ({name}) => (
 function FriendsScreen({navigation}) {
   const friends = ['Alice', 'Bob', 'Charlie']
   return (
-    <View style={{...styles.container, ...styles.flexColumn}}>
-      <View style={{marginTop: 48}}>
-        <Header>Friends</Header>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={{...styles.container, ...styles.flexColumn}}>
+        <View style={{marginTop: 48}}>
+          <Header>Friends</Header>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginLeft: 4,
-            marginRight: 4,
-            marginTop: 24,
-            marginBottom: 24,
-            paddingTop: 6,
-            paddingBottom: 6,
-            paddingLeft: 10,
-            paddingRight: 10,
-            borderRadius: 8,
-            backgroundColor: '#222',
-          }}>
-          <Text style={{fontSize: 16}}>🔍</Text>
-          <TextInput
-            placeholder="Search"
-            placeholderTextColor="#777"
-            style={{width: Dimensions.get('window').width - 80, color: 'white', fontSize: 16}}
-          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginLeft: 4,
+              marginRight: 4,
+              marginTop: 24,
+              marginBottom: 24,
+              paddingTop: 6,
+              paddingBottom: 6,
+              paddingLeft: 10,
+              paddingRight: 10,
+              borderRadius: 8,
+              backgroundColor: '#222',
+            }}>
+            <Text style={{fontSize: 16}}>🔍</Text>
+            <TextInput
+              placeholder="Search"
+              placeholderTextColor="#777"
+              style={{width: Dimensions.get('window').width - 80, color: 'white', fontSize: 16, marginLeft: 6}}
+            />
+          </View>
+
+          {friends.map((name) => (
+            <Friend name={name} />
+          ))}
         </View>
-
-        {friends.map((name) => (
-          <Friend name={name} />
-        ))}
+        <NavBtns navigation={navigation} />
       </View>
-      <NavBtns navigation={navigation} />
-    </View>
+    </TouchableWithoutFeedback>
   )
 }
 
@@ -107,12 +109,10 @@ export default function App() {
 
   return (
     <AuthTokenContext.Provider value={{authToken, setAuthToken}}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        {/* <View style={styles.container}>
+      {/* <View style={styles.container}>
           <Pre data={{authToken}} /> */}
-        {authToken ? <LoggedInNavigator /> : <LoginScreen />}
-        {/* </View> */}
-      </TouchableWithoutFeedback>
+      {authToken ? <LoggedInNavigator /> : <LoginScreen />}
+      {/* </View> */}
     </AuthTokenContext.Provider>
   )
 }
