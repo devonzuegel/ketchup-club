@@ -45,6 +45,12 @@ export const Button = ({onPress, title, style}) => (
   </TouchableOpacity>
 )
 
+export const Pre = ({data, children}) => (
+  <Text style={{fontFamily: 'Courier New', marginTop: 10, marginBottom: 10, padding: 10, backgroundColor: '#222'}}>
+    {children || JSON.stringify({data}, null, 2)}
+  </Text>
+)
+
 export const fonts = {
   SFCompactRounded_Thin: require('./assets/fonts/SF-Compact-Rounded-Thin.otf'),
   SFCompactRounded_Light: require('./assets/fonts/SF-Compact-Rounded-Light.otf'),
