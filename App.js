@@ -86,7 +86,42 @@ function HomeScreen({route, navigation}) {
   const {itemId, otherParam} = route.params
   return (
     <View style={{...styles.container, ...styles.flexColumn}}>
-      <Text>Home Screen</Text>
+      <Text style={{fontSize: 54, textAlign: 'center'}}>Ketchup Club</Text>
+      <View>
+        <Text style={{textAlign: 'center', fontSize: 18}}>Set your status:</Text>
+        <View
+          style={{
+            backgroundColor: '#222',
+            padding: 6,
+            borderRadius: 100,
+            margin: 8,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}>
+          <View style={{flex: 1, borderRadius: 100, padding: 14, flexDirection: 'column', justifyContent: 'center'}}>
+            <Text style={{textAlign: 'center', fontSize: 30}}>Offline</Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              borderRadius: 100,
+              padding: 14,
+              flexDirection: 'column',
+              justifyContent: 'center',
+              backgroundColor: 'green',
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 1,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 1,
+            }}>
+            <Text style={{textAlign: 'center', fontSize: 30}}>Online</Text>
+          </View>
+        </View>
+      </View>
       <Pre data={route.params} />
       <NavBtns navigation={navigation} />
     </View>
