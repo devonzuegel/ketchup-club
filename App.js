@@ -8,8 +8,35 @@ import {NavigationContainer} from '@react-navigation/native'
 import {createNativeStackNavigator} from '@react-navigation/native-stack'
 import HomeScreen from './Home'
 
-const SettingItem = ({name}) => (
+const SearchBar = () => (
   <View
+    style={{
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginLeft: 4,
+      marginRight: 4,
+      marginTop: 10,
+      marginBottom: 24,
+      paddingTop: 5,
+      paddingBottom: 5,
+      paddingLeft: 10,
+      paddingRight: 10,
+      borderRadius: 100,
+      backgroundColor: '#222',
+    }}>
+    <Text style={{fontSize: 16}}>🔍</Text>
+    <TextInput
+      placeholder="Search"
+      placeholderTextColor="#777"
+      style={{width: Dimensions.get('window').width - 80, color: 'white', fontSize: 16, marginLeft: 6}}
+    />
+  </View>
+)
+
+const SettingItem = ({name, icon, dangerous, onPress}) => (
+  <View
+    onTouchEnd={onPress}
     style={{
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -22,8 +49,10 @@ const SettingItem = ({name}) => (
       backgroundColor: '#222',
       borderRadius: 8,
     }}>
-    <Text style={{fontSize: 20}}>{name}</Text>
-    <Text style={{fontSize: 20}}>{name.length % 3 == 0 ? '✅' : '❌'}</Text>
+    <Text style={{fontSize: 18, fontFamily: 'SFCompactRounded_Regular', color: dangerous ? 'red' : 'white'}}>{name}</Text>
+    <Text style={{fontSize: 18, fontFamily: 'SFCompactRounded_Regular', color: dangerous ? 'red' : 'white'}}>
+      {icon || (name.length % 3 == 0 ? '✅' : '❌')}
+    </Text>
   </View>
 )
 
@@ -38,47 +67,28 @@ function SettingsScreen({navigation}) {
     AsyncStorage.removeItem('authToken')
   }
 
-  const settings = ['Contacts', 'Push Notifications', 'Username', 'Avatar', 'Phone']
+  const settings = [
+    ['System Permissions', ['Contacts', 'Push Notifications']],
+    ['Profile', ['Username', 'Avatar']],
+    ['Account', ['Phone']],
+  ]
 
   return (
     <AuthTokenContext.Provider value={{authToken, setAuthToken}}>
-      {/* <View style={{...styles.container, ...styles.flexColumn}}>
-        <Text>Settings</Text>
-        <Button title="Logout" onPress={logout} />
-        <NavBtns navigation={navigation} />
-      </View> */}
-
       <View style={{...styles.container, ...styles.flexColumn}}>
         <View style={{marginTop: 48}}>
           <Header>Settings</Header>
+          <SearchBar />
 
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginLeft: 4,
-              marginRight: 4,
-              marginTop: 24,
-              marginBottom: 24,
-              paddingTop: 6,
-              paddingBottom: 6,
-              paddingLeft: 10,
-              paddingRight: 10,
-              borderRadius: 8,
-              backgroundColor: '#222',
-            }}>
-            <Text style={{fontSize: 16}}>🔍</Text>
-            <TextInput
-              placeholder="Search"
-              placeholderTextColor="#777"
-              style={{width: Dimensions.get('window').width - 80, color: 'white', fontSize: 16, marginLeft: 6}}
-            />
-          </View>
-
-          {settings.map((name) => (
-            <SettingItem name={name} />
+          {settings.map(([section, sectionItems], i) => (
+            <View key={i}>
+              <Header style={{textAlign: 'left', fontSize: 16, marginLeft: 16, marginBottom: 2, marginTop: 18}}>{section}</Header>
+              {sectionItems.map((name, j) => (
+                <SettingItem name={name} key={j} />
+              ))}
+            </View>
           ))}
+          <SettingItem name={'Sign out'} icon="➡️" dangerous onPress={logout} />
         </View>
 
         <NavBtns navigation={navigation} />
@@ -113,33 +123,10 @@ function FriendsScreen({navigation}) {
       <View style={{...styles.container, ...styles.flexColumn}}>
         <View style={{marginTop: 48}}>
           <Header>Friends</Header>
+          <SearchBar />
 
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginLeft: 4,
-              marginRight: 4,
-              marginTop: 24,
-              marginBottom: 24,
-              paddingTop: 6,
-              paddingBottom: 6,
-              paddingLeft: 10,
-              paddingRight: 10,
-              borderRadius: 8,
-              backgroundColor: '#222',
-            }}>
-            <Text style={{fontSize: 16}}>🔍</Text>
-            <TextInput
-              placeholder="Search"
-              placeholderTextColor="#777"
-              style={{width: Dimensions.get('window').width - 80, color: 'white', fontSize: 16, marginLeft: 6}}
-            />
-          </View>
-
-          {friends.map((name) => (
-            <Friend name={name} />
+          {friends.map((name, i) => (
+            <Friend name={name} key={i} />
           ))}
         </View>
 

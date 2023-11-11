@@ -82,8 +82,8 @@ export const styles = StyleSheet.create({
   },
 })
 
-export const Header = ({children}) => (
-  <Text style={{textAlign: 'center', fontSize: 20, color: '#444', marginBottom: 4}}>{children}</Text>
+export const Header = ({children, style}) => (
+  <Text style={{textAlign: 'center', fontSize: 20, color: '#444', marginBottom: 4, ...style}}>{children}</Text>
 )
 
 export const Text = (props) => (
