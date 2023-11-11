@@ -14,6 +14,10 @@ const containerPadding = 16
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'column', // inner items will be added vertically
+    flexGrow: 1, // all the available vertical space will be occupied by it
+    justifyContent: 'space-between', // will create the gutter between body and footer
+
     fontFamily: 'SFCompactRounded_Medium',
     backgroundColor: 'black',
     padding: containerPadding,
@@ -80,8 +84,8 @@ const NavBtns = ({navigation}) => {
 function SettingsScreen({navigation}) {
   return (
     <View style={styles.container}>
-      <NavBtns navigation={navigation} />
       <Text>Settings</Text>
+      <NavBtns navigation={navigation} />
     </View>
   )
 }
@@ -91,9 +95,9 @@ function HomeScreen({route, navigation}) {
   const {itemId, otherParam} = route.params
   return (
     <View style={styles.container}>
-      <NavBtns navigation={navigation} />
       <Text>Home Screen</Text>
       <Pre data={route.params} />
+      <NavBtns navigation={navigation} />
     </View>
   )
 }
@@ -101,8 +105,8 @@ function HomeScreen({route, navigation}) {
 function FriendsScreen({navigation}) {
   return (
     <View style={styles.container}>
-      <NavBtns navigation={navigation} />
       <Text>Friends</Text>
+      <NavBtns navigation={navigation} />
     </View>
   )
 }
