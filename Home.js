@@ -7,7 +7,7 @@ const homeStyles = StyleSheet.create({
     backgroundColor: '#222',
     padding: 6,
     borderRadius: 100,
-    margin: 8,
+    margin: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -25,7 +25,7 @@ const homeStyles = StyleSheet.create({
   toggleBtnTextSelected: {color: 'white'},
 })
 
-const Header = ({children}) => <Text style={{textAlign: 'center', fontSize: 20, color: '#777'}}>{children}</Text>
+const Header = ({children}) => <Text style={{textAlign: 'center', fontSize: 20, color: '#444', marginBottom: 4}}>{children}</Text>
 
 const OnlineOfflineToggle = () => (
   <View>
@@ -62,7 +62,9 @@ const Friend = ({name}) => (
 export default function HomeScreen({navigation}) {
   return (
     <View style={{...styles.container, ...styles.flexColumn}}>
-      <Text style={{fontSize: 54, textAlign: 'center', marginTop: 40}}>Ketchup Club</Text>
+      <Text style={{fontSize: 54, textAlign: 'center', marginTop: 42, fontFamily: 'SFCompactRounded_Semibold'}}>
+        Ketchup Club
+      </Text>
 
       <OnlineOfflineToggle />
 
