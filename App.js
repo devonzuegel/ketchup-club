@@ -24,20 +24,16 @@ const styles = StyleSheet.create({
   },
 })
 
-// const LoggedIn = () => {
-//   return (
-//     <View>
-//       <Text>Hello, world!</Text>
-//       <Button
-//         title="Settings"
-//         onPress={() => {
-//           // TODO: navigate to Settings screen by upddating the state of the navigator
-//         }}
-//       />
-//     </View>
-//   )
-// }
-
+const NavBtns = ({navigation}) => (
+  <View>
+    <View flexDirection="row" justifyContent="space-around">
+      <Button title="<" onPress={() => navigation.goBack()} />
+      <Button title="Friends" onPress={() => navigation.navigate('Friends')} />
+      <Button title="Home" onPress={() => navigation.push('Home', {itemId: Math.floor(Math.random() * 100)})} />
+      <Button title="Settings" onPress={() => navigation.navigate('Settings')} />
+    </View>
+  </View>
+)
 // const SettingsScreen = () => {
 //   const {authToken, setAuthToken} = React.useContext(AuthTokenContext)
 //   // const [authToken, setAuthToken] = useState(null)
@@ -63,14 +59,8 @@ const styles = StyleSheet.create({
 function SettingsScreen({navigation}) {
   return (
     <View style={styles.container}>
+      <NavBtns navigation={navigation} />
       <Text>Settings</Text>
-      <Button
-        title="Go to Home"
-        onPress={() => {
-          /* 1. Navigate to the Home route with params */
-          navigation.navigate('Home', {itemId: 86, otherParam: 'foo'})
-        }}
-      />
     </View>
   )
 }
@@ -80,11 +70,18 @@ function HomeScreen({route, navigation}) {
   const {itemId, otherParam} = route.params
   return (
     <View style={styles.container}>
+      <NavBtns navigation={navigation} />
       <Text>Home Screen</Text>
       <Pre data={route.params} />
-      <Button title="Go to Home... again" onPress={() => navigation.push('Home', {itemId: Math.floor(Math.random() * 100)})} />
-      <Button title="Go to Settings" onPress={() => navigation.navigate('Settings')} />
-      <Button title="Go back" onPress={() => navigation.goBack()} />
+    </View>
+  )
+}
+
+function FriendsScreen({navigation}) {
+  return (
+    <View style={styles.container}>
+      <NavBtns navigation={navigation} />
+      <Text>Friends</Text>
     </View>
   )
 }
@@ -93,9 +90,10 @@ const Stack = createNativeStackNavigator()
 
 const LoggedInNavigator = () => (
   <NavigationContainer>
-    <Stack.Navigator initialRouteName="Home">
+    <Stack.Navigator initialRouteName="Home" screenOptions={{animation: 'none'}}>
       <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}} initialParams={{itemId: 10}} />
       <Stack.Screen name="Settings" component={SettingsScreen} options={{headerShown: false}} />
+      <Stack.Screen name="Friends" component={FriendsScreen} options={{headerShown: false}} />
     </Stack.Navigator>
   </NavigationContainer>
 )
