@@ -7,8 +7,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import {NavigationContainer} from '@react-navigation/native'
 import {createNativeStackNavigator} from '@react-navigation/native-stack'
 
-// import Map from './Map'
-
 const containerPadding = 16
 
 const styles = StyleSheet.create({
@@ -59,34 +57,25 @@ const NavBtns = ({navigation}) => {
     </View>
   )
 }
-// const SettingsScreen = () => {
-//   const {authToken, setAuthToken} = React.useContext(AuthTokenContext)
-//   // const [authToken, setAuthToken] = useState(null)
-//   const [fontsLoaded] = useFonts(fonts)
-//   if (!fontsLoaded) return null
-
-//   const logout = () => {
-//     console.log('logout')
-//     setAuthToken(null)
-//     AsyncStorage.removeItem('authToken')
-//   }
-
-//   return (
-//     <AuthTokenContext.Provider value={{authToken, setAuthToken}}>
-//       <View>
-//         <Button title="Logout" onPress={logout} />
-//         <Text>Hello, world!</Text>
-//       </View>
-//     </AuthTokenContext.Provider>
-//   )
-// }
-
 function SettingsScreen({navigation}) {
+  const {authToken, setAuthToken} = React.useContext(AuthTokenContext)
+  const [fontsLoaded] = useFonts(fonts)
+  if (!fontsLoaded) return null
+
+  const logout = () => {
+    console.log('logout')
+    setAuthToken(null)
+    AsyncStorage.removeItem('authToken')
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Settings</Text>
-      <NavBtns navigation={navigation} />
-    </View>
+    <AuthTokenContext.Provider value={{authToken, setAuthToken}}>
+      <View style={styles.container}>
+        <Text>Settings</Text>
+        <Button title="Logout" onPress={logout} />
+        <NavBtns navigation={navigation} />
+      </View>
+    </AuthTokenContext.Provider>
   )
 }
 
