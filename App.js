@@ -59,6 +59,7 @@ const NavBtns = ({navigation}) => {
     </View>
   )
 }
+
 function SettingsScreen({navigation}) {
   const {authToken, setAuthToken} = React.useContext(AuthTokenContext)
   const [fontsLoaded] = useFonts(fonts)
@@ -81,48 +82,42 @@ function SettingsScreen({navigation}) {
   )
 }
 
-function HomeScreen({route, navigation}) {
-  /* 2. Get the param */
-  const {itemId, otherParam} = route.params
+const homeStyles = StyleSheet.create({
+  toggleOuter: {
+    backgroundColor: '#222',
+    padding: 6,
+    borderRadius: 100,
+    margin: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  toggleBtn: {flex: 1, borderRadius: 100, padding: 14, flexDirection: 'column', justifyContent: 'center'},
+  toggleBtnSelected: {
+    backgroundColor: 'green',
+    shadowColor: '#000',
+    shadowOffset: {width: 1, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 1,
+  },
+  toggleButtonText: {textAlign: 'center', fontSize: 32, fontFamily: 'SFCompactRounded_Semibold'},
+})
+
+function HomeScreen({navigation}) {
   return (
     <View style={{...styles.container, ...styles.flexColumn}}>
       <Text style={{fontSize: 54, textAlign: 'center'}}>Ketchup Club</Text>
       <View>
         <Text style={{textAlign: 'center', fontSize: 18}}>Set your status:</Text>
-        <View
-          style={{
-            backgroundColor: '#222',
-            padding: 6,
-            borderRadius: 100,
-            margin: 8,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-          <View style={{flex: 1, borderRadius: 100, padding: 14, flexDirection: 'column', justifyContent: 'center'}}>
-            <Text style={{textAlign: 'center', fontSize: 30}}>Offline</Text>
+        <View style={homeStyles.toggleOuter}>
+          <View style={homeStyles.toggleBtn}>
+            <Text style={homeStyles.toggleButtonText}>Offline</Text>
           </View>
-          <View
-            style={{
-              flex: 1,
-              borderRadius: 100,
-              padding: 14,
-              flexDirection: 'column',
-              justifyContent: 'center',
-              backgroundColor: 'green',
-              shadowColor: '#000',
-              shadowOffset: {
-                width: 1,
-                height: 2,
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 1,
-            }}>
-            <Text style={{textAlign: 'center', fontSize: 30}}>Online</Text>
+          <View style={{...homeStyles.toggleBtn, ...homeStyles.toggleBtnSelected}}>
+            <Text style={homeStyles.toggleButtonText}>Online</Text>
           </View>
         </View>
       </View>
-      <Pre data={route.params} />
       <NavBtns navigation={navigation} />
     </View>
   )
@@ -159,7 +154,6 @@ export default function App() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <Pre data={{authToken}} />
-          {/* <LoggedInNavigator /> */}
           {authToken ? <LoggedInNavigator /> : <LoginScreen />}
         </View>
       </TouchableWithoutFeedback>
