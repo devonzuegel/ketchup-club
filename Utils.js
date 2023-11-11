@@ -70,9 +70,9 @@ export const styles = StyleSheet.create({
     backgroundColor: 'black',
     padding: containerPadding,
     paddingTop: 48,
-    borderColor: '#222',
-    borderStyle: 'dotted',
-    borderWidth: 2,
+    // borderColor: '#222',
+    // borderWidth: 2,
+    // borderStyle: 'dotted',
   },
   flexColumn: {
     flex: 1,

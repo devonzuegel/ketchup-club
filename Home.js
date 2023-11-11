@@ -13,31 +13,66 @@ const homeStyles = StyleSheet.create({
   },
   toggleBtn: {flex: 1, borderRadius: 100, padding: 14, flexDirection: 'column', justifyContent: 'center'},
   toggleBtnSelected: {
-    backgroundColor: 'green',
+    backgroundColor: '#32C084',
+    color: 'white',
     shadowColor: '#000',
     shadowOffset: {width: 1, height: 2},
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 1,
   },
-  toggleButtonText: {textAlign: 'center', fontSize: 32, fontFamily: 'SFCompactRounded_Semibold'},
+  toggleBtnText: {textAlign: 'center', fontSize: 32, fontFamily: 'SFCompactRounded_Semibold', color: '#777'},
+  toggleBtnTextSelected: {color: 'white'},
 })
+
+const Header = ({children}) => <Text style={{textAlign: 'center', fontSize: 20, color: '#777'}}>{children}</Text>
+
+const OnlineOfflineToggle = () => (
+  <View>
+    <Header>Set your status</Header>
+    <View style={homeStyles.toggleOuter}>
+      <View style={homeStyles.toggleBtn}>
+        <Text style={homeStyles.toggleBtnText}>Offline</Text>
+      </View>
+      <View style={{...homeStyles.toggleBtn, ...homeStyles.toggleBtnSelected}}>
+        <Text style={{...homeStyles.toggleBtnText, ...homeStyles.toggleBtnTextSelected}}>Online</Text>
+      </View>
+    </View>
+  </View>
+)
+
+const Friend = ({name}) => (
+  <View
+    style={{
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingTop: 8,
+      paddingBottom: 8,
+      paddingLeft: 12,
+      paddingRight: 12,
+      margin: 4,
+      backgroundColor: '#222',
+      borderRadius: 8,
+    }}>
+    <Text style={{fontSize: 32}}>{name}</Text>
+    <Text style={{fontSize: 32}}>📞</Text>
+  </View>
+)
 
 export default function HomeScreen({navigation}) {
   return (
     <View style={{...styles.container, ...styles.flexColumn}}>
-      <Text style={{fontSize: 54, textAlign: 'center'}}>Ketchup Club</Text>
+      <Text style={{fontSize: 54, textAlign: 'center', marginTop: 40}}>Ketchup Club</Text>
+
+      <OnlineOfflineToggle />
+
       <View>
-        <Text style={{textAlign: 'center', fontSize: 18}}>Set your status:</Text>
-        <View style={homeStyles.toggleOuter}>
-          <View style={homeStyles.toggleBtn}>
-            <Text style={homeStyles.toggleButtonText}>Offline</Text>
-          </View>
-          <View style={{...homeStyles.toggleBtn, ...homeStyles.toggleBtnSelected}}>
-            <Text style={homeStyles.toggleButtonText}>Online</Text>
-          </View>
-        </View>
+        <Header>Friends online right now</Header>
+        <Friend name="Alice" />
+        <Friend name="Bob" />
+        <Friend name="Charlie" />
       </View>
+
       <NavBtns navigation={navigation} />
     </View>
   )

@@ -59,10 +59,10 @@ export default function App() {
   return (
     <AuthTokenContext.Provider value={{authToken, setAuthToken}}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <Pre data={{authToken}} />
-          {authToken ? <LoggedInNavigator /> : <LoginScreen />}
-        </View>
+        {/* <View style={styles.container}>
+          <Pre data={{authToken}} /> */}
+        {authToken ? <LoggedInNavigator /> : <LoginScreen />}
+        {/* </View> */}
       </TouchableWithoutFeedback>
     </AuthTokenContext.Provider>
   )

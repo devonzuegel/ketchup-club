@@ -2,7 +2,7 @@ import React, {useState, useRef, forwardRef} from 'react'
 import {TextInput as RNTextInput, View} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
-import {Button, Text} from './Utils'
+import {Button, Text, styles} from './Utils'
 
 const stylesheet = {
   textInput: {
@@ -97,9 +97,9 @@ export const LoginScreen = () => {
   // }
 
   return (
-    <View>
+    <View style={styles.container}>
       <View>
-        <Text style={{fontSize: 24, textAlign: 'center', color: '#50606C'}}>Welcome to</Text>
+        <Text style={{fontSize: 24, textAlign: 'center', color: '#50606C', marginTop: 120}}>Welcome to</Text>
         <Text style={{fontSize: 54, textAlign: 'center'}}>Ketchup Club</Text>
       </View>
 
