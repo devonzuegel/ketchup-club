@@ -12,10 +12,6 @@ const containerPadding = 16
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column', // inner items will be added vertically
-    flexGrow: 1, // all the available vertical space will be occupied by it
-    justifyContent: 'space-between', // will create the gutter between body and footer
-
     fontFamily: 'SFCompactRounded_Medium',
     backgroundColor: 'black',
     padding: containerPadding,
@@ -23,6 +19,12 @@ const styles = StyleSheet.create({
     borderColor: '#222',
     borderStyle: 'dotted',
     borderWidth: 2,
+  },
+  flexColumn: {
+    flex: 1,
+    flexDirection: 'column', // inner items will be added vertically
+    flexGrow: 1, // all the available vertical space will be occupied by it
+    justifyContent: 'space-between', // will create the gutter between body and footer
   },
 })
 
@@ -70,7 +72,7 @@ function SettingsScreen({navigation}) {
 
   return (
     <AuthTokenContext.Provider value={{authToken, setAuthToken}}>
-      <View style={styles.container}>
+      <View style={{...styles.container, ...styles.flexColumn}}>
         <Text>Settings</Text>
         <Button title="Logout" onPress={logout} />
         <NavBtns navigation={navigation} />
@@ -83,7 +85,7 @@ function HomeScreen({route, navigation}) {
   /* 2. Get the param */
   const {itemId, otherParam} = route.params
   return (
-    <View style={styles.container}>
+    <View style={{...styles.container, ...styles.flexColumn}}>
       <Text>Home Screen</Text>
       <Pre data={route.params} />
       <NavBtns navigation={navigation} />
@@ -93,7 +95,7 @@ function HomeScreen({route, navigation}) {
 
 function FriendsScreen({navigation}) {
   return (
-    <View style={styles.container}>
+    <View style={{...styles.container, ...styles.flexColumn}}>
       <Text>Friends</Text>
       <NavBtns navigation={navigation} />
     </View>
@@ -122,9 +124,8 @@ export default function App() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <Pre data={{authToken}} />
-          <LoggedInNavigator />
-          {/* {authToken ? <LoggedInNavigator /> : <LoginScreen />} */}
-          {/* <Map /> */}
+          {/* <LoggedInNavigator /> */}
+          {authToken ? <LoggedInNavigator /> : <LoginScreen />}
         </View>
       </TouchableWithoutFeedback>
     </AuthTokenContext.Provider>

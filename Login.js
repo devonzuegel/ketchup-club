@@ -98,7 +98,7 @@ export const LoginScreen = () => {
 
   return (
     <View>
-      <View style={{marginTop: 100, marginBottom: 36}}>
+      <View>
         <Text style={{fontSize: 24, textAlign: 'center', color: '#50606C'}}>Welcome to</Text>
         <Text style={{fontSize: 54, textAlign: 'center'}}>Ketchup Club</Text>
       </View>
