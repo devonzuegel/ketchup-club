@@ -30,7 +30,7 @@ const TextInput = forwardRef((props, ref) => (
 ))
 
 const api = axios.create({
-  baseURL: 'https://f5f6-132-147-43-111.ngrok-free.app/api/v2',
+  baseURL: 'https://6c35-132-147-43-111.ngrok-free.app/api/v2',
 })
 
 export const LoginScreen = () => {
@@ -99,7 +99,7 @@ export const LoginScreen = () => {
   return (
     <View>
       <View style={{marginTop: 100, marginBottom: 36}}>
-        <Text style={{fontSize: 24, textAlign: 'center'}}>Welcome to</Text>
+        <Text style={{fontSize: 24, textAlign: 'center', color: '#50606C'}}>Welcome to</Text>
         <Text style={{fontSize: 54, textAlign: 'center'}}>Ketchup Club</Text>
       </View>
 
