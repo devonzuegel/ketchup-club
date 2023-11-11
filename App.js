@@ -1,8 +1,8 @@
-import {View, TouchableWithoutFeedback, Keyboard} from 'react-native'
-import {fonts, Text, Button, Pre, styles, NavBtns} from './Utils'
+import {View, TouchableWithoutFeedback, Keyboard, TextInput, Dimensions} from 'react-native'
+import {fonts, Text, Button, Pre, styles, NavBtns, Header} from './Utils'
 import React, {useState} from 'react'
 import {useFonts} from 'expo-font'
-import {LoginScreen, AuthTokenContext, logout} from './Login'
+import {LoginScreen, AuthTokenContext} from './Login'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {NavigationContainer} from '@react-navigation/native'
 import {createNativeStackNavigator} from '@react-navigation/native-stack'
@@ -30,10 +30,59 @@ function SettingsScreen({navigation}) {
   )
 }
 
+const Friend = ({name}) => (
+  <View
+    style={{
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingTop: 12,
+      paddingBottom: 12,
+      paddingLeft: 18,
+      paddingRight: 18,
+      margin: 4,
+      backgroundColor: '#222',
+      borderRadius: 8,
+    }}>
+    <Text style={{fontSize: 32}}>{name}</Text>
+    <Text style={{fontSize: 32}}>{name.length % 3 == 0 ? '🔔' : '🔕'}</Text>
+  </View>
+)
+
 function FriendsScreen({navigation}) {
+  const friends = ['Alice', 'Bob', 'Charlie']
   return (
     <View style={{...styles.container, ...styles.flexColumn}}>
-      <Text>Friends</Text>
+      <View style={{marginTop: 48}}>
+        <Header>Friends</Header>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginLeft: 4,
+            marginRight: 4,
+            marginTop: 24,
+            marginBottom: 24,
+            paddingTop: 6,
+            paddingBottom: 6,
+            paddingLeft: 10,
+            paddingRight: 10,
+            borderRadius: 8,
+            backgroundColor: '#222',
+          }}>
+          <Text style={{fontSize: 16}}>🔍</Text>
+          <TextInput
+            placeholder="Search"
+            placeholderTextColor="#777"
+            style={{width: Dimensions.get('window').width - 80, color: 'white', fontSize: 16}}
+          />
+        </View>
+
+        {friends.map((name) => (
+          <Friend name={name} />
+        ))}
+      </View>
       <NavBtns navigation={navigation} />
     </View>
   )

@@ -1,5 +1,5 @@
 import {StyleSheet, View} from 'react-native'
-import {Text, styles, NavBtns} from './Utils'
+import {Text, styles, NavBtns, Header} from './Utils'
 import React from 'react'
 
 const homeStyles = StyleSheet.create({
@@ -24,8 +24,6 @@ const homeStyles = StyleSheet.create({
   toggleBtnText: {textAlign: 'center', fontSize: 32, fontFamily: 'SFCompactRounded_Semibold', color: '#777'},
   toggleBtnTextSelected: {color: 'white'},
 })
-
-const Header = ({children}) => <Text style={{textAlign: 'center', fontSize: 20, color: '#444', marginBottom: 4}}>{children}</Text>
 
 const OnlineOfflineToggle = () => (
   <View>

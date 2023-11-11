@@ -82,6 +82,10 @@ export const styles = StyleSheet.create({
   },
 })
 
+export const Header = ({children}) => (
+  <Text style={{textAlign: 'center', fontSize: 20, color: '#444', marginBottom: 4}}>{children}</Text>
+)
+
 export const Text = (props) => (
   <RNText {...props} style={{fontFamily: 'SFCompactRounded_Medium', color: 'white', ...props.style}}>
     {props.children}
