@@ -78,7 +78,6 @@ function SettingsScreen({navigation}) {
       <View style={{...styles.container, ...styles.flexColumn}}>
         <View style={{marginTop: 48}}>
           <Header>Settings</Header>
-          <SearchBar />
 
           {settings.map(([section, sectionItems], i) => (
             <View key={i}>
