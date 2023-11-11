@@ -39,9 +39,9 @@ export const Text = (props) => (
   </RNText>
 )
 
-export const Button = ({onPress, title, style}) => (
-  <TouchableOpacity onPress={onPress} style={{...styles.appButtonContainer, ...style}}>
-    <Text style={styles.appButtonText}>{title}</Text>
+export const Button = ({onPress, title, btnStyle, textStyle}) => (
+  <TouchableOpacity onPress={onPress} style={{...styles.appButtonContainer, ...btnStyle}}>
+    <Text style={{...styles.appButtonText, ...textStyle}}>{title}</Text>
   </TouchableOpacity>
 )
 

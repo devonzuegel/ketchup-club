@@ -24,16 +24,37 @@ const styles = StyleSheet.create({
   },
 })
 
-const NavBtns = ({navigation}) => (
-  <View>
-    <View flexDirection="row" justifyContent="space-around">
-      <Button title="<" onPress={() => navigation.goBack()} />
-      <Button title="Friends" onPress={() => navigation.navigate('Friends')} />
-      <Button title="Home" onPress={() => navigation.push('Home', {itemId: Math.floor(Math.random() * 100)})} />
-      <Button title="Settings" onPress={() => navigation.navigate('Settings')} />
+const NavBtns = ({navigation}) => {
+  const getCurrentScreen = () => {
+    const {routes, index} = navigation.getState()
+    return routes[index].name
+  }
+  const isCurrentScreen = (screenName) => screenName == getCurrentScreen()
+  return (
+    <View>
+      <View flexDirection="row" justifyContent="space-around" style={{marginBottom: 40}}>
+        <Button
+          title="Friends"
+          btnStyle={isCurrentScreen('Friends') && {borderColor: 'white'}}
+          textStyle={isCurrentScreen('Friends') && {color: 'white'}}
+          onPress={() => navigation.navigate('Friends')}
+        />
+        <Button
+          title="Home"
+          btnStyle={isCurrentScreen('Home') && {borderColor: 'white'}}
+          textStyle={isCurrentScreen('Home') && {color: 'white'}}
+          onPress={() => navigation.push('Home', {itemId: Math.floor(Math.random() * 100)})}
+        />
+        <Button
+          title="Settings"
+          btnStyle={isCurrentScreen('Settings') && {borderColor: 'white'}}
+          textStyle={isCurrentScreen('Settings') && {color: 'white'}}
+          onPress={() => navigation.navigate('Settings')}
+        />
+      </View>
     </View>
-  </View>
-)
+  )
+}
 // const SettingsScreen = () => {
 //   const {authToken, setAuthToken} = React.useContext(AuthTokenContext)
 //   // const [authToken, setAuthToken] = useState(null)
