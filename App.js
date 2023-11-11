@@ -8,6 +8,25 @@ import {NavigationContainer} from '@react-navigation/native'
 import {createNativeStackNavigator} from '@react-navigation/native-stack'
 import HomeScreen from './Home'
 
+const SettingItem = ({name}) => (
+  <View
+    style={{
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingTop: 10,
+      paddingBottom: 10,
+      paddingLeft: 14,
+      paddingRight: 14,
+      margin: 4,
+      backgroundColor: '#222',
+      borderRadius: 8,
+    }}>
+    <Text style={{fontSize: 20}}>{name}</Text>
+    <Text style={{fontSize: 20}}>{name.length % 3 == 0 ? '✅' : '❌'}</Text>
+  </View>
+)
+
 function SettingsScreen({navigation}) {
   const {authToken, setAuthToken} = React.useContext(AuthTokenContext)
   const [fontsLoaded] = useFonts(fonts)
@@ -19,11 +38,49 @@ function SettingsScreen({navigation}) {
     AsyncStorage.removeItem('authToken')
   }
 
+  const settings = ['Contacts', 'Push Notifications', 'Username', 'Avatar', 'Phone']
+
   return (
     <AuthTokenContext.Provider value={{authToken, setAuthToken}}>
-      <View style={{...styles.container, ...styles.flexColumn}}>
+      {/* <View style={{...styles.container, ...styles.flexColumn}}>
         <Text>Settings</Text>
         <Button title="Logout" onPress={logout} />
+        <NavBtns navigation={navigation} />
+      </View> */}
+
+      <View style={{...styles.container, ...styles.flexColumn}}>
+        <View style={{marginTop: 48}}>
+          <Header>Settings</Header>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginLeft: 4,
+              marginRight: 4,
+              marginTop: 24,
+              marginBottom: 24,
+              paddingTop: 6,
+              paddingBottom: 6,
+              paddingLeft: 10,
+              paddingRight: 10,
+              borderRadius: 8,
+              backgroundColor: '#222',
+            }}>
+            <Text style={{fontSize: 16}}>🔍</Text>
+            <TextInput
+              placeholder="Search"
+              placeholderTextColor="#777"
+              style={{width: Dimensions.get('window').width - 80, color: 'white', fontSize: 16, marginLeft: 6}}
+            />
+          </View>
+
+          {settings.map((name) => (
+            <SettingItem name={name} />
+          ))}
+        </View>
+
         <NavBtns navigation={navigation} />
       </View>
     </AuthTokenContext.Provider>
@@ -35,6 +92,7 @@ const Friend = ({name}) => (
     style={{
       flexDirection: 'row',
       justifyContent: 'space-between',
+      alignItems: 'center',
       paddingTop: 12,
       paddingBottom: 12,
       paddingLeft: 18,
@@ -84,6 +142,7 @@ function FriendsScreen({navigation}) {
             <Friend name={name} />
           ))}
         </View>
+
         <NavBtns navigation={navigation} />
       </View>
     </TouchableWithoutFeedback>
