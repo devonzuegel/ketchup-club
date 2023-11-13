@@ -35,7 +35,7 @@ const api = axios.create({
 })
 
 export const LoginScreen = () => {
-  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
@@ -54,13 +54,13 @@ export const LoginScreen = () => {
   }, [])
 
   const handleLogin = async () => {
-    if (email === '' && password === '') return setError("Oops, email and password can't be blank!")
-    if (email === '') return setError("Oops, email can't be blank!")
+    if (phone === '' && password === '') return setError("Oops, phone number and password can't be blank!")
+    if (phone === '') return setError("Oops, phone number can't be blank!")
     if (password === '') return setError("Oops, password can't be blank!")
     setError(null) // clear error messages from screen
 
     try {
-      const response = await api.post('/login', {params: {email: email, password}})
+      const response = await api.post('/login', {params: {phone, password}})
       setMessage(response.data.message)
       console.log('\n\nresponse.data: ', JSON.stringify(response.data, null, 2))
 
@@ -110,11 +110,11 @@ export const LoginScreen = () => {
         <Text style={{textAlign: 'center', color: 'green'}}>{message} </Text>
 
         <TextInput
-          placeholder="Email"
-          value={email}
+          placeholder="Phone number"
+          value={phone}
           multiline={true} // this is a fake multiline, it's only here to get around the fact that iOS Text Replacements don't work with single line text inputs
           height={40}
-          onChangeText={setEmail}
+          onChangeText={setPhone}
           returnKeyType="done"
           blurOnSubmit={true}
           style={{paddingTop: 10}}
