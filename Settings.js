@@ -40,8 +40,8 @@ export function SettingsScreen({navigation}) {
 
   const settings = [
     ['System Permissions', ['Contacts', 'Push Notifications']],
-    ['Profile', ['Username', 'Avatar']],
-    ['Account', ['Phone']],
+    ['Profile', ['Username', 'Avatar', 'Phone']],
+    ['Account', []],
   ]
 
   return (
