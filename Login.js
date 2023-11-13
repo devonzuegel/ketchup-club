@@ -36,13 +36,13 @@ const api = axios.create({
 
 export const LoginScreen = () => {
   const [phone, setPhone] = useState('')
-  const [password, setPassword] = useState('')
+  const [smsCode, setSmsCode] = useState('')
   const [phoneEntered, setPhoneEntered] = useState(false)
   const [smsCodeEntered, setSmsCodeEntered] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const {setAuthToken} = React.useContext(AuthTokenContext)
-  const passwordFieldRef = useRef()
+  const smsCodeFieldRef = useRef()
 
   // when this component loads, check if we have a token in AsyncStorage
   React.useEffect(() => {
@@ -56,13 +56,13 @@ export const LoginScreen = () => {
   }, [])
 
   const handleLogin = async () => {
-    if (phone === '' && password === '') return setError("Oops, phone number and password can't be blank!")
+    if (phone === '' && smsCode === '') return setError("Oops, phone number and SMS code can't be blank!")
     if (phone === '') return setError("Oops, phone number can't be blank!")
-    if (password === '') return setError("Oops, password can't be blank!")
+    if (smsCode === '') return setError("Oops, SMS code can't be blank!")
     setError(null) // clear error messages from screen
 
     try {
-      const response = await api.post('/login', {params: {phone, password}})
+      const response = await api.post('/login', {params: {phone, smsCode}})
       setMessage(response.data.message)
       console.log('\n\nresponse.data: ', JSON.stringify(response.data, null, 2))
 
@@ -114,31 +114,32 @@ export const LoginScreen = () => {
         <TextInput
           placeholder="Phone number"
           value={phone}
-          multiline={true} // this is a fake multiline, it's only here to get around the fact that iOS Text Replacements don't work with single line text inputs
-          height={40}
-          onChangeText={setPhone}
+          onChangeText={(text) => {
+            setPhone(text)
+            if (text.length >= 10) setPhoneEntered(true)
+          }}
           returnKeyType="done"
           blurOnSubmit={true}
           style={{paddingTop: 10}}
           onSubmitEditing={() => {
-            setPhoneEntered(true)
-            setTimeout(() => passwordFieldRef.current.focus(), 0)
+            setTimeout(() => smsCodeFieldRef.current.focus(), 0)
           }}
           autoCorrect={true}
-          numberOfLines={1}
-          autoCapitalize="none"
+          keyboardType="phone-pad"
+          autoFocus={true}
+          textContentType="telephoneNumber"
         />
         {phoneEntered && (
           <TextInput
-            placeholder="Password"
-            value={password}
-            ref={passwordFieldRef}
+            placeholder="SMS code"
+            value={smsCode}
+            ref={smsCodeFieldRef}
             onChangeText={(text) => {
-              setPassword(text)
+              setSmsCode(text)
               if (text.length >= 4) setSmsCodeEntered(true)
             }}
             autoCapitalize="none"
-            secureTextEntry
+            keyboardType="number-pad"
           />
         )}
         {phoneEntered && smsCodeEntered && <Button title="Login" onPress={handleLogin} />}
