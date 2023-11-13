@@ -1,6 +1,7 @@
+import React from 'react'
 import {StyleSheet, View} from 'react-native'
 import {Text, styles, NavBtns, Header} from './Utils'
-import React from 'react'
+import {callNumber} from './Phone'
 
 const homeStyles = StyleSheet.create({
   toggleOuter: {
@@ -39,7 +40,7 @@ const OnlineOfflineToggle = () => (
   </View>
 )
 
-const Friend = ({name}) => (
+const Friend = ({name, phoneNumber}) => (
   <View
     style={{
       flexDirection: 'row',
@@ -53,7 +54,9 @@ const Friend = ({name}) => (
       borderRadius: 8,
     }}>
     <Text style={{fontSize: 32}}>{name}</Text>
-    <Text style={{fontSize: 32}}>📞</Text>
+    <Text style={{fontSize: 32}} onPress={() => callNumber(phoneNumber)}>
+      📞
+    </Text>
   </View>
 )
 
@@ -68,9 +71,9 @@ export default function HomeScreen({navigation}) {
 
       <View>
         <Header>Friends online right now</Header>
-        <Friend name="Alice" />
-        <Friend name="Bob" />
-        <Friend name="Charlie" />
+        <Friend name="Alicia" phoneNumber="+1-123-123-1234" />
+        <Friend name="Bennett" phoneNumber="+1-123-123-1234" />
+        <Friend name="Charlie" phoneNumber="+1-123-123-1234" />
       </View>
 
       <NavBtns navigation={navigation} />
