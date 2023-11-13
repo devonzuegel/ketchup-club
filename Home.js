@@ -2,6 +2,7 @@ import React from 'react'
 import {StyleSheet, View} from 'react-native'
 import {Text, styles, NavBtns, Header} from './Utils'
 import {callNumber} from './Phone'
+import {mockFriends} from './Friends'
 
 const homeStyles = StyleSheet.create({
   toggleOuter: {
@@ -71,9 +72,10 @@ export default function HomeScreen({navigation}) {
 
       <View>
         <Header>Friends online right now</Header>
-        <Friend name="Alicia" phoneNumber="+1-123-123-1234" />
-        <Friend name="Bennett" phoneNumber="+1-123-123-1234" />
-        <Friend name="Charlie" phoneNumber="+1-123-123-1234" />
+
+        {mockFriends.map(({name, phoneNumber}, i) => (
+          <Friend name={name} phoneNumber={phoneNumber} key={i} />
+        ))}
       </View>
 
       <NavBtns navigation={navigation} />
