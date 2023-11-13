@@ -37,6 +37,8 @@ const api = axios.create({
 export const LoginScreen = () => {
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
+  const [phoneEntered, setPhoneEntered] = useState(false)
+  const [smsCodeEntered, setSmsCodeEntered] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const {setAuthToken} = React.useContext(AuthTokenContext)
@@ -118,20 +120,29 @@ export const LoginScreen = () => {
           returnKeyType="done"
           blurOnSubmit={true}
           style={{paddingTop: 10}}
-          onSubmitEditing={() => passwordFieldRef.current.focus()}
+          onSubmitEditing={() => {
+            setPhoneEntered(true)
+            setTimeout(() => passwordFieldRef.current.focus(), 0)
+          }}
           autoCorrect={true}
           numberOfLines={1}
           autoCapitalize="none"
         />
-        <TextInput
-          placeholder="Password"
-          value={password}
-          ref={passwordFieldRef}
-          onChangeText={setPassword}
-          autoCapitalize="none"
-          secureTextEntry
-        />
-        <Button title="Login" onPress={handleLogin} />
+        {phoneEntered && (
+          <TextInput
+            placeholder="Password"
+            value={password}
+            ref={passwordFieldRef}
+            onChangeText={(text) => {
+              setPassword(text)
+              if (text.length >= 4) setSmsCodeEntered(true)
+            }}
+            autoCapitalize="none"
+            secureTextEntry
+          />
+        )}
+        {phoneEntered && smsCodeEntered && <Button title="Login" onPress={handleLogin} />}
+
         {/* <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
       <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(authToken)} />
       <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} /> */}
