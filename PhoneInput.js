@@ -5,15 +5,6 @@ import PhoneInput from 'react-native-phone-number-input'
 
 const debug = true
 
-const styles = {
-  wrapper: {
-    padding: 24,
-    paddingTop: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-}
-
 const PhoneInputComponent = ({validPhone, setValidPhone}) => {
   const [value, setValue] = useState('')
   const [formattedValue, setFormattedValue] = useState('')
@@ -21,7 +12,7 @@ const PhoneInputComponent = ({validPhone, setValidPhone}) => {
 
   return (
     <>
-      <SafeAreaView style={styles.wrapper}>
+      <SafeAreaView>
         {debug && (
           <View style={debugStyles.message}>
             <Text style={debugStyles.msgTxt}>········· Valid: {validPhone ? 'true' : 'false'}</Text>
@@ -37,7 +28,7 @@ const PhoneInputComponent = ({validPhone, setValidPhone}) => {
           onChangeText={(text) => {
             setValue(text)
             const checkValid = phoneInput.current?.isValidNumber(text)
-            setValidPhone(checkValid ? checkValid : false)
+            setValidPhone(checkValid)
           }}
           onChangeFormattedText={(text) => {
             setFormattedValue(text)

@@ -18,6 +18,11 @@ const stylesheet = {
     borderRadius: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
   },
+  wrapper: {
+    padding: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 }
 
 export const AuthTokenContext = React.createContext() // allows access to the auth token throughout the app
@@ -113,15 +118,16 @@ export const LoginScreen = () => {
           <Text style={{fontSize: 24, textAlign: 'center', color: '#50606C', marginTop: 120}}>Welcome to</Text>
           <Text style={{fontSize: 54, textAlign: 'center'}}>Ketchup Club</Text>
         </View>
+        <View style={stylesheet.wrapper}>
+          {/* The spaces at the end of the "error" & "message" fields are to prevent the text from jumping */}
+          <Text style={{textAlign: 'center', color: 'red'}}>{error} </Text>
+          <Text style={{textAlign: 'center', color: 'green'}}>{message} </Text>
 
-        {/* The spaces at the end of the "error" & "message" fields are to prevent the text from jumping */}
-        <Text style={{textAlign: 'center', color: 'red'}}>{error} </Text>
-        <Text style={{textAlign: 'center', color: 'green'}}>{message} </Text>
-
-        <Text style={{textAlign: 'center', color: '#50606C', marginTop: 24, marginBottom: 12, fontSize: 16}}>
-          Enter your phone number to sign in or sign up
-        </Text>
-        <PhoneInput validPhone={validPhone} setValidPhone={setValidPhone} />
+          <Text style={{textAlign: 'center', color: '#50606C', marginBottom: 12, fontSize: 16}}>
+            Enter your phone number to sign in or sign up
+          </Text>
+          <PhoneInput validPhone={validPhone} setValidPhone={setValidPhone} />
+        </View>
 
         {/* <PhoneInput
           ref={phoneInput}
