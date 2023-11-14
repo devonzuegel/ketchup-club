@@ -125,9 +125,8 @@ export const LoginScreen = () => {
             Enter your phone number to sign in or sign up
           </Text>
           <PhoneInput validPhone={validPhone} setValidPhone={setValidPhone} phone={phone} setPhone={setPhone} />
-        </View>
 
-        {/* <TextInput
+          {/* <TextInput
           placeholder="Phone number"
           value={phone}
           onChangeText={(text) => {
@@ -145,20 +144,22 @@ export const LoginScreen = () => {
           autoFocus={true}
           textContentType="telephoneNumber"
         /> */}
-        {validPhone && (
-          <TextInput
-            placeholder="SMS code"
-            value={smsCode}
-            ref={smsCodeFieldRef}
-            onChangeText={(text) => {
-              setSmsCode(text)
-              if (text.length >= 4) setSmsCodeEntered(true)
-            }}
-            autoCapitalize="none"
-            keyboardType="number-pad"
-          />
-        )}
-        {validPhone && smsCodeEntered && <Button title="Login" onPress={handleLogin} />}
+          {validPhone && (
+            <TextInput
+              style={{width: '100%'}}
+              placeholder="SMS code"
+              value={smsCode}
+              ref={smsCodeFieldRef}
+              onChangeText={(text) => {
+                setSmsCode(text)
+                if (text.length >= 4) setSmsCodeEntered(true)
+              }}
+              autoCapitalize="none"
+              keyboardType="number-pad"
+            />
+          )}
+          {validPhone && smsCodeEntered && <Button title="Login" onPress={handleLogin} />}
+        </View>
 
         {debug && (
           <>
