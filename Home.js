@@ -1,8 +1,7 @@
 import React from 'react'
 import {StyleSheet, View} from 'react-native'
-import {Text, styles, NavBtns, Header, Button} from './Utils'
+import {Text, styles, NavBtns, Header, Button, DotAnimation} from './Utils'
 import {callNumber} from './Phone'
-import {mockFriends} from './Friends'
 import api from './API'
 
 const homeStyles = StyleSheet.create({
@@ -63,6 +62,17 @@ const Friend = ({name, phoneNumber}) => (
 )
 
 export default function HomeScreen({navigation}) {
+  const [friends, setFriends] = React.useState(null)
+
+  React.useEffect(() => {
+    async function fetchFriends() {
+      api.get('/users').then((result) => {
+        setFriends(result.data)
+      })
+    }
+    fetchFriends()
+  }, [])
+
   return (
     <View style={{...styles.container, ...styles.flexColumn}}>
       <Text style={{fontSize: 54, textAlign: 'center', marginTop: 42, fontFamily: 'SFCompactRounded_Semibold'}}>
@@ -71,20 +81,14 @@ export default function HomeScreen({navigation}) {
 
       <OnlineOfflineToggle />
 
-      <Button
-        title="get users"
-        onPress={() => {
-          api.get('/users').then((res) => {
-            console.log('res.data:', res.data)
-          })
-        }}></Button>
-
       <View>
         <Header>Friends online right now</Header>
 
-        {mockFriends.map(({name, phoneNumber}, i) => (
-          <Friend name={name} phoneNumber={phoneNumber} key={i} />
-        ))}
+        {friends == null ? (
+          <DotAnimation style={{alignSelf: 'center', width: 60, marginTop: 12}} />
+        ) : (
+          friends.map(({screen_name, phone}, i) => <Friend name={screen_name} phoneNumber={phone} key={i} />)
+        )}
       </View>
 
       <NavBtns navigation={navigation} />
