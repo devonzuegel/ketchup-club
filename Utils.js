@@ -82,6 +82,20 @@ export const styles = StyleSheet.create({
   },
 })
 
+export const debugStyles = StyleSheet.create({
+  message: {
+    padding: 12,
+    marginTop: 24,
+    backgroundColor: '#222',
+    color: 'white',
+    borderRadius: 4,
+    justifyContent: 'left',
+    width: 300,
+    marginBottom: 12,
+  },
+  msgTxt: {color: 'white', fontFamily: 'Courier New'},
+})
+
 export const Header = ({children, style}) => (
   <Text style={{textAlign: 'center', fontSize: 20, color: '#444', marginBottom: 4, ...style}}>{children}</Text>
 )

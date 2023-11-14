@@ -38,6 +38,7 @@ const api = axios.create({
 export const LoginScreen = () => {
   const [phone, setPhone] = useState('')
   const [smsCode, setSmsCode] = useState('')
+  const [validPhone, setValidPhone] = useState(false)
   const [phoneEntered, setPhoneEntered] = useState(false)
   const [smsCodeEntered, setSmsCodeEntered] = useState(false)
   const [error, setError] = useState('')
@@ -120,7 +121,7 @@ export const LoginScreen = () => {
         <Text style={{textAlign: 'center', color: '#50606C', marginTop: 24, marginBottom: 12, fontSize: 16}}>
           Enter your phone number to sign in or sign up
         </Text>
-        <PhoneInput />
+        <PhoneInput validPhone={validPhone} setValidPhone={setValidPhone} />
 
         {/* <PhoneInput
           ref={phoneInput}

@@ -1,6 +1,9 @@
 import React, {useState, useRef} from 'react'
-import {SafeAreaView, View, TouchableOpacity, Text} from 'react-native'
+import {SafeAreaView, View, Text} from 'react-native'
+import {debugStyles} from './Utils'
 import PhoneInput from 'react-native-phone-number-input'
+
+const debug = true
 
 const styles = {
   wrapper: {
@@ -9,33 +12,23 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  message: {
-    padding: 12,
-    marginTop: 24,
-    backgroundColor: '#222',
-    color: 'white',
-    borderRadius: 4,
-    justifyContent: 'left',
-    width: 300,
-    marginBottom: 12,
-  },
-  msgTxt: {color: 'white', fontFamily: 'Courier New'},
 }
 
-const PhoneInputComponent = () => {
+const PhoneInputComponent = ({validPhone, setValidPhone}) => {
   const [value, setValue] = useState('')
   const [formattedValue, setFormattedValue] = useState('')
-  const [valid, setValid] = useState(false)
   const phoneInput = useRef()
 
   return (
     <>
       <SafeAreaView style={styles.wrapper}>
-        <View style={styles.message}>
-          <Text style={styles.msgTxt}>········· Valid: {valid ? 'true' : 'false'}</Text>
-          <Text style={styles.msgTxt}>········· Value: {value}</Text>
-          <Text style={styles.msgTxt}>Formatted Value: {formattedValue}</Text>
-        </View>
+        {debug && (
+          <View style={debugStyles.message}>
+            <Text style={debugStyles.msgTxt}>········· Valid: {validPhone ? 'true' : 'false'}</Text>
+            <Text style={debugStyles.msgTxt}>········· Value: {value}</Text>
+            <Text style={debugStyles.msgTxt}>Formatted Value: {formattedValue}</Text>
+          </View>
+        )}
         <PhoneInput
           ref={phoneInput}
           defaultValue={value}
@@ -44,7 +37,7 @@ const PhoneInputComponent = () => {
           onChangeText={(text) => {
             setValue(text)
             const checkValid = phoneInput.current?.isValidNumber(text)
-            setValid(checkValid ? checkValid : false)
+            setValidPhone(checkValid ? checkValid : false)
           }}
           onChangeFormattedText={(text) => {
             setFormattedValue(text)
