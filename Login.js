@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
 import {Button, Text, styles} from './Utils'
 import {Keyboard, TouchableWithoutFeedback} from 'react-native'
+import PhoneInput from './PhoneInput'
 
 const stylesheet = {
   textInput: {
@@ -99,6 +100,11 @@ export const LoginScreen = () => {
   //   }
   // }
 
+  // const phoneInput = useRef()
+  // const [value, setValue] = useState('')
+  // const [formattedValue, setFormattedValue] = useState('')
+  // const [valid, setValid] = useState(false)
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
@@ -111,7 +117,28 @@ export const LoginScreen = () => {
         <Text style={{textAlign: 'center', color: 'red'}}>{error} </Text>
         <Text style={{textAlign: 'center', color: 'green'}}>{message} </Text>
 
-        <TextInput
+        <Text style={{textAlign: 'center', color: '#50606C', marginTop: 24, marginBottom: 12, fontSize: 16}}>
+          Enter your phone number to sign in or sign up
+        </Text>
+        <PhoneInput />
+
+        {/* <PhoneInput
+          ref={phoneInput}
+          defaultValue={value}
+          defaultCode="US"
+          layout="first"
+          onChangeText={(text) => {
+            setValue(text)
+          }}
+          onChangeFormattedText={(text) => {
+            setFormattedValue(text)
+          }}
+          withDarkTheme
+          withShadow
+          autoFocus
+        /> */}
+
+        {/* <TextInput
           placeholder="Phone number"
           value={phone}
           onChangeText={(text) => {
@@ -128,7 +155,7 @@ export const LoginScreen = () => {
           keyboardType="phone-pad"
           autoFocus={true}
           textContentType="telephoneNumber"
-        />
+        /> */}
         {phoneEntered && (
           <TextInput
             placeholder="SMS code"
