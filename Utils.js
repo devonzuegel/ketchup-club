@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import {View, Button as RNButton, StyleSheet, TouchableOpacity, Text as RNText} from 'react-native'
 
 export const NavBtns = ({navigation}) => {
@@ -127,4 +127,28 @@ export const fonts = {
   SFCompactRounded_Bold: require('./assets/fonts/SF-Compact-Rounded-Bold.otf'),
   SFCompactRounded_Heavy: require('./assets/fonts/SF-Compact-Rounded-Heavy.otf'),
   SFCompactRounded_Black: require('./assets/fonts/SF-Compact-Rounded-Black.otf'),
+}
+
+export const DotAnimation = ({style}) => {
+  const [dots, setDots] = useState('...')
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prevDots) => {
+        if (prevDots.length < 3) {
+          return prevDots + '.'
+        } else {
+          return ''
+        }
+      })
+    }, 300) // Change dot every 500 milliseconds
+
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <View>
+      <Text style={style}>Loading{dots}</Text>
+    </View>
+  )
 }
