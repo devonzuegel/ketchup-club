@@ -1,8 +1,9 @@
 import React from 'react'
 import {StyleSheet, View} from 'react-native'
-import {Text, styles, NavBtns, Header} from './Utils'
+import {Text, styles, NavBtns, Header, Button} from './Utils'
 import {callNumber} from './Phone'
 import {mockFriends} from './Friends'
+import api from './API'
 
 const homeStyles = StyleSheet.create({
   toggleOuter: {
@@ -69,6 +70,14 @@ export default function HomeScreen({navigation}) {
       </Text>
 
       <OnlineOfflineToggle />
+
+      <Button
+        title="get users"
+        onPress={() => {
+          api.get('/users').then((res) => {
+            console.log('res.data:', res.data)
+          })
+        }}></Button>
 
       <View>
         <Header>Friends online right now</Header>

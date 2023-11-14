@@ -1,10 +1,10 @@
 import React, {useState, useRef, forwardRef} from 'react'
 import {TextInput as RNTextInput, View} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import axios from 'axios'
 import {Button, Text, styles} from './Utils'
 import {Keyboard, TouchableWithoutFeedback} from 'react-native'
 import PhoneInput from './PhoneInput'
+import api from './API'
 
 const debug = false
 
@@ -37,10 +37,6 @@ const TextInput = forwardRef((props, ref) => (
     style={{...stylesheet.textInput, ...props.style}}
   />
 ))
-
-const api = axios.create({
-  baseURL: 'https://6c35-132-147-43-111.ngrok-free.app/api/v2',
-})
 
 export const LoginScreen = () => {
   const [phone, setPhone] = useState('')
