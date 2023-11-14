@@ -5,7 +5,7 @@ import {LoginScreen, AuthTokenContext} from './Login'
 import {NavigationContainer} from '@react-navigation/native'
 import {createNativeStackNavigator} from '@react-navigation/native-stack'
 import HomeScreen from './Home'
-import {FriendsScreen, FriendsProvider} from './Friends'
+import {FriendsScreen, FriendsContext} from './Friends'
 import {SettingsScreen} from './Settings'
 
 const debug = false
@@ -31,7 +31,9 @@ export default function App() {
   return (
     <AuthTokenContext.Provider value={{authToken, setAuthToken}}>
       {debug && <Pre data={{authToken}} />}
-      <FriendsProvider value={{friends, setFriends}}>{authToken ? <LoggedInNavigator /> : <LoginScreen />}</FriendsProvider>
+      <FriendsContext.Provider value={{friends, setFriends}}>
+        {authToken ? <LoggedInNavigator /> : <LoginScreen />}
+      </FriendsContext.Provider>
     </AuthTokenContext.Provider>
   )
 }

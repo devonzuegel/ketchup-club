@@ -4,11 +4,6 @@ import React from 'react'
 
 export const FriendsContext = React.createContext() // allows access to key data throughout the app
 
-export const FriendsProvider = ({children}) => {
-  const [friends, setFriends] = React.useState(null)
-  return <FriendsContext.Provider value={{friends, setFriends}}>{children}</FriendsContext.Provider>
-}
-
 export const mockFriends = [
   {phoneNumber: '+1-123-123-1234', name: 'Alicia'},
   {phoneNumber: '+1-123-123-1234', name: 'Bobby'},
@@ -61,9 +56,7 @@ const Friend = ({name}) => (
 )
 
 export function FriendsScreen({navigation}) {
-  // const friends = mockFriends.map((f) => f.name)
-  // const {friends} = React.useContext(FriendsContext)
-  const {friends, setFriends} = React.useContext(FriendsContext)
+  const {friends} = React.useContext(FriendsContext)
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={{...styles.container, ...styles.flexColumn}}>

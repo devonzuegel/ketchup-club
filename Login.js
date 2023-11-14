@@ -29,6 +29,11 @@ const stylesheet = {
 
 export const AuthTokenContext = React.createContext() // allows access to the auth token throughout the app
 
+export const AuthTokenProvider = ({children}) => {
+  const [authToken, setAuthToken] = React.useState(null)
+  return <AuthTokenContext.Provider value={{authToken, setAuthToken}}>{children}</AuthTokenContext.Provider>
+}
+
 const TextInput = forwardRef((props, ref) => (
   <RNTextInput
     ref={ref}
