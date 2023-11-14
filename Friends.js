@@ -1,6 +1,13 @@
 import {View, TouchableWithoutFeedback, Keyboard, TextInput, Dimensions} from 'react-native'
-import {Text, styles, NavBtns, Header} from './Utils'
+import {Text, styles, NavBtns, Header, DotAnimation} from './Utils'
 import React from 'react'
+
+export const FriendsContext = React.createContext() // allows access to key data throughout the app
+
+export const FriendsProvider = ({children}) => {
+  const [friends, setFriends] = React.useState(null)
+  return <FriendsContext.Provider value={{friends, setFriends}}>{children}</FriendsContext.Provider>
+}
 
 export const mockFriends = [
   {phoneNumber: '+1-123-123-1234', name: 'Alicia'},
@@ -49,12 +56,14 @@ const Friend = ({name}) => (
       borderRadius: 8,
     }}>
     <Text style={{fontSize: 32}}>{name}</Text>
-    <Text style={{fontSize: 32}}>{name.length % 3 == 0 ? '🔔' : '🔕'}</Text>
+    <Text style={{fontSize: 32}}>{name.length % 5 == 0 ? '🔔' : '🔕'}</Text>
   </View>
 )
 
 export function FriendsScreen({navigation}) {
-  const friends = mockFriends.map((f) => f.name)
+  // const friends = mockFriends.map((f) => f.name)
+  // const {friends} = React.useContext(FriendsContext)
+  const {friends, setFriends} = React.useContext(FriendsContext)
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={{...styles.container, ...styles.flexColumn}}>
@@ -62,9 +71,11 @@ export function FriendsScreen({navigation}) {
           <Header>Friends</Header>
           <SearchBar />
 
-          {friends.map((name, i) => (
-            <Friend name={name} key={i} />
-          ))}
+          {friends == null ? (
+            <DotAnimation style={{alignSelf: 'center', width: 60, marginTop: 12}} />
+          ) : (
+            friends.map(({screen_name}, i) => <Friend name={screen_name} key={i} />)
+          )}
         </View>
 
         <NavBtns navigation={navigation} />

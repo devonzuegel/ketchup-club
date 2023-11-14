@@ -1,12 +1,14 @@
-import {fonts} from './Utils'
-import React, {useState} from 'react'
+import {fonts, Pre} from './Utils'
+import React from 'react'
 import {useFonts} from 'expo-font'
 import {LoginScreen, AuthTokenContext} from './Login'
 import {NavigationContainer} from '@react-navigation/native'
 import {createNativeStackNavigator} from '@react-navigation/native-stack'
 import HomeScreen from './Home'
-import {FriendsScreen} from './Friends'
+import {FriendsScreen, FriendsProvider} from './Friends'
 import {SettingsScreen} from './Settings'
+
+const debug = false
 
 const Stack = createNativeStackNavigator()
 
@@ -21,16 +23,15 @@ const LoggedInNavigator = () => (
 )
 
 export default function App() {
-  const [authToken, setAuthToken] = useState(null)
+  const [authToken, setAuthToken] = React.useState(null)
+  const [friends, setFriends] = React.useState(null)
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
 
   return (
     <AuthTokenContext.Provider value={{authToken, setAuthToken}}>
-      {/* <View style={styles.container}>
-          <Pre data={{authToken}} /> */}
-      {authToken ? <LoggedInNavigator /> : <LoginScreen />}
-      {/* </View> */}
+      {debug && <Pre data={{authToken}} />}
+      <FriendsProvider value={{friends, setFriends}}>{authToken ? <LoggedInNavigator /> : <LoginScreen />}</FriendsProvider>
     </AuthTokenContext.Provider>
   )
 }

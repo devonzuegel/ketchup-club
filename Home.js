@@ -1,8 +1,9 @@
 import React from 'react'
 import {StyleSheet, View} from 'react-native'
-import {Text, styles, NavBtns, Header, Button, DotAnimation} from './Utils'
+import {Text, styles, NavBtns, Header, DotAnimation} from './Utils'
 import {callNumber} from './Phone'
 import api from './API'
+import {FriendsContext} from './Friends'
 
 const homeStyles = StyleSheet.create({
   toggleOuter: {
@@ -61,8 +62,11 @@ const Friend = ({name, phoneNumber}) => (
   </View>
 )
 
+const Spacer = () => <View style={{marginTop: 48}} />
+
 export default function HomeScreen({navigation}) {
-  const [friends, setFriends] = React.useState(null)
+  // const [friends, setFriends] = React.useState(null)
+  const {friends, setFriends} = React.useContext(FriendsContext)
 
   React.useEffect(() => {
     async function fetchFriends() {
@@ -75,19 +79,23 @@ export default function HomeScreen({navigation}) {
 
   return (
     <View style={{...styles.container, ...styles.flexColumn}}>
-      <Text style={{fontSize: 54, textAlign: 'center', marginTop: 42, fontFamily: 'SFCompactRounded_Semibold'}}>
-        Ketchup Club
-      </Text>
-
-      <OnlineOfflineToggle />
-
       <View>
+        <Text style={{fontSize: 54, textAlign: 'center', marginTop: 42, fontFamily: 'SFCompactRounded_Semibold'}}>
+          Ketchup Club
+        </Text>
+
+        <Spacer />
+        <OnlineOfflineToggle />
+
+        <Spacer />
         <Header>Friends online right now</Header>
 
         {friends == null ? (
           <DotAnimation style={{alignSelf: 'center', width: 60, marginTop: 12}} />
         ) : (
-          friends.map(({screen_name, phone}, i) => <Friend name={screen_name} phoneNumber={phone} key={i} />)
+          friends
+            .filter(({status}) => status == 'online')
+            .map(({screen_name, phone}, i) => <Friend name={screen_name} phoneNumber={phone} key={i} />)
         )}
       </View>
 
