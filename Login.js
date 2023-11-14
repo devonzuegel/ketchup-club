@@ -124,26 +124,15 @@ export const LoginScreen = () => {
           <Text style={{textAlign: 'center', color: '#50606C', marginBottom: 12, fontSize: 16}}>
             Enter your phone number to sign in or sign up
           </Text>
-          <PhoneInput validPhone={validPhone} setValidPhone={setValidPhone} phone={phone} setPhone={setPhone} />
-
-          {/* <TextInput
-          placeholder="Phone number"
-          value={phone}
-          onChangeText={(text) => {
-            setPhone(text)
-            if (text.length >= 10) setPhoneEntered(true)
-          }}
-          returnKeyType="done"
-          blurOnSubmit={true}
-          style={{paddingTop: 10}}
-          onSubmitEditing={() => {
-            setTimeout(() => smsCodeFieldRef.current.focus(), 0)
-          }}
-          autoCorrect={true}
-          keyboardType="phone-pad"
-          autoFocus={true}
-          textContentType="telephoneNumber"
-        /> */}
+          <PhoneInput
+            validPhone={validPhone}
+            setValidPhone={(value) => {
+              if (value) setTimeout(() => smsCodeFieldRef.current.focus(), 0)
+              setValidPhone(value)
+            }}
+            phone={phone}
+            setPhone={setPhone}
+          />
           {validPhone && (
             <TextInput
               style={{width: '100%'}}
