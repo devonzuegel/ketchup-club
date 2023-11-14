@@ -6,6 +6,8 @@ import {Button, Text, styles} from './Utils'
 import {Keyboard, TouchableWithoutFeedback} from 'react-native'
 import PhoneInput from './PhoneInput'
 
+const debug = false
+
 const stylesheet = {
   textInput: {
     height: 40,
@@ -44,7 +46,6 @@ export const LoginScreen = () => {
   const [phone, setPhone] = useState('')
   const [smsCode, setSmsCode] = useState('')
   const [validPhone, setValidPhone] = useState(false)
-  const [phoneEntered, setPhoneEntered] = useState(false)
   const [smsCodeEntered, setSmsCodeEntered] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
@@ -86,30 +87,27 @@ export const LoginScreen = () => {
     }
   }
 
-  // const authenticatedRequest = (theAuthToken) => async () => {
-  //   try {
-  //     console.log('===========================================================')
-  //     console.log('authToken: "' + theAuthToken + '"')
-  //     const response = await api.get('/protected', {headers: {Authorization: `Bearer ${theAuthToken}`}})
-  //     console.log('response.data:        ', response.data)
-  //     console.log('response.data.success:', response.data.success)
-  //     console.log('response.data.message:', response.data.message)
-  //     if (response.data.success) {
-  //       setMessage(response.data.message)
-  //     } else {
-  //       console.error(response.data.message)
-  //       setError('Please log in, then try again')
-  //     }
-  //   } catch (error) {
-  //     console.error(JSON.stringify(error, null, 2))
-  //     setError('Oops, something went wrong. Please try again')
-  //   }
-  // }
-
-  // const phoneInput = useRef()
-  // const [value, setValue] = useState('')
-  // const [formattedValue, setFormattedValue] = useState('')
-  // const [valid, setValid] = useState(false)
+  /*
+  const authenticatedRequest = (theAuthToken) => async () => {
+    try {
+      console.log('===========================================================')
+      console.log('authToken: "' + theAuthToken + '"')
+      const response = await api.get('/protected', {headers: {Authorization: `Bearer ${theAuthToken}`}})
+      console.log('response.data:        ', response.data)
+      console.log('response.data.success:', response.data.success)
+      console.log('response.data.message:', response.data.message)
+      if (response.data.success) {
+        setMessage(response.data.message)
+      } else {
+        console.error(response.data.message)
+        setError('Please log in, then try again')
+      }
+    } catch (error) {
+      console.error(JSON.stringify(error, null, 2))
+      setError('Oops, something went wrong. Please try again')
+    }
+  }
+  */
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -126,24 +124,8 @@ export const LoginScreen = () => {
           <Text style={{textAlign: 'center', color: '#50606C', marginBottom: 12, fontSize: 16}}>
             Enter your phone number to sign in or sign up
           </Text>
-          <PhoneInput validPhone={validPhone} setValidPhone={setValidPhone} />
+          <PhoneInput validPhone={validPhone} setValidPhone={setValidPhone} phone={phone} setPhone={setPhone} />
         </View>
-
-        {/* <PhoneInput
-          ref={phoneInput}
-          defaultValue={value}
-          defaultCode="US"
-          layout="first"
-          onChangeText={(text) => {
-            setValue(text)
-          }}
-          onChangeFormattedText={(text) => {
-            setFormattedValue(text)
-          }}
-          withDarkTheme
-          withShadow
-          autoFocus
-        /> */}
 
         {/* <TextInput
           placeholder="Phone number"
@@ -163,7 +145,7 @@ export const LoginScreen = () => {
           autoFocus={true}
           textContentType="telephoneNumber"
         /> */}
-        {phoneEntered && (
+        {validPhone && (
           <TextInput
             placeholder="SMS code"
             value={smsCode}
@@ -176,11 +158,15 @@ export const LoginScreen = () => {
             keyboardType="number-pad"
           />
         )}
-        {phoneEntered && smsCodeEntered && <Button title="Login" onPress={handleLogin} />}
+        {validPhone && smsCodeEntered && <Button title="Login" onPress={handleLogin} />}
 
-        {/* <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
-      <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(authToken)} />
-      <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} /> */}
+        {debug && (
+          <>
+            <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
+            <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(authToken)} />
+            <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} />
+          </>
+        )}
       </View>
     </TouchableWithoutFeedback>
   )
