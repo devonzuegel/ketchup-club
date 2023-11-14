@@ -3,44 +3,39 @@ import {SafeAreaView, View, TouchableOpacity, Text} from 'react-native'
 import PhoneInput from 'react-native-phone-number-input'
 
 const styles = {
-  container: {},
   wrapper: {
     padding: 24,
     paddingTop: 100,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  button: {
-    marginTop: 24,
-    padding: 12,
-    backgroundColor: '#32C084',
-    borderRadius: 4,
-  },
   message: {
     padding: 12,
     marginTop: 24,
-    backgroundColor: '#32C084',
+    backgroundColor: '#222',
+    color: 'white',
     borderRadius: 4,
+    justifyContent: 'left',
+    width: 300,
+    marginBottom: 12,
   },
+  msgTxt: {color: 'white', fontFamily: 'Courier New'},
 }
 
 const PhoneInputComponent = () => {
   const [value, setValue] = useState('')
   const [formattedValue, setFormattedValue] = useState('')
   const [valid, setValid] = useState(false)
-  const [showMessage, setShowMessage] = useState(false)
   const phoneInput = useRef()
 
   return (
     <>
       <SafeAreaView style={styles.wrapper}>
-        {showMessage && (
-          <View style={styles.message}>
-            <Text>Value : {value}</Text>
-            <Text>Formatted Value : {formattedValue}</Text>
-            <Text>Valid : {valid ? 'true' : 'false'}</Text>
-          </View>
-        )}
+        <View style={styles.message}>
+          <Text style={styles.msgTxt}>········· Valid: {valid ? 'true' : 'false'}</Text>
+          <Text style={styles.msgTxt}>········· Value: {value}</Text>
+          <Text style={styles.msgTxt}>Formatted Value: {formattedValue}</Text>
+        </View>
         <PhoneInput
           ref={phoneInput}
           defaultValue={value}
@@ -48,6 +43,8 @@ const PhoneInputComponent = () => {
           layout="first"
           onChangeText={(text) => {
             setValue(text)
+            const checkValid = phoneInput.current?.isValidNumber(text)
+            setValid(checkValid ? checkValid : false)
           }}
           onChangeFormattedText={(text) => {
             setFormattedValue(text)
@@ -57,15 +54,6 @@ const PhoneInputComponent = () => {
           autoFocus
           textContentType="telephoneNumber"
         />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            const checkValid = phoneInput.current?.isValidNumber(value)
-            setShowMessage(true)
-            setValid(checkValid ? checkValid : false)
-          }}>
-          <Text>Check</Text>
-        </TouchableOpacity>
       </SafeAreaView>
     </>
   )
