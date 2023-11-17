@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "plugins": [
       [
         "expo-location",
@@ -41,8 +43,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "7af7d8d1-8be6-480c-9f9e-5cb8e748c168"
+        "projectId": "b4a2f0d3-ce87-4538-baf1-3db1eabce9b7"
       }
-    }
+    },
+    "owner": "devonzuegel"
   }
 }
