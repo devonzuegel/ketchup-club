@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "react-native-gmaps-2",
-    "slug": "react-native-gmaps-2",
+    "name": "ketchup-club",
+    "slug": "ketchup-club",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -22,7 +22,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.adventurelandinstitute.reactnativegmaps2"
+      "bundleIdentifier": "com.adventurelandinstitute.ketchupclub"
     },
     "android": {
       "adaptiveIcon": {
@@ -34,7 +34,7 @@
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE"
       ],
-      "package": "com.devonzuegel.reactnativegmaps2"
+      "package": "com.devonzuegel.ketchupclub"
     },
     "web": {
       "favicon": "./assets/favicon.png"
