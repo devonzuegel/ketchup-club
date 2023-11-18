@@ -114,7 +114,7 @@ export const Button = ({onPress, title, btnStyle, textStyle}) => (
 
 export const Pre = ({data, children}) => (
   <Text style={{fontFamily: 'Courier New', marginTop: 10, marginBottom: 10, padding: 10, backgroundColor: '#222'}}>
-    {children || JSON.stringify({data}, null, 2)}
+    {children || JSON.stringify(data, null, 2)}
   </Text>
 )
 
