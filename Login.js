@@ -71,7 +71,7 @@ export const LoginScreen = () => {
     setError(null) // clear error messages from screen
 
     try {
-      const response = await api.post('/login', {params: {phone, smsCode}})
+      const response = await api.post('/login', null, {params: {phone, smsCode}})
       setMessage(response.data.message)
       console.log('\n\nresponse.data: ', JSON.stringify(response.data, null, 2))
 

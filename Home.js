@@ -27,9 +27,34 @@ const homeStyles = StyleSheet.create({
   toggleBtnTextSelected: {color: 'white'},
 })
 
-// new component:
+const myPhoneNumber = '+4-650-906-7099'
+
 function OnlineOfflineToggle() {
   const [status, setStatus] = React.useState('online')
+  const [pingInterval, setPingInterval] = React.useState(null)
+
+  async function pingServer() {
+    console.log(new Date(Date.now()).toLocaleString() + ' pingServer')
+    api
+      .post('/ping', null, {params: {phone: myPhoneNumber}})
+      .then((result) => {
+        console.log('        pingServer result:', result.data)
+      })
+      .catch((err) => {
+        console.log('        pingServer error:', err)
+      })
+  }
+
+  const startPingInterval = () => {
+    pingServer() // ping the first time
+    const nSeconds = 4 // then every nSeconds
+    setPingInterval(setInterval(pingServer, nSeconds * 1000))
+  }
+
+  React.useEffect(() => {
+    if (status == 'online') startPingInterval()
+    return () => clearInterval(pingInterval) // clear interval on component unmount
+  }, [])
 
   return (
     <View>
@@ -42,7 +67,11 @@ function OnlineOfflineToggle() {
             ...(status == 'offline' ? homeStyles.toggleBtnSelected : {backgroundColor: 'transparent'}),
           }}>
           <Text
-            onPress={() => setStatus('offline')}
+            onPress={() => {
+              setStatus('offline')
+              clearInterval(pingInterval)
+              console.log('set offline + ping interval cleared')
+            }}
             style={{
               ...homeStyles.toggleBtnText,
               ...(status == 'offline' ? homeStyles.toggleBtnTextSelected : {}),
@@ -57,7 +86,10 @@ function OnlineOfflineToggle() {
             ...(status == 'online' ? homeStyles.toggleBtnSelected : {backgroundColor: 'transparent'}),
           }}>
           <Text
-            onPress={() => setStatus('online')}
+            onPress={() => {
+              setStatus('online')
+              startPingInterval()
+            }}
             style={{...homeStyles.toggleBtnText, ...(status == 'online' ? homeStyles.toggleBtnTextSelected : {})}}>
             Online
           </Text>
@@ -124,9 +156,8 @@ const minsAgo = (mins) => new Date().getTime() - 1000 * 60 * mins
 const timestampWithinMins = (timestamp, nMins) => new Date(timestamp).getTime() > minsAgo(nMins)
 
 export default function HomeScreen({navigation}) {
-  // const [friends, setFriends] = React.useState(null)
   const {friends, setFriends} = React.useContext(FriendsContext)
-  const onlineFriends = friends ? friends.filter(({last_ping}) => timestampWithinMins(last_ping, 20)) : []
+  const onlineFriends = friends ? friends.filter(({last_ping}) => timestampWithinMins(last_ping, 2)) : []
 
   async function fetchFriends() {
     console.log(new Date(Date.now()).toLocaleString() + ' fetchFriends')
@@ -136,13 +167,13 @@ export default function HomeScreen({navigation}) {
         setFriends(result.data)
       })
       .catch((err) => {
-        console.log('fetchFriends error:', err)
+        console.error('fetchFriends error:', err)
       })
   }
 
   React.useEffect(() => {
     fetchFriends()
-    const nSeconds = 5
+    const nSeconds = 100
     const interval = setInterval(fetchFriends, nSeconds * 1000)
     return () => clearInterval(interval) // clear interval on component unmount
   }, [])
