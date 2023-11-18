@@ -5,6 +5,8 @@ import {callNumber} from './Phone'
 import api from './API'
 import {FriendsContext} from './Friends'
 
+const myPhoneNumber = '+1-650-906-7099'
+
 const homeStyles = StyleSheet.create({
   toggleOuter: {
     backgroundColor: '#222',
@@ -27,16 +29,24 @@ const homeStyles = StyleSheet.create({
   toggleBtnTextSelected: {color: 'white'},
 })
 
-const myPhoneNumber = '+4-650-906-7099'
+const fetchFriends = (setFriends) => async () => {
+  console.log(new Date(Date.now()).toLocaleString() + ' fetchFriends')
+  api
+    .get('/users')
+    .then((result) => setFriends(result.data))
+    .catch((err) => console.error('fetchFriends error:', err))
+}
 
 function OnlineOfflineToggle() {
   const [status, setStatus] = React.useState('online')
   const [pingInterval, setPingInterval] = React.useState(null)
+  const {setFriends} = React.useContext(FriendsContext)
+  const fetchFriendsFn = fetchFriends(setFriends) // curried
 
-  async function pingServer() {
+  async function pingServer({status}) {
     console.log(new Date(Date.now()).toLocaleString() + ' pingServer')
     api
-      .post('/ping', null, {params: {phone: myPhoneNumber}})
+      .post('/ping', null, {params: {phone: myPhoneNumber, status}})
       .then((result) => {
         console.log('        pingServer result:', result.data)
       })
@@ -46,9 +56,9 @@ function OnlineOfflineToggle() {
   }
 
   const startPingInterval = () => {
-    pingServer() // ping the first time
-    const nSeconds = 4 // then every nSeconds
-    setPingInterval(setInterval(pingServer, nSeconds * 1000))
+    // pingServer({status: 'online'}) // ping the first time
+    // const nSeconds = 10 // then every nSeconds
+    // setPingInterval(setInterval(() => pingServer({status: 'online'}), nSeconds * 1000))
   }
 
   React.useEffect(() => {
@@ -69,8 +79,9 @@ function OnlineOfflineToggle() {
           <Text
             onPress={() => {
               setStatus('offline')
-              clearInterval(pingInterval)
-              console.log('set offline + ping interval cleared')
+              pingServer({status: 'offline'}).then(() => setTimeout(fetchFriendsFn, 10))
+              // clearInterval(pingInterval)
+              // console.log('set offline + ping interval cleared')
             }}
             style={{
               ...homeStyles.toggleBtnText,
@@ -88,7 +99,8 @@ function OnlineOfflineToggle() {
           <Text
             onPress={() => {
               setStatus('online')
-              startPingInterval()
+              pingServer({status: 'online'}).then(() => setTimeout(fetchFriendsFn, 10))
+              // startPingInterval()
             }}
             style={{...homeStyles.toggleBtnText, ...(status == 'online' ? homeStyles.toggleBtnTextSelected : {})}}>
             Online
@@ -155,26 +167,27 @@ const Spacer = () => <View style={{marginTop: 48}} />
 const minsAgo = (mins) => new Date().getTime() - 1000 * 60 * mins
 const timestampWithinMins = (timestamp, nMins) => new Date(timestamp).getTime() > minsAgo(nMins)
 
+const fetchFromApi = (setResult) => async () => {
+  console.log(new Date(Date.now()).toLocaleString() + ' Fetching from API:', endpoint)
+  try {
+    const result = await api.get(endpoint)
+    setResult(result.data)
+  } catch (err) {
+    console.error('API fetch error:', err)
+  }
+}
+
 export default function HomeScreen({navigation}) {
   const {friends, setFriends} = React.useContext(FriendsContext)
-  const onlineFriends = friends ? friends.filter(({last_ping}) => timestampWithinMins(last_ping, 2)) : []
-
-  async function fetchFriends() {
-    console.log(new Date(Date.now()).toLocaleString() + ' fetchFriends')
-    api
-      .get('/users')
-      .then((result) => {
-        setFriends(result.data)
-      })
-      .catch((err) => {
-        console.error('fetchFriends error:', err)
-      })
-  }
+  const onlineFriends = friends
+    ? friends.filter(({status}) => status == 'online').filter(({last_ping}) => timestampWithinMins(last_ping, 2))
+    : []
+  const fetchFriendsFn = fetchFriends(setFriends) // curried
 
   React.useEffect(() => {
-    fetchFriends()
-    const nSeconds = 100
-    const interval = setInterval(fetchFriends, nSeconds * 1000)
+    fetchFriendsFn()
+    const nSeconds = 10
+    const interval = setInterval(fetchFriendsFn, nSeconds * 1000)
     return () => clearInterval(interval) // clear interval on component unmount
   }, [])
 
