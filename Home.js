@@ -16,7 +16,6 @@ const homeStyles = StyleSheet.create({
   },
   toggleBtn: {flex: 1, borderRadius: 100, padding: 14, flexDirection: 'column', justifyContent: 'center'},
   toggleBtnSelected: {
-    backgroundColor: '#32C084',
     color: 'white',
     shadowColor: '#000',
     shadowOffset: {width: 1, height: 2},
@@ -28,19 +27,45 @@ const homeStyles = StyleSheet.create({
   toggleBtnTextSelected: {color: 'white'},
 })
 
-const OnlineOfflineToggle = () => (
-  <View>
-    <Header>Set your status</Header>
-    <View style={homeStyles.toggleOuter}>
-      <View style={homeStyles.toggleBtn}>
-        <Text style={homeStyles.toggleBtnText}>Offline</Text>
-      </View>
-      <View style={{...homeStyles.toggleBtn, ...homeStyles.toggleBtnSelected}}>
-        <Text style={{...homeStyles.toggleBtnText, ...homeStyles.toggleBtnTextSelected}}>Online</Text>
+// new component:
+function OnlineOfflineToggle() {
+  const [status, setStatus] = React.useState('online')
+
+  return (
+    <View>
+      <Header>Set your status</Header>
+      <View style={homeStyles.toggleOuter}>
+        <View
+          style={{
+            ...homeStyles.toggleBtn,
+            backgroundColor: '#555',
+            ...(status == 'offline' ? homeStyles.toggleBtnSelected : {backgroundColor: 'transparent'}),
+          }}>
+          <Text
+            onPress={() => setStatus('offline')}
+            style={{
+              ...homeStyles.toggleBtnText,
+              ...(status == 'offline' ? homeStyles.toggleBtnTextSelected : {}),
+            }}>
+            Offline
+          </Text>
+        </View>
+        <View
+          style={{
+            ...homeStyles.toggleBtn,
+            backgroundColor: '#32C084',
+            ...(status == 'online' ? homeStyles.toggleBtnSelected : {backgroundColor: 'transparent'}),
+          }}>
+          <Text
+            onPress={() => setStatus('online')}
+            style={{...homeStyles.toggleBtnText, ...(status == 'online' ? homeStyles.toggleBtnTextSelected : {})}}>
+            Online
+          </Text>
+        </View>
       </View>
     </View>
-  </View>
-)
+  )
+}
 
 const longAgoInEnglish = (timestamp) => {
   const now = new Date().getTime()
