@@ -34,7 +34,7 @@ const SearchBar = () => (
   </View>
 )
 
-const Friend = ({name}) => (
+const Friend = ({name, phone}) => (
   <View
     style={{
       flexDirection: 'row',
@@ -49,12 +49,14 @@ const Friend = ({name}) => (
       borderRadius: 8,
     }}>
     <Text style={{fontSize: 32}}>{name}</Text>
+    <Text style={{fontSize: 16}}>{phone}</Text>
     <Text style={{fontSize: 32}}>{name.length % 5 == 0 ? '🔔' : '🔕'}</Text>
   </View>
 )
 
 export function FriendsScreen({navigation}) {
   const {friends} = React.useContext(GlobalContext)
+  console.log('friends', JSON.stringify(friends, null, 2))
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={{...styles.container, ...styles.flexColumn}}>
@@ -65,7 +67,7 @@ export function FriendsScreen({navigation}) {
           {friends == null ? (
             <DotAnimation style={{alignSelf: 'center', width: 60, marginTop: 12}} />
           ) : (
-            friends.map(({screen_name}, i) => <Friend name={screen_name} key={i} />)
+            friends.map(({screen_name, phone}, i) => <Friend name={screen_name} phone={phone} key={i} />)
           )}
         </View>
 

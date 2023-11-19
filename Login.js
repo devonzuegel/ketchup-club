@@ -49,8 +49,15 @@ export const LoginScreen = () => {
   React.useEffect(() => {
     async function fetchAuthToken() {
       const authToken = await AsyncStorage.getItem('authToken')
+      const phone = await AsyncStorage.getItem('phone')
+      const phoneCountryCode = await AsyncStorage.getItem('phoneCountryCode')
       console.log('autToken from async storage: ', authToken || 'null')
-      if (authToken) setAuthToken(authToken) // storing in the component state AND in AsyncStorage may cause confusion in the future...
+
+      // WARNING: storing in the component state AND in AsyncStorage may cause confusion in the future...
+      //          ... but it's the best solution we have for now, so let's stick with it
+      if (authToken) setAuthToken(authToken)
+      if (phone) setPhone(phone)
+      if (phoneCountryCode) setPhoneCountryCode(phoneCountryCode)
     }
     console.log('fetching token from async storage..')
     fetchAuthToken()
@@ -72,6 +79,8 @@ export const LoginScreen = () => {
         setAuthToken(token)
         setPhone(phone)
         await AsyncStorage.setItem('authToken', token)
+        await AsyncStorage.setItem('phone', phone)
+        await AsyncStorage.setItem('phoneCountryCode', phoneCountryCode)
       } else {
         throw new Error(response.data)
       }

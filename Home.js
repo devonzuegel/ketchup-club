@@ -4,8 +4,6 @@ import {Text, styles, NavBtns, Header, DotAnimation, Pre, GlobalContext} from '.
 import {callNumber} from './Phone'
 import api from './API'
 
-const myPhoneNumber = '+1-alice'
-
 const homeStyles = StyleSheet.create({
   toggleOuter: {
     backgroundColor: '#222',
@@ -39,13 +37,13 @@ const fetchFriends = (setFriends) => async () => {
 function OnlineOfflineToggle() {
   const [status, setStatus] = React.useState('online')
   const [pingInterval, setPingInterval] = React.useState(null)
-  const {setFriends} = React.useContext(GlobalContext)
+  const {setFriends, phone} = React.useContext(GlobalContext)
   const fetchFriendsFn = fetchFriends(setFriends) // curried
 
   async function pingServer({status}) {
     console.log(new Date(Date.now()).toLocaleString() + ' pingServer')
     api
-      .post('/ping', null, {params: {phone: myPhoneNumber, status}})
+      .post('/ping', null, {params: {phone, status}})
       .then((result) => {
         console.log('        pingServer result:', result.data)
       })
@@ -55,7 +53,7 @@ function OnlineOfflineToggle() {
   }
 
   const startPingInterval = () => {
-    // pingServer({status: 'online'}) // ping the first time
+    pingServer({status: 'online'}) // ping the first time
     // const nSeconds = 10 // then every nSeconds
     // setPingInterval(setInterval(() => pingServer({status: 'online'}), nSeconds * 1000))
   }
