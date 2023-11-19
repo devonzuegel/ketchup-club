@@ -2,8 +2,8 @@ import React from 'react'
 import {View} from 'react-native'
 import {fonts, Text, styles, NavBtns, Header} from './Utils'
 import {useFonts} from 'expo-font'
-import {AuthTokenContext} from './Login'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import {GlobalContext} from './AppGlobalContext'
 
 const SettingItem = ({name, icon, dangerous, onPress}) => (
   <View
@@ -28,7 +28,7 @@ const SettingItem = ({name, icon, dangerous, onPress}) => (
 )
 
 export function SettingsScreen({navigation}) {
-  const {authToken, setAuthToken} = React.useContext(AuthTokenContext)
+  const {authToken, setAuthToken} = React.useContext(GlobalContext)
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
 
@@ -45,7 +45,7 @@ export function SettingsScreen({navigation}) {
   ]
 
   return (
-    <AuthTokenContext.Provider value={{authToken, setAuthToken}}>
+    <GlobalContext.Provider value={{authToken, setAuthToken}}>
       <View style={{...styles.container, ...styles.flexColumn}}>
         <View style={{marginTop: 48}}>
           <Header>Settings</Header>
@@ -63,6 +63,6 @@ export function SettingsScreen({navigation}) {
 
         <NavBtns navigation={navigation} />
       </View>
-    </AuthTokenContext.Provider>
+    </GlobalContext.Provider>
   )
 }

@@ -5,6 +5,7 @@ import {Button, Text, styles} from './Utils'
 import {Keyboard, TouchableWithoutFeedback} from 'react-native'
 import PhoneInput from './PhoneInput'
 import api from './API'
+import {GlobalContext} from './AppGlobalContext'
 
 const debug = false
 
@@ -27,13 +28,6 @@ const stylesheet = {
   },
 }
 
-export const AuthTokenContext = React.createContext() // allows access to the auth token throughout the app
-
-export const AuthTokenProvider = ({children}) => {
-  const [authToken, setAuthToken] = React.useState(null)
-  return <AuthTokenContext.Provider value={{authToken, setAuthToken}}>{children}</AuthTokenContext.Provider>
-}
-
 const TextInput = forwardRef((props, ref) => (
   <RNTextInput
     ref={ref}
@@ -50,15 +44,15 @@ export const LoginScreen = () => {
   const [smsCodeEntered, setSmsCodeEntered] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const {setAuthToken} = React.useContext(AuthTokenContext)
+  const {setAuthToken} = React.useContext(GlobalContext)
   const smsCodeFieldRef = useRef()
 
   // when this component loads, check if we have a token in AsyncStorage
   React.useEffect(() => {
     async function fetchAuthToken() {
       const authToken = await AsyncStorage.getItem('authToken')
-      console.log('autToken from async storage: ', authToken || '[null]')
-      setAuthToken(authToken) // storing in the component state AND in AsyncStorage may cause confusion in the future...
+      console.log('autToken from async storage: ', authToken || 'null')
+      if (authToken) setAuthToken(authToken) // storing in the component state AND in AsyncStorage may cause confusion in the future...
     }
     console.log('fetching token from async storage..')
     fetchAuthToken()

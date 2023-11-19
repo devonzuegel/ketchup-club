@@ -3,9 +3,9 @@ import {StyleSheet, View} from 'react-native'
 import {Text, styles, NavBtns, Header, DotAnimation, Pre} from './Utils'
 import {callNumber} from './Phone'
 import api from './API'
-import {FriendsContext} from './Friends'
+import {GlobalContext} from './AppGlobalContext'
 
-const myPhoneNumber = '+1-650-906-7099'
+const myPhoneNumber = '+1-alice'
 
 const homeStyles = StyleSheet.create({
   toggleOuter: {
@@ -40,7 +40,7 @@ const fetchFriends = (setFriends) => async () => {
 function OnlineOfflineToggle() {
   const [status, setStatus] = React.useState('online')
   const [pingInterval, setPingInterval] = React.useState(null)
-  const {setFriends} = React.useContext(FriendsContext)
+  const {setFriends} = React.useContext(GlobalContext)
   const fetchFriendsFn = fetchFriends(setFriends) // curried
 
   async function pingServer({status}) {
@@ -178,7 +178,7 @@ const fetchFromApi = (setResult) => async () => {
 }
 
 export default function HomeScreen({navigation}) {
-  const {friends, setFriends} = React.useContext(FriendsContext)
+  const {friends, setFriends} = React.useContext(GlobalContext)
   const onlineFriends = friends
     ? friends.filter(({status}) => status == 'online').filter(({last_ping}) => timestampWithinMins(last_ping, 2))
     : []

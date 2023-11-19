@@ -1,8 +1,7 @@
 import {View, TouchableWithoutFeedback, Keyboard, TextInput, Dimensions} from 'react-native'
 import {Text, styles, NavBtns, Header, DotAnimation} from './Utils'
 import React from 'react'
-
-export const FriendsContext = React.createContext() // allows access to key data throughout the app
+import {GlobalContext} from './AppGlobalContext'
 
 export const mockFriends = [
   {phoneNumber: '+1-123-123-1234', name: 'Alicia'},
@@ -56,7 +55,7 @@ const Friend = ({name}) => (
 )
 
 export function FriendsScreen({navigation}) {
-  const {friends} = React.useContext(FriendsContext)
+  const {friends} = React.useContext(GlobalContext)
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={{...styles.container, ...styles.flexColumn}}>
