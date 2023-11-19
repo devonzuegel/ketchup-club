@@ -20,14 +20,14 @@ const SettingItem = ({name, icon, value, dangerous, onPress}) => (
       borderRadius: 8,
     }}>
     <Text style={{fontSize: 18, fontFamily: 'SFCompactRounded_Regular', color: dangerous ? 'red' : 'white'}}>{name}</Text>
-    <Text style={{fontSize: 18, fontFamily: 'SFCompactRounded_Regular', color: dangerous ? 'red' : 'white'}}>
-      {value || icon || (name.length % 3 == 0 ? '✅' : '❌')}
+    <Text style={{fontSize: 15, fontFamily: 'SFCompactRounded_Regular', color: dangerous ? 'red' : 'white'}}>
+      {value || icon || '❌'}
     </Text>
   </View>
 )
 
 export function SettingsScreen({navigation}) {
-  const {phone, authToken, setAuthToken} = React.useContext(GlobalContext)
+  const {phoneCountryCode, phone, authToken, setAuthToken} = React.useContext(GlobalContext)
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
 
@@ -38,8 +38,8 @@ export function SettingsScreen({navigation}) {
   }
 
   const settings = [
-    ['System Permissions', {Contacts: 'x', 'Push Notifications': 'x'}],
-    ['Profile', {Username: 'TODO:', Avatar: 'x', Phone: formatPhone(phone)}],
+    ['System Permissions', {Contacts: null, 'Push Notifications': null}],
+    ['Profile', {Username: null, Avatar: null, Phone: formatPhone(phoneCountryCode + phone)}],
     ['Account', {}],
   ]
 

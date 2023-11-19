@@ -26,13 +26,15 @@ export default function App() {
   const [authToken, setAuthToken] = React.useState(null)
   const [friends, setFriends] = React.useState(null)
   const [phone, setPhone] = React.useState(null)
+  const [phoneCountryCode, setPhoneCountryCode] = React.useState(null)
+  const globalContextVars = {authToken, setAuthToken, friends, setFriends, phone, setPhone, phoneCountryCode, setPhoneCountryCode}
 
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
 
   return (
-    <GlobalContext.Provider value={{authToken, setAuthToken, friends, setFriends, phone, setPhone}}>
-      {debug && <Pre data={{authToken, friends: friends && friends.length, phone}} />}
+    <GlobalContext.Provider value={globalContextVars}>
+      {debug && <Pre data={{...globalContextVars, friends: friends && friends.length}} />}
       {authToken ? <LoggedInNavigator /> : <LoginScreen />}
     </GlobalContext.Provider>
   )

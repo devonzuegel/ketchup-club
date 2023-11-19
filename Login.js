@@ -42,7 +42,7 @@ export const LoginScreen = () => {
   const [smsCodeEntered, setSmsCodeEntered] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const {setAuthToken, phone, setPhone} = React.useContext(GlobalContext)
+  const {setAuthToken, phone, setPhone, phoneCountryCode, setPhoneCountryCode} = React.useContext(GlobalContext)
   const smsCodeFieldRef = useRef()
 
   // when this component loads, check if we have a token in AsyncStorage
@@ -121,6 +121,8 @@ export const LoginScreen = () => {
           <PhoneInput
             phone={phone}
             setPhone={setPhone}
+            phoneCountryCode={phoneCountryCode}
+            setPhoneCountryCode={setPhoneCountryCode}
             validPhone={validPhone}
             setValidPhone={(isValid) => {
               if (isValid) setTimeout(() => smsCodeFieldRef.current.focus(), 0)
