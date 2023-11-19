@@ -37,13 +37,14 @@ const fetchFriends = (setFriends) => async () => {
 function OnlineOfflineToggle() {
   const [status, setStatus] = React.useState('online')
   const [pingInterval, setPingInterval] = React.useState(null)
-  const {setFriends, phone} = React.useContext(GlobalContext)
+  const {setFriends, phoneCountryCode, phone} = React.useContext(GlobalContext)
   const fetchFriendsFn = fetchFriends(setFriends) // curried
+  const fullPhone = '+' + phoneCountryCode + phone // TODO: store the phoneCountryCode and phone in the db separately + rename `phone` `phoneWithoutCountryCode`
 
   async function pingServer({status}) {
     console.log(new Date(Date.now()).toLocaleString() + ' pingServer')
     api
-      .post('/ping', null, {params: {phone, status}})
+      .post('/ping', null, {params: {phone: fullPhone, status}})
       .then((result) => {
         console.log('        pingServer result:', result.data)
       })
