@@ -8,7 +8,7 @@ import HomeScreen from './Home'
 import {FriendsScreen} from './Friends'
 import {SettingsScreen} from './Settings'
 
-export const debug = true
+export const debug = false
 
 const Stack = createNativeStackNavigator()
 

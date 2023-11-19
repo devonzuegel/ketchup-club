@@ -3,7 +3,7 @@ import {SafeAreaView, View, Text} from 'react-native'
 import {debugStyles} from './Utils'
 import PhoneInput from 'react-native-phone-number-input'
 
-const debug = true
+const debug = false
 
 const PhoneInputComponent = ({phone, setPhone, validPhone, setValidPhone, phoneCountryCode, setPhoneCountryCode}) => {
   const ref = useRef()

@@ -158,7 +158,7 @@ export const DotAnimation = ({style}) => {
 // WARNING: this may not be the correct way to format phone numbers for all international phone numbers. I checked it for
 // the US and Argentina, and it seems to work. But I'm not sure if it will work for all countries.
 export const formatPhone = (phone) => {
-  if (phone == null) return null
+  if (!phone) return null
 
   phone = phone.replace(/[^\d]/g, '') // normalize string & remove all unnecessary characters
 
