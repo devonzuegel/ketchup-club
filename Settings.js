@@ -1,9 +1,8 @@
 import React from 'react'
 import {View} from 'react-native'
-import {fonts, Text, styles, NavBtns, Header} from './Utils'
+import {fonts, Text, styles, NavBtns, Header, GlobalContext} from './Utils'
 import {useFonts} from 'expo-font'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {GlobalContext} from './AppGlobalContext'
 
 const SettingItem = ({name, icon, dangerous, onPress}) => (
   <View

@@ -1,11 +1,10 @@
 import React, {useState, useRef, forwardRef} from 'react'
 import {TextInput as RNTextInput, View} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {Button, Text, styles} from './Utils'
+import {Button, Text, styles, GlobalContext} from './Utils'
 import {Keyboard, TouchableWithoutFeedback} from 'react-native'
 import PhoneInput from './PhoneInput'
 import api from './API'
-import {GlobalContext} from './AppGlobalContext'
 
 const debug = false
 

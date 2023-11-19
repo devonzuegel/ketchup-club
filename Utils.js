@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import {View, Button as RNButton, StyleSheet, TouchableOpacity, Text as RNText} from 'react-native'
 
+export const GlobalContext = React.createContext()
+
 export const NavBtns = ({navigation}) => {
   const getCurrentScreen = () => {
     const {routes, index} = navigation.getState()

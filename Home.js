@@ -1,9 +1,8 @@
 import React from 'react'
 import {StyleSheet, View} from 'react-native'
-import {Text, styles, NavBtns, Header, DotAnimation, Pre} from './Utils'
+import {Text, styles, NavBtns, Header, DotAnimation, Pre, GlobalContext} from './Utils'
 import {callNumber} from './Phone'
 import api from './API'
-import {GlobalContext} from './AppGlobalContext'
 
 const myPhoneNumber = '+1-alice'
 

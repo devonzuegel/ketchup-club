@@ -1,7 +1,6 @@
 import {View, TouchableWithoutFeedback, Keyboard, TextInput, Dimensions} from 'react-native'
-import {Text, styles, NavBtns, Header, DotAnimation} from './Utils'
+import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext} from './Utils'
 import React from 'react'
-import {GlobalContext} from './AppGlobalContext'
 
 export const mockFriends = [
   {phoneNumber: '+1-123-123-1234', name: 'Alicia'},
