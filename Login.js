@@ -37,13 +37,12 @@ const TextInput = forwardRef((props, ref) => (
 ))
 
 export const LoginScreen = () => {
-  const [phone, setPhone] = useState('')
   const [smsCode, setSmsCode] = useState('')
   const [validPhone, setValidPhone] = useState(false)
   const [smsCodeEntered, setSmsCodeEntered] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const {setAuthToken} = React.useContext(GlobalContext)
+  const {setAuthToken, phone, setPhone} = React.useContext(GlobalContext)
   const smsCodeFieldRef = useRef()
 
   // when this component loads, check if we have a token in AsyncStorage
@@ -71,6 +70,7 @@ export const LoginScreen = () => {
       if (response.data.success) {
         const token = response.data.authToken
         setAuthToken(token)
+        setPhone(phone)
         await AsyncStorage.setItem('authToken', token)
       } else {
         throw new Error(response.data)
@@ -119,13 +119,13 @@ export const LoginScreen = () => {
             Enter your phone number to sign in or sign up
           </Text>
           <PhoneInput
-            validPhone={validPhone}
-            setValidPhone={(value) => {
-              if (value) setTimeout(() => smsCodeFieldRef.current.focus(), 0)
-              setValidPhone(value)
-            }}
             phone={phone}
             setPhone={setPhone}
+            validPhone={validPhone}
+            setValidPhone={(isValid) => {
+              if (isValid) setTimeout(() => smsCodeFieldRef.current.focus(), 0)
+              setValidPhone(isValid)
+            }}
           />
           {validPhone && (
             <TextInput

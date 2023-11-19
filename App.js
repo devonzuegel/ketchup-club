@@ -8,7 +8,7 @@ import HomeScreen from './Home'
 import {FriendsScreen} from './Friends'
 import {SettingsScreen} from './Settings'
 
-export const debug = false
+export const debug = true
 
 const Stack = createNativeStackNavigator()
 
@@ -32,7 +32,7 @@ export default function App() {
 
   return (
     <GlobalContext.Provider value={{authToken, setAuthToken, friends, setFriends, phone, setPhone}}>
-      {debug && <Pre data={{authToken}} />}
+      {debug && <Pre data={{authToken, friends: friends && friends.length, phone}} />}
       {authToken ? <LoggedInNavigator /> : <LoginScreen />}
     </GlobalContext.Provider>
   )

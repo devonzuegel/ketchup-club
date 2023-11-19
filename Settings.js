@@ -1,10 +1,10 @@
 import React from 'react'
 import {View} from 'react-native'
-import {fonts, Text, styles, NavBtns, Header, GlobalContext} from './Utils'
+import {fonts, Text, styles, NavBtns, Header, GlobalContext, formatPhone} from './Utils'
 import {useFonts} from 'expo-font'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const SettingItem = ({name, icon, dangerous, onPress}) => (
+const SettingItem = ({name, icon, value, dangerous, onPress}) => (
   <View
     onTouchEnd={onPress}
     style={{
@@ -21,13 +21,13 @@ const SettingItem = ({name, icon, dangerous, onPress}) => (
     }}>
     <Text style={{fontSize: 18, fontFamily: 'SFCompactRounded_Regular', color: dangerous ? 'red' : 'white'}}>{name}</Text>
     <Text style={{fontSize: 18, fontFamily: 'SFCompactRounded_Regular', color: dangerous ? 'red' : 'white'}}>
-      {icon || (name.length % 3 == 0 ? '✅' : '❌')}
+      {value || icon || (name.length % 3 == 0 ? '✅' : '❌')}
     </Text>
   </View>
 )
 
 export function SettingsScreen({navigation}) {
-  const {authToken, setAuthToken} = React.useContext(GlobalContext)
+  const {phone, authToken, setAuthToken} = React.useContext(GlobalContext)
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
 
@@ -38,9 +38,9 @@ export function SettingsScreen({navigation}) {
   }
 
   const settings = [
-    ['System Permissions', ['Contacts', 'Push Notifications']],
-    ['Profile', ['Username', 'Avatar', 'Phone']],
-    ['Account', []],
+    ['System Permissions', {Contacts: 'x', 'Push Notifications': 'x'}],
+    ['Profile', {Username: 'TODO:', Avatar: 'x', Phone: formatPhone(phone)}],
+    ['Account', {}],
   ]
 
   return (
@@ -52,8 +52,8 @@ export function SettingsScreen({navigation}) {
           {settings.map(([section, sectionItems], i) => (
             <View key={i}>
               <Header style={{textAlign: 'left', fontSize: 16, marginLeft: 16, marginBottom: 2, marginTop: 18}}>{section}</Header>
-              {sectionItems.map((name, j) => (
-                <SettingItem name={name} key={j} />
+              {Object.entries(sectionItems).map(([name, value], j) => (
+                <SettingItem name={name} value={value} key={j} />
               ))}
             </View>
           ))}

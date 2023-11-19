@@ -154,3 +154,18 @@ export const DotAnimation = ({style}) => {
     </View>
   )
 }
+
+// WARNING: this may not be the correct way to format phone numbers for all international phone numbers. I checked it for
+// the US and Argentina, and it seems to work. But I'm not sure if it will work for all countries.
+export const formatPhone = (phone) => {
+  if (phone == null) return null
+
+  phone = phone.replace(/[^\d]/g, '') // normalize string & remove all unnecessary characters
+
+  if (phone.length == 10) return phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')
+  if (phone.length == 11) return phone.replace(/(\d{1})(\d{3})(\d{3})(\d{4})/, '+$1 ($2) $3-$4')
+  if (phone.length == 12) return phone.replace(/(\d{2})(\d{3})(\d{3})(\d{4})/, '+$1 ($2) $3-$4')
+  if (phone.length == 13) return phone.replace(/(\d{3})(\d{3})(\d{3})(\d{4})/, '+$1 ($2) $3-$4')
+
+  return phone
+}
