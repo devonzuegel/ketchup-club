@@ -1,8 +1,8 @@
 import React, {useState, useRef, forwardRef} from 'react'
-import {TextInput as RNTextInput, View} from 'react-native'
+import {TextInput as RNTextInput, View, Keyboard, TouchableWithoutFeedback} from 'react-native'
+import {PhoneNumberUtil} from 'google-libphonenumber'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {Button, Text, styles, GlobalContext} from './Utils'
-import {Keyboard, TouchableWithoutFeedback} from 'react-native'
 import PhoneInput from './PhoneInput'
 import api from './API'
 
@@ -42,7 +42,7 @@ export const LoginScreen = () => {
   const [smsCodeEntered, setSmsCodeEntered] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const {setAuthToken, phone, setPhone, phoneCountryCode, setPhoneCountryCode} = React.useContext(GlobalContext)
+  const {setAuthToken, phone, setPhone} = React.useContext(GlobalContext)
   const smsCodeFieldRef = useRef()
 
   // when this component loads, check if we have a token in AsyncStorage
@@ -50,14 +50,13 @@ export const LoginScreen = () => {
     async function fetchAuthToken() {
       const authToken = await AsyncStorage.getItem('authToken')
       const phone = await AsyncStorage.getItem('phone')
-      const phoneCountryCode = await AsyncStorage.getItem('phoneCountryCode')
-      console.log('autToken from async storage: ', authToken || 'null')
+      console.log('authToken from async storage: ', authToken || 'null')
+      console.log('    phone from async storage: ', phone || 'null')
 
       // WARNING: storing in the component state AND in AsyncStorage may cause confusion in the future...
       //          ... but it's the best solution we have for now, so let's stick with it
       if (authToken) setAuthToken(authToken)
       if (phone) setPhone(phone)
-      if (phoneCountryCode) setPhoneCountryCode(phoneCountryCode)
     }
     console.log('fetching token from async storage..')
     fetchAuthToken()
@@ -80,7 +79,6 @@ export const LoginScreen = () => {
         setPhone(phone)
         await AsyncStorage.setItem('authToken', token)
         await AsyncStorage.setItem('phone', phone)
-        await AsyncStorage.setItem('phoneCountryCode', phoneCountryCode)
       } else {
         throw new Error(response.data)
       }
@@ -112,6 +110,34 @@ export const LoginScreen = () => {
   }
   */
 
+  const removeCountryCode = (fullPhoneNumber) => {
+    if (fullPhoneNumber == null) return null
+    try {
+      const phoneUtil = PhoneNumberUtil.getInstance()
+      const parsedPhone = phoneUtil.parse(fullPhoneNumber)
+      const domesticNumber = phoneUtil.getNationalSignificantNumber(parsedPhone)
+      const countryCode = phoneUtil.getCountryCodeForRegion(phoneUtil.getRegionCodeForNumber(parsedPhone))
+      if (debug) console.log({fullPhoneNumber, domesticNumber, countryCode})
+      return domesticNumber
+    } catch (error) {
+      return null
+    }
+  }
+
+  const countryCode = (fullPhoneNumber) => {
+    if (fullPhoneNumber == null) return null
+    console.log({fullPhoneNumber})
+    try {
+      const phoneUtil = PhoneNumberUtil.getInstance()
+      const parsedPhone = phoneUtil.parse(fullPhoneNumber)
+      const countryCodeName = phoneUtil.getRegionCodeForNumber(parsedPhone)
+      if (debug) console.log({fullPhoneNumber, countryCodeName})
+      return countryCodeName
+    } catch (error) {
+      return null
+    }
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
@@ -128,10 +154,9 @@ export const LoginScreen = () => {
             Enter your phone number to sign in or sign up
           </Text>
           <PhoneInput
-            phone={phone}
+            phone={removeCountryCode(phone)} // if pulling number from AsyncStorage, remove country code so that the country code is not displayed in the input field as a duplicate
+            defaultCountryCode={countryCode(phone)}
             setPhone={setPhone}
-            phoneCountryCode={phoneCountryCode}
-            setPhoneCountryCode={setPhoneCountryCode}
             validPhone={validPhone}
             setValidPhone={(isValid) => {
               if (isValid) setTimeout(() => smsCodeFieldRef.current.focus(), 0)

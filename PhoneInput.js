@@ -5,7 +5,7 @@ import PhoneInput from 'react-native-phone-number-input'
 
 const debug = false
 
-const PhoneInputComponent = ({phone, setPhone, validPhone, setValidPhone, phoneCountryCode, setPhoneCountryCode}) => {
+const PhoneInputComponent = ({phone, setPhone, validPhone, setValidPhone, defaultCountryCode}) => {
   const ref = useRef()
 
   return (
@@ -14,23 +14,18 @@ const PhoneInputComponent = ({phone, setPhone, validPhone, setValidPhone, phoneC
         {debug && (
           <View style={debugStyles.message}>
             <Text style={debugStyles.msgTxt}>········· Valid: {validPhone ? 'true' : 'false'}</Text>
-            <Text style={debugStyles.msgTxt}>·········· Code: {phoneCountryCode}</Text>
             <Text style={debugStyles.msgTxt}>········· Phone: {phone}</Text>
           </View>
         )}
         <PhoneInput
           ref={ref}
           defaultValue={phone}
-          defaultCode="US"
+          defaultCode={defaultCountryCode || 'US'}
           layout="first"
           onChangeFormattedText={(formatted) => {
             const checkValid = ref.current?.isValidNumber(formatted)
-            const callingCode = ref.current?.getCallingCode()
-            const numberWithoutCode = formatted.replace(`+${callingCode}`, '')
-
-            setPhoneCountryCode(callingCode)
-            setPhone(numberWithoutCode)
             setValidPhone(checkValid)
+            setPhone(formatted)
           }}
           onChangeCountry={(text) => {
             console.log('onChangeCountry text:')

@@ -27,7 +27,7 @@ const SettingItem = ({name, icon, value, dangerous, onPress}) => (
 )
 
 export function SettingsScreen({navigation}) {
-  const {phoneCountryCode, phone, authToken, setAuthToken} = React.useContext(GlobalContext)
+  const {phone, authToken, setAuthToken} = React.useContext(GlobalContext)
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
 
@@ -39,7 +39,7 @@ export function SettingsScreen({navigation}) {
 
   const settings = [
     ['System Permissions', {Contacts: null, 'Push Notifications': null}],
-    ['Profile', {Username: null, Avatar: null, Phone: formatPhone(phoneCountryCode + phone)}],
+    ['Profile', {Username: null, Avatar: null, Phone: formatPhone(phone)}],
     ['Account', {}],
   ]
 
