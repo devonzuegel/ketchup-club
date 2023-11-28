@@ -186,7 +186,7 @@ export default function HomeScreen({navigation}) {
   const fetchFriendsFn = fetchFriends(setFriends) // curried
   React.useEffect(() => {
     fetchFriendsFn()
-    const nSeconds = 4
+    const nSeconds = 10
     const interval = setInterval(fetchFriendsFn, nSeconds * 1000)
     return () => clearInterval(interval) // clear interval on component unmount
   }, [])

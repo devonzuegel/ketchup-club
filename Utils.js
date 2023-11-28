@@ -187,7 +187,6 @@ export const removeCountryCode = (fullPhoneNumber) => {
 
 export const countryCode = (fullPhoneNumber) => {
   if (fullPhoneNumber == null) return null
-  console.log({fullPhoneNumber})
   try {
     const phoneUtil = PhoneNumberUtil.getInstance()
     const parsedPhone = phoneUtil.parse(fullPhoneNumber)
