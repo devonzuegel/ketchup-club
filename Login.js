@@ -70,7 +70,6 @@ export const LoginScreen = () => {
 
     try {
       const response = await api.post('/login', null, {params: {phone, smsCode}})
-      setMessage(response.data.message)
       console.log('\n\nresponse.data: ', JSON.stringify(response.data, null, 2))
 
       if (response.data.success) {
@@ -79,12 +78,12 @@ export const LoginScreen = () => {
         setPhone(phone)
         await AsyncStorage.setItem('authToken', token)
         await AsyncStorage.setItem('phone', phone)
+        setMessage(response.data.message)
       } else {
-        throw new Error(response.data)
+        throw new Error(response.data.message)
       }
     } catch (error) {
-      console.error(error)
-      setError('Oops, something went wrong. Please try again.')
+      setError(error.message || 'Oops, something went wrong. Please try again.')
     }
   }
 
