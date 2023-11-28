@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {View, Button as RNButton, StyleSheet, TouchableOpacity, Text as RNText} from 'react-native'
+import {PhoneNumberUtil, PhoneNumberFormat} from 'google-libphonenumber'
 
 export const GlobalContext = React.createContext()
 
@@ -155,17 +156,57 @@ export const DotAnimation = ({style}) => {
   )
 }
 
-// WARNING: this may not be the correct way to format phone numbers for all international phone numbers. I checked it for
-// the US and Argentina, and it seems to work. But I'm not sure if it will work for all countries.
-export const formatPhone = (phone) => {
-  if (!phone) return null
+// // WARNING: this may not be the correct way to format phone numbers for all international phone numbers. I checked it for
+// // the US and Argentina, and it seems to work. But I'm not sure if it will work for all countries.
+// export const formatPhone = (phone) => {
+//   if (!phone) return null
 
-  phone = phone.replace(/[^\d]/g, '') // normalize string & remove all unnecessary characters
+//   phone = phone.replace(/[^\d]/g, '') // normalize string & remove all unnecessary characters
 
-  if (phone.length == 10) return phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')
-  if (phone.length == 11) return phone.replace(/(\d{1})(\d{3})(\d{3})(\d{4})/, '+$1 ($2) $3-$4')
-  if (phone.length == 12) return phone.replace(/(\d{2})(\d{3})(\d{3})(\d{4})/, '+$1 ($2) $3-$4')
-  if (phone.length == 13) return phone.replace(/(\d{3})(\d{3})(\d{3})(\d{4})/, '+$1 ($2) $3-$4')
+//   if (phone.length == 10) return phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')
+//   if (phone.length == 11) return phone.replace(/(\d{1})(\d{3})(\d{3})(\d{4})/, '+$1 ($2) $3-$4')
+//   if (phone.length == 12) return phone.replace(/(\d{2})(\d{3})(\d{3})(\d{4})/, '+$1 ($2) $3-$4')
+//   if (phone.length == 13) return phone.replace(/(\d{3})(\d{3})(\d{3})(\d{4})/, '+$1 ($2) $3-$4')
 
-  return phone
+//   return phone
+// }
+
+export const removeCountryCode = (fullPhoneNumber) => {
+  if (fullPhoneNumber == null) return null
+  try {
+    const phoneUtil = PhoneNumberUtil.getInstance()
+    const parsedPhone = phoneUtil.parse(fullPhoneNumber)
+    const domesticNumber = phoneUtil.getNationalSignificantNumber(parsedPhone)
+    const countryCode = phoneUtil.getCountryCodeForRegion(phoneUtil.getRegionCodeForNumber(parsedPhone))
+    if (debug) console.log({fullPhoneNumber, domesticNumber, countryCode})
+    return domesticNumber
+  } catch (error) {
+    return null
+  }
+}
+
+export const countryCode = (fullPhoneNumber) => {
+  if (fullPhoneNumber == null) return null
+  console.log({fullPhoneNumber})
+  try {
+    const phoneUtil = PhoneNumberUtil.getInstance()
+    const parsedPhone = phoneUtil.parse(fullPhoneNumber)
+    const countryCodeName = phoneUtil.getRegionCodeForNumber(parsedPhone)
+    if (debug) console.log({fullPhoneNumber, countryCodeName})
+    return countryCodeName
+  } catch (error) {
+    return null
+  }
+}
+
+export const formatPhone = (phoneNumberString) => {
+  if (!phoneNumberString) return null
+  try {
+    const phoneUtil = PhoneNumberUtil.getInstance()
+    const phoneNumber = phoneUtil.parseAndKeepRawInput(phoneNumberString, countryCode(phoneNumberString))
+    return phoneUtil.format(phoneNumber, PhoneNumberFormat.INTERNATIONAL)
+  } catch (error) {
+    console.error('Error formatting phone number:', error.message)
+    return phoneNumberString
+  }
 }

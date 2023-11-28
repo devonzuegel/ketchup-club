@@ -2,7 +2,7 @@ import React, {useState, useRef, forwardRef} from 'react'
 import {TextInput as RNTextInput, View, Keyboard, TouchableWithoutFeedback} from 'react-native'
 import {PhoneNumberUtil} from 'google-libphonenumber'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {Button, Text, styles, GlobalContext} from './Utils'
+import {Button, Text, styles, GlobalContext, countryCode, removeCountryCode} from './Utils'
 import PhoneInput from './PhoneInput'
 import api from './API'
 
@@ -109,34 +109,6 @@ export const LoginScreen = () => {
     }
   }
   */
-
-  const removeCountryCode = (fullPhoneNumber) => {
-    if (fullPhoneNumber == null) return null
-    try {
-      const phoneUtil = PhoneNumberUtil.getInstance()
-      const parsedPhone = phoneUtil.parse(fullPhoneNumber)
-      const domesticNumber = phoneUtil.getNationalSignificantNumber(parsedPhone)
-      const countryCode = phoneUtil.getCountryCodeForRegion(phoneUtil.getRegionCodeForNumber(parsedPhone))
-      if (debug) console.log({fullPhoneNumber, domesticNumber, countryCode})
-      return domesticNumber
-    } catch (error) {
-      return null
-    }
-  }
-
-  const countryCode = (fullPhoneNumber) => {
-    if (fullPhoneNumber == null) return null
-    console.log({fullPhoneNumber})
-    try {
-      const phoneUtil = PhoneNumberUtil.getInstance()
-      const parsedPhone = phoneUtil.parse(fullPhoneNumber)
-      const countryCodeName = phoneUtil.getRegionCodeForNumber(parsedPhone)
-      if (debug) console.log({fullPhoneNumber, countryCodeName})
-      return countryCodeName
-    } catch (error) {
-      return null
-    }
-  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

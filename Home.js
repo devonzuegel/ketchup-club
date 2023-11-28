@@ -1,8 +1,9 @@
 import React from 'react'
 import {StyleSheet, View} from 'react-native'
-import {Text, styles, NavBtns, Header, DotAnimation, Pre, GlobalContext} from './Utils'
+import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone} from './Utils'
 import {callNumber} from './Phone'
 import api from './API'
+import {PhoneNumberUtil} from 'google-libphonenumber'
 
 const homeStyles = StyleSheet.create({
   toggleOuter: {
@@ -176,14 +177,16 @@ const fetchFromApi = (setResult) => async () => {
 
 export default function HomeScreen({navigation}) {
   const {friends, setFriends} = React.useContext(GlobalContext)
+  const {phone} = React.useContext(GlobalContext)
   const onlineFriends = friends
-    ? friends.filter(({status}) => status == 'online').filter(({last_ping}) => timestampWithinMins(last_ping, 2))
+    ? friends
+        .filter(({status, phone: theirPhone}) => status == 'online' && theirPhone != phone)
+        .filter(({last_ping}) => timestampWithinMins(last_ping, 2))
     : []
   const fetchFriendsFn = fetchFriends(setFriends) // curried
-
   React.useEffect(() => {
     fetchFriendsFn()
-    const nSeconds = 10
+    const nSeconds = 4
     const interval = setInterval(fetchFriendsFn, nSeconds * 1000)
     return () => clearInterval(interval) // clear interval on component unmount
   }, [])
@@ -193,6 +196,9 @@ export default function HomeScreen({navigation}) {
       <View>
         <Text style={{fontSize: 54, textAlign: 'center', marginTop: 42, fontFamily: 'SFCompactRounded_Semibold'}}>
           Ketchup Club
+        </Text>
+        <Text style={{fontSize: 18, textAlign: 'center', marginTop: 2, fontFamily: 'SFCompactRounded_Medium'}}>
+          {formatPhone(phone)}
         </Text>
 
         <Spacer />
