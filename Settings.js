@@ -6,9 +6,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const SettingItem = ({name, icon, value, dangerous, onPress}) => {
   const {theme} = React.useContext(GlobalContext)
-
-  console.log('theme in SettingItem: ' + theme)
-
   return (
     <View
       onTouchEnd={onPress}
@@ -16,15 +13,19 @@ const SettingItem = ({name, icon, value, dangerous, onPress}) => {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingTop: 10,
-        paddingBottom: 10,
         paddingLeft: 14,
         paddingRight: 14,
         margin: 4,
         backgroundColor: themes[theme].text_input_bkgd,
         borderRadius: 8,
       }}>
-      <Text style={{fontSize: 18, fontFamily: 'SFCompactRounded_Medium', color: dangerous ? 'red' : themes.light.text_secondary}}>
+      <Text
+        style={{
+          fontSize: 18,
+          fontFamily: 'SFCompactRounded_Medium',
+          lineHeight: 48, // Emojis have a different lineHeight than text, so this is to normalize between the two
+          color: dangerous ? 'red' : themes.light.text_secondary,
+        }}>
         {name}
       </Text>
       <Text style={{fontSize: 18, fontFamily: 'SFCompactRounded_Medium', color: dangerous ? 'red' : themes.light.text_emphasis}}>
@@ -35,9 +36,10 @@ const SettingItem = ({name, icon, value, dangerous, onPress}) => {
 }
 
 export function SettingsScreen({navigation}) {
-  const {phone, authToken, setAuthToken, theme} = React.useContext(GlobalContext)
+  const {phone, friends, setAuthToken, theme} = React.useContext(GlobalContext)
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
+  const user = friends ? friends.find(({phone: theirPhone}) => theirPhone == phone) : null
 
   const logout = () => {
     console.log('logout')
@@ -47,8 +49,8 @@ export function SettingsScreen({navigation}) {
 
   const settings = [
     ['System Permissions', {Contacts: null, 'Push Notifications': null}],
-    ['Profile', {Username: null, Avatar: null, Phone: formatPhone(phone)}],
-    ['Account', {}],
+    ['Profile', {Username: user?.screen_name ? '@' + user?.screen_name : null, Phone: formatPhone(phone), Avatar: null}],
+    ['Account', {Theme: '☀️ Light · Dark 🌙'}],
   ]
 
   return (
