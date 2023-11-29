@@ -24,7 +24,12 @@ const homeStyles = (theme) =>
       shadowRadius: 3.84,
       elevation: 1,
     },
-    toggleBtnText: {textAlign: 'center', fontSize: 32, fontFamily: 'SFCompactRounded_Semibold', color: '#777'},
+    toggleBtnText: {
+      textAlign: 'center',
+      fontSize: 32,
+      fontFamily: 'SFCompactRounded_Semibold',
+      color: themes[theme].text_input_placeholder,
+    },
     toggleBtnTextSelected: {color: 'white'},
   })
 
@@ -48,8 +53,8 @@ function OnlineOfflineToggle() {
 
   const startPingInterval = () => {
     pingServer({status: 'online'}) // ping the first time
-    // const nSeconds = 10 // then every nSeconds
-    // setPingInterval(setInterval(() => pingServer({status: 'online'}), nSeconds * 1000))
+    const nSeconds = 10 // then every nSeconds
+    setPingInterval(setInterval(() => pingServer({status: 'online'}), nSeconds * 1000))
   }
 
   React.useEffect(() => {
@@ -145,8 +150,8 @@ const Friend = ({name, phoneNumber, last_ping}) => {
         borderRadius: 8,
       }}>
       <View style={{}}>
-        <Text style={{fontSize: 32}}>{name}</Text>
-        <Text style={{fontSize: 16, fontFamily: 'SFCompactRounded_Light'}}>online {longAgoInEnglish(last_ping)}</Text>
+        <Text style={{fontSize: 32, color: themes[theme].text_emphasis, fontFamily: 'SFCompactRounded_Semibold'}}>@{name}</Text>
+        <Text style={{fontSize: 16, color: themes[theme].text_secondary}}>online {longAgoInEnglish(last_ping)}</Text>
       </View>
       <Text style={{fontSize: 36}} onPress={() => callNumber(phoneNumber)}>
         📞
@@ -185,7 +190,7 @@ export default function HomeScreen({navigation}) {
 
   React.useEffect(() => {
     fetchFriendsFn()
-    const nSeconds = 10
+    const nSeconds = __DEV__ ? 15 : 3
     const interval = setInterval(fetchFriendsFn, nSeconds * 1000)
     return () => clearInterval(interval) // clear interval on component unmount
   }, [])

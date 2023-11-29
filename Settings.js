@@ -56,7 +56,7 @@ export function SettingsScreen({navigation}) {
   return (
     <View style={{...styles(theme).container, ...styles(theme).flexColumn}}>
       <View style={{marginTop: 48}}>
-        <Header>Settings</Header>
+        <Header style={{fontSize: 28, color: themes[theme].text_secondary}}>Settings</Header>
 
         {settings.map(([section, sectionItems], i) => (
           <View key={i}>

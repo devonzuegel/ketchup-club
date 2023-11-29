@@ -87,7 +87,7 @@ export function FriendsScreen({navigation}) {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={{...styles(theme).container, ...styles(theme).flexColumn}}>
         <View style={{marginTop: 48}}>
-          <Header>Friends</Header>
+          <Header style={{fontSize: 28, color: themes[theme].text_secondary}}>Friends</Header>
           <SearchBar />
 
           {friends == null ? (

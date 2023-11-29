@@ -10,6 +10,7 @@ const colors = {
   black_0: '#000',
   black_1: '#50606C',
   black_2: '#6E7C87',
+  black_3: '#AAB7C0',
   grey_0: '#bbb',
   grey_4: 'rgba(0, 0, 0, 0.05)',
   grey_5: 'rgba(255,255, 0.05)',
@@ -22,6 +23,7 @@ export const themes = {
     text_emphasis: colors.black_0,
     text_primary: colors.black_1,
     text_secondary: colors.black_2,
+    text_tertiary: colors.black_3,
     text_input_placeholder: colors.grey_0,
     text_input_bkgd: colors.grey_4,
   },
@@ -30,6 +32,7 @@ export const themes = {
     text_emphasis: colors.white_0,
     text_primary: colors.white_0,
     text_secondary: colors.grey_0,
+    text_tertiary: colors.grey_4,
     text_input_placeholder: colors.grey_0,
     text_input_bkgd: colors.grey_5,
   },
@@ -107,6 +110,7 @@ export const styles = (theme) =>
       fontFamily: 'SFCompactRounded_Medium',
       backgroundColor: themes[theme].backgroundColor,
       padding: containerPadding,
+      paddingBottom: 0,
       paddingTop: 48,
     },
     flexColumn: {
@@ -148,14 +152,14 @@ export const debugStyles = (theme) =>
 
 export const Header = ({children, style}) => {
   const {theme} = React.useContext(GlobalContext)
-  console.log('     theme in Header: ' + theme)
   return (
     <Text
       style={{
         textAlign: 'center',
         fontSize: 20,
-        color: themes[theme].text_secondary,
+        color: themes[theme].text_tertiary,
         marginBottom: 4,
+        fontFamily: 'SFCompactRounded_Semibold',
         ...style,
       }}>
       {children}

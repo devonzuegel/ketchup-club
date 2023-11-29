@@ -2,7 +2,7 @@ import React, {useState, useRef} from 'react'
 import {View, Keyboard, TouchableWithoutFeedback} from 'react-native'
 import {PhoneNumberUtil} from 'google-libphonenumber'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {Button, Text, TextInput, styles, GlobalContext, countryCode, removeCountryCode} from './Utils'
+import {Button, Text, TextInput, styles, GlobalContext, countryCode, removeCountryCode, themes} from './Utils'
 import PhoneInput from './PhoneInput'
 import api from './API'
 
@@ -92,8 +92,11 @@ export const LoginScreen = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles(theme).container}>
         <View>
-          <Text style={{fontSize: 24, textAlign: 'center', color: '#50606C', marginTop: 120}}>Welcome to</Text>
-          <Text style={{fontSize: 54, textAlign: 'center'}}>Ketchup Club</Text>
+          <Text style={{fontSize: 22, textAlign: 'center', color: themes[theme].text_secondary, marginTop: 120}}>Welcome to</Text>
+          <Text
+            style={{fontSize: 52, textAlign: 'center', color: themes[theme].text_primary, fontFamily: 'SFCompactRounded_Bold'}}>
+            Ketchup Club
+          </Text>
         </View>
         <View style={stylesheet.wrapper}>
           {/* The spaces at the end of the "error" & "message" fields are to prevent the text from jumping */}
