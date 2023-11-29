@@ -178,6 +178,8 @@ const fetchFromApi = (setResult) => async () => {
 export default function HomeScreen({navigation}) {
   const {friends, setFriends} = React.useContext(GlobalContext)
   const {phone} = React.useContext(GlobalContext)
+  const user = friends ? friends.find(({phone: theirPhone}) => theirPhone == phone) : null
+
   const onlineFriends = friends
     ? friends
         .filter(({status, phone: theirPhone}) => status == 'online' && theirPhone != phone)
@@ -194,13 +196,19 @@ export default function HomeScreen({navigation}) {
   return (
     <View style={{...styles.container, ...styles.flexColumn}}>
       <View>
-        <Text style={{fontSize: 54, textAlign: 'center', marginTop: 42, fontFamily: 'SFCompactRounded_Semibold'}}>
+        <Text style={{fontSize: 54, textAlign: 'center', marginTop: 52, fontFamily: 'SFCompactRounded_Semibold'}}>
           Ketchup Club
         </Text>
-        <Text style={{fontSize: 18, textAlign: 'center', marginTop: 2, fontFamily: 'SFCompactRounded_Medium'}}>
-          {formatPhone(phone)}
-        </Text>
 
+        <Spacer />
+        <Header style={{color: '#aaa', fontFamily: 'SFCompactRounded_Medium'}}>
+          Hello,{' '}
+          <Text style={{color: 'white', fontFamily: 'SFCompactRounded_Bold'}}>
+            {/* TODO: in the future, we'll store the whole user in the global state and fetch that rather than doing this messy thing of finding the user in the list of friends */}
+            {user && user.screen_name ? '@' + user.screen_name : formatPhone(phone)}
+          </Text>
+          ! Nice to see you
+        </Header>
         <Spacer />
         <OnlineOfflineToggle />
 
