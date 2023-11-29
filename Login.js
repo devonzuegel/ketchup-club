@@ -1,8 +1,8 @@
-import React, {useState, useRef, forwardRef} from 'react'
-import {TextInput as RNTextInput, View, Keyboard, TouchableWithoutFeedback} from 'react-native'
+import React, {useState, useRef} from 'react'
+import {View, Keyboard, TouchableWithoutFeedback} from 'react-native'
 import {PhoneNumberUtil} from 'google-libphonenumber'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {Button, Text, styles, GlobalContext, countryCode, removeCountryCode} from './Utils'
+import {Button, Text, TextInput, styles, GlobalContext, countryCode, removeCountryCode} from './Utils'
 import PhoneInput from './PhoneInput'
 import api from './API'
 
@@ -26,15 +26,6 @@ const stylesheet = {
     justifyContent: 'center',
   },
 }
-
-const TextInput = forwardRef((props, ref) => (
-  <RNTextInput
-    ref={ref}
-    placeholderTextColor="rgba(255, 255, 255, 0.4)"
-    {...props}
-    style={{...stylesheet.textInput, ...props.style}}
-  />
-))
 
 export const LoginScreen = () => {
   const [smsCode, setSmsCode] = useState('')

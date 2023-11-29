@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react'
-import {View, Button as RNButton, StyleSheet, TouchableOpacity, Text as RNText} from 'react-native'
+import React, {useState, useEffect, forwardRef} from 'react'
+import {View, StyleSheet, TouchableOpacity, Text as RNText, TextInput as RNTextInput} from 'react-native'
 import {PhoneNumberUtil, PhoneNumberFormat} from 'google-libphonenumber'
 
 export const GlobalContext = React.createContext()
@@ -83,6 +83,17 @@ export const styles = StyleSheet.create({
     flexGrow: 1, // all the available vertical space will be occupied by it
     justifyContent: 'space-between', // will create the gutter between body and footer
   },
+  textInput: {
+    height: 40,
+    borderWidth: 1,
+    marginTop: 4,
+    marginBottom: 4,
+    padding: 10,
+    color: 'white',
+    fontFamily: 'SFCompactRounded_Medium',
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+  },
 })
 
 export const debugStyles = StyleSheet.create({
@@ -108,6 +119,15 @@ export const Text = (props) => (
     {props.children}
   </RNText>
 )
+
+export const TextInput = forwardRef((props, ref) => (
+  <RNTextInput
+    ref={ref}
+    placeholderTextColor="rgba(255, 255, 255, 0.4)"
+    {...props}
+    style={{...styles.textInput, ...props.style}}
+  />
+))
 
 export const Button = ({onPress, title, btnStyle, textStyle}) => (
   <TouchableOpacity onPress={onPress} style={{...styles.appButtonContainer, ...btnStyle}}>
