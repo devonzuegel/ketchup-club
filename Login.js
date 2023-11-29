@@ -22,7 +22,7 @@ export const LoginScreen = () => {
   const [smsCodeEntered, setSmsCodeEntered] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const {setAuthToken, phone, setPhone} = React.useContext(GlobalContext)
+  const {setAuthToken, phone, setPhone, theme} = React.useContext(GlobalContext)
   const smsCodeFieldRef = useRef()
 
   // when this component loads, check if we have a token in AsyncStorage
@@ -88,10 +88,9 @@ export const LoginScreen = () => {
     }
   }
   */
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
+      <View style={styles(theme).container}>
         <View>
           <Text style={{fontSize: 24, textAlign: 'center', color: '#50606C', marginTop: 120}}>Welcome to</Text>
           <Text style={{fontSize: 54, textAlign: 'center'}}>Ketchup Club</Text>
@@ -100,10 +99,6 @@ export const LoginScreen = () => {
           {/* The spaces at the end of the "error" & "message" fields are to prevent the text from jumping */}
           <Text style={{textAlign: 'center', color: 'red'}}>{error} </Text>
           <Text style={{textAlign: 'center', color: 'green'}}>{message} </Text>
-
-          <Text style={{textAlign: 'center', color: '#50606C', marginBottom: 12, fontSize: 16}}>
-            Enter your phone number to sign in or sign up
-          </Text>
           <PhoneInput
             phone={removeCountryCode(phone)} // if pulling number from AsyncStorage, remove country code so that the country code is not displayed in the input field as a duplicate
             defaultCountryCode={countryCode(phone)}
@@ -116,7 +111,7 @@ export const LoginScreen = () => {
           />
           {validPhone && (
             <TextInput
-              style={{width: '100%'}}
+              style={{width: '80%'}}
               placeholder="SMS code"
               value={smsCode}
               ref={smsCodeFieldRef}
@@ -128,7 +123,7 @@ export const LoginScreen = () => {
               keyboardType="number-pad"
             />
           )}
-          {validPhone && smsCodeEntered && <Button title="Login" onPress={handleLogin} />}
+          {validPhone && smsCodeEntered && <Button title="Login →" onPress={handleLogin} />}
         </View>
 
         {debug && (

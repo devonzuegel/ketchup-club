@@ -1,4 +1,6 @@
 import {StyleSheet, Dimensions} from 'react-native'
+import {themes} from '../Utils'
+
 const {width: viewportWidth, height: viewportHeight} = Dimensions.get('window')
 function wp(percentage) {
   const value = (percentage * viewportWidth) / 100
@@ -10,13 +12,19 @@ function hp(percentage) {
 }
 const styles = StyleSheet.create({
   container: {
-    width: wp(80),
-    backgroundColor: 'white',
+    width: '80%',
     flexDirection: 'row',
+    height: 40,
+    marginTop: 4,
+    marginBottom: 4,
+    color: 'black',
+    fontFamily: 'SFCompactRounded_Medium',
+    borderRadius: 10,
+    backgroundColor: themes.light.text_input_bkgd,
   },
   flagButtonView: {
-    width: wp(20),
     height: '100%',
+    marginLeft: 8,
     minWidth: 32,
     justifyContent: 'center',
     flexDirection: 'row',
@@ -41,21 +49,22 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    backgroundColor: '#F8F9F9',
-    paddingHorizontal: wp(4),
-    paddingVertical: hp(2),
+    borderRadius: 10,
+    borderLeftColor: 'white',
     textAlign: 'left',
     flexDirection: 'row',
     alignItems: 'center',
   },
   codeText: {
-    fontSize: 16,
+    fontFamily: 'SFCompactRounded_Medium',
+    fontSize: 15,
     marginRight: 10,
     fontWeight: '500',
     color: '#000000',
   },
   numberText: {
-    fontSize: 16,
+    fontFamily: 'SFCompactRounded_Medium',
+    fontSize: 15,
     color: '#000000',
     flex: 1,
   },

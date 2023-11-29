@@ -1,43 +1,37 @@
 import React from 'react'
 import {StyleSheet, View} from 'react-native'
-import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone} from './Utils'
+import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone, themes} from './Utils'
 import {callNumber} from './Phone'
+import {fetchFriends} from './Friends'
 import api from './API'
 
-const homeStyles = StyleSheet.create({
-  toggleOuter: {
-    backgroundColor: '#222',
-    padding: 6,
-    borderRadius: 100,
-    margin: 4,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  toggleBtn: {flex: 1, borderRadius: 100, padding: 14, flexDirection: 'column', justifyContent: 'center'},
-  toggleBtnSelected: {
-    color: 'white',
-    shadowColor: '#000',
-    shadowOffset: {width: 1, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 1,
-  },
-  toggleBtnText: {textAlign: 'center', fontSize: 32, fontFamily: 'SFCompactRounded_Semibold', color: '#777'},
-  toggleBtnTextSelected: {color: 'white'},
-})
-
-const fetchFriends = (setFriends) => async () => {
-  console.log(new Date(Date.now()).toLocaleString() + ' fetchFriends')
-  api
-    .get('/users')
-    .then((result) => setFriends(result.data))
-    .catch((err) => console.error('fetchFriends error:', err))
-}
+const homeStyles = (theme) =>
+  StyleSheet.create({
+    toggleOuter: {
+      backgroundColor: themes[theme].text_input_bkgd,
+      padding: 6,
+      borderRadius: 100,
+      margin: 4,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    toggleBtn: {flex: 1, borderRadius: 100, padding: 14, flexDirection: 'column', justifyContent: 'center'},
+    toggleBtnSelected: {
+      color: 'white',
+      shadowColor: '#000',
+      shadowOffset: {width: 1, height: 2},
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 1,
+    },
+    toggleBtnText: {textAlign: 'center', fontSize: 32, fontFamily: 'SFCompactRounded_Semibold', color: '#777'},
+    toggleBtnTextSelected: {color: 'white'},
+  })
 
 function OnlineOfflineToggle() {
   const [status, setStatus] = React.useState('online')
   const [pingInterval, setPingInterval] = React.useState(null)
-  const {setFriends, phone} = React.useContext(GlobalContext)
+  const {setFriends, phone, theme} = React.useContext(GlobalContext)
   const fetchFriendsFn = fetchFriends(setFriends) // curried
 
   async function pingServer({status}) {
@@ -66,32 +60,32 @@ function OnlineOfflineToggle() {
   return (
     <View>
       <Header>Set your status</Header>
-      <View style={homeStyles.toggleOuter}>
+      <View style={homeStyles(theme).toggleOuter}>
         <View
           style={{
-            ...homeStyles.toggleBtn,
-            backgroundColor: '#555',
-            ...(status == 'offline' ? homeStyles.toggleBtnSelected : {backgroundColor: 'transparent'}),
+            ...homeStyles(theme).toggleBtn,
+            backgroundColor: themes[theme].text_input_placeholder,
+            ...(status == 'offline' ? homeStyles(theme).toggleBtnSelected : {backgroundColor: 'transparent'}),
           }}>
           <Text
             onPress={() => {
               setStatus('offline')
               pingServer({status: 'offline'}).then(() => setTimeout(fetchFriendsFn, 10))
-              // clearInterval(pingInterval)
-              // console.log('set offline + ping interval cleared')
+              clearInterval(pingInterval)
+              console.log('set offline + ping interval cleared')
             }}
             style={{
-              ...homeStyles.toggleBtnText,
-              ...(status == 'offline' ? homeStyles.toggleBtnTextSelected : {}),
+              ...homeStyles(theme).toggleBtnText,
+              ...(status == 'offline' ? homeStyles(theme).toggleBtnTextSelected : {}),
             }}>
             Offline
           </Text>
         </View>
         <View
           style={{
-            ...homeStyles.toggleBtn,
+            ...homeStyles(theme).toggleBtn,
             backgroundColor: '#32C084',
-            ...(status == 'online' ? homeStyles.toggleBtnSelected : {backgroundColor: 'transparent'}),
+            ...(status == 'online' ? homeStyles(theme).toggleBtnSelected : {backgroundColor: 'transparent'}),
           }}>
           <Text
             onPress={() => {
@@ -99,7 +93,7 @@ function OnlineOfflineToggle() {
               pingServer({status: 'online'}).then(() => setTimeout(fetchFriendsFn, 10))
               // startPingInterval()
             }}
-            style={{...homeStyles.toggleBtnText, ...(status == 'online' ? homeStyles.toggleBtnTextSelected : {})}}>
+            style={{...homeStyles(theme).toggleBtnText, ...(status == 'online' ? homeStyles(theme).toggleBtnTextSelected : {})}}>
             Online
           </Text>
         </View>
@@ -132,32 +126,34 @@ const longAgoInEnglish = (timestamp) => {
   return `${years} years ago`
 }
 
-const Friend = ({name, phoneNumber, last_ping}) => (
-  <View
-    style={{
-      paddingTop: 8,
-      paddingBottom: 8,
-      paddingLeft: 12,
-      paddingRight: 12,
-      margin: 4,
-      backgroundColor: '#222',
-      borderRadius: 8,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#222',
-      borderRadius: 8,
-    }}>
-    <View style={{}}>
-      <Text style={{fontSize: 32}}>{name}</Text>
-      <Text style={{fontSize: 16, fontFamily: 'SFCompactRounded_Light'}}>online {longAgoInEnglish(last_ping)}</Text>
+const Friend = ({name, phoneNumber, last_ping}) => {
+  const {theme} = React.useContext(GlobalContext)
+  return (
+    <View
+      style={{
+        paddingTop: 8,
+        paddingBottom: 8,
+        paddingLeft: 12,
+        paddingRight: 12,
+        margin: 4,
+        backgroundColor: themes[theme].text_input_bkgd,
+        borderRadius: 8,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignContent: 'center',
+        alignItems: 'center',
+        borderRadius: 8,
+      }}>
+      <View style={{}}>
+        <Text style={{fontSize: 32}}>{name}</Text>
+        <Text style={{fontSize: 16, fontFamily: 'SFCompactRounded_Light'}}>online {longAgoInEnglish(last_ping)}</Text>
+      </View>
+      <Text style={{fontSize: 36}} onPress={() => callNumber(phoneNumber)}>
+        📞
+      </Text>
     </View>
-    <Text style={{fontSize: 36}} onPress={() => callNumber(phoneNumber)}>
-      📞
-    </Text>
-  </View>
-)
+  )
+}
 
 const Spacer = () => <View style={{marginTop: 48}} />
 
@@ -182,9 +178,11 @@ export default function HomeScreen({navigation}) {
   const onlineFriends = friends
     ? friends
         .filter(({status, phone: theirPhone}) => status == 'online' && theirPhone != phone)
-        .filter(({last_ping}) => timestampWithinMins(last_ping, 2))
+        .filter(({last_ping}) => timestampWithinMins(last_ping, 20))
     : []
+
   const fetchFriendsFn = fetchFriends(setFriends) // curried
+
   React.useEffect(() => {
     fetchFriendsFn()
     const nSeconds = 10
@@ -192,17 +190,34 @@ export default function HomeScreen({navigation}) {
     return () => clearInterval(interval) // clear interval on component unmount
   }, [])
 
+  const {theme} = React.useContext(GlobalContext)
+
   return (
-    <View style={{...styles.container, ...styles.flexColumn}}>
+    <View style={{...styles(theme).container, ...styles(theme).flexColumn}}>
       <View>
-        <Text style={{fontSize: 54, textAlign: 'center', marginTop: 52, fontFamily: 'SFCompactRounded_Semibold'}}>
+        <Text
+          style={{
+            fontSize: 52,
+            textAlign: 'center',
+            marginTop: 52,
+            fontFamily: 'SFCompactRounded_Bold',
+            // color: themes[theme].text_secondary,
+          }}>
           Ketchup Club
         </Text>
 
         <Spacer />
-        <Header style={{color: '#aaa', fontFamily: 'SFCompactRounded_Medium'}}>
+        <Header
+          style={{
+            color: themes[theme].text_secondary,
+            fontFamily: 'SFCompactRounded_Medium',
+          }}>
           Hello,{' '}
-          <Text style={{color: 'white', fontFamily: 'SFCompactRounded_Bold'}}>
+          <Text
+            style={{
+              color: themes[theme].text_emphasis,
+              fontFamily: 'SFCompactRounded_Bold',
+            }}>
             {/* TODO: in the future, we'll store the whole user in the global state and fetch that rather than doing this messy thing of finding the user in the list of friends */}
             {user && user.screen_name ? '@' + user.screen_name : formatPhone(phone)}
           </Text>

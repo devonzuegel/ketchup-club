@@ -1,6 +1,6 @@
 import React, {useState, useRef, PureComponent} from 'react'
 import {SafeAreaView, View, Text, TouchableOpacity, Image, TextInput} from 'react-native'
-import {debugStyles} from '../Utils'
+import {debugStyles, GlobalContext, themes} from '../Utils'
 import CountryPicker, {
   getCallingCode,
   DARK_THEME,
@@ -128,8 +128,9 @@ class PhoneInput extends PureComponent {
   }
 
   render() {
+    // const {theme} = React.useContext(GlobalContext)
+    const theme = 'light'
     const {
-      withShadow,
       withDarkTheme,
       codeTextStyle,
       textInputProps,
@@ -149,7 +150,7 @@ class PhoneInput extends PureComponent {
     const {modalVisible, code, countryCode, number, disabled} = this.state
     return (
       <CountryModalProvider>
-        <View style={[styles.container, withShadow ? styles.shadow : {}, containerStyle ? containerStyle : {}]}>
+        <View style={[styles.container, containerStyle ? containerStyle : {}]}>
           <TouchableOpacity
             style={[
               styles.flagButtonView,
@@ -169,7 +170,7 @@ class PhoneInput extends PureComponent {
               withCallingCode
               disableNativeModal={disabled}
               visible={modalVisible}
-              theme={withDarkTheme ? DARK_THEME : DEFAULT_THEME}
+              theme={theme}
               renderFlagButton={this.renderFlagButton}
               onClose={() => this.setState({modalVisible: false})}
               {...countryPickerProps}
@@ -187,7 +188,8 @@ class PhoneInput extends PureComponent {
             )}
             <TextInput
               style={[styles.numberText, textInputStyle ? textInputStyle : {}]}
-              placeholder={placeholder ? placeholder : 'Phone Number'}
+              placeholder={placeholder ? placeholder : 'Phone number'}
+              placeholderTextColor={themes[theme].text_input_placeholder}
               onChangeText={this.onChangeText}
               value={number}
               editable={disabled ? false : true}
@@ -215,17 +217,19 @@ export const isValidNumber = (number, countryCode) => {
 
 const PhoneInputComponent = ({phone, setPhone, validPhone, setValidPhone, defaultCountryCode}) => {
   const ref = useRef()
+  const {theme} = React.useContext(GlobalContext)
 
   return (
     <>
       <SafeAreaView>
         {debug && (
-          <View style={debugStyles.message}>
-            <Text style={debugStyles.msgTxt}>········· Valid: {validPhone ? 'true' : 'false'}</Text>
-            <Text style={debugStyles.msgTxt}>········· Phone: {phone}</Text>
+          <View style={debugStyles(theme).message}>
+            <Text style={debugStyles(theme).msgTxt}>········· Valid: {validPhone ? 'true' : 'false'}</Text>
+            <Text style={debugStyles(theme).msgTxt}>········· Phone: {phone}</Text>
           </View>
         )}
         <PhoneInput
+          disableArrowIcon
           ref={ref}
           defaultValue={phone}
           defaultCode={defaultCountryCode || 'US'}
@@ -244,12 +248,6 @@ const PhoneInputComponent = ({phone, setPhone, validPhone, setValidPhone, defaul
           withShadow
           autoFocus
           textContentType="telephoneNumber"
-          // countryPickerButtonStyle={{backgroundColor: '#222', color: 'white'}}
-          // textInputStyle={{backgroundColor: '#222', color: 'white'}}
-          // textContainerStyle={{backgroundColor: '#222', color: 'white'}}
-          // containerStyle={{backgroundColor: '#222', color: 'white'}}
-          // flagButtonStyle={{backgroundColor: '#222', color: 'white'}}
-          // codeTextStyle={{backgroundColor: '#222', color: 'white'}}
         />
       </SafeAreaView>
     </>
