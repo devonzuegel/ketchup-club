@@ -9,17 +9,6 @@ import api from './API'
 const debug = false
 
 const stylesheet = {
-  textInput: {
-    height: 40,
-    borderWidth: 1,
-    marginTop: 4,
-    marginBottom: 4,
-    padding: 10,
-    color: 'white',
-    fontFamily: 'SFCompactRounded_Medium',
-    borderRadius: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-  },
   wrapper: {
     padding: 12,
     alignItems: 'center',

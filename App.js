@@ -7,8 +7,15 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack'
 import HomeScreen from './Home'
 import {FriendsScreen} from './Friends'
 import {SettingsScreen} from './Settings'
+import {apiBaseURL} from './API'
 
 export const debug = false
+
+console.log('=================================================================')
+console.log('STARTING APP...')
+console.log('          mode: ' + (__DEV__ ? 'DEVELOPMENT  🛠️' : 'PRODUCTION 🚀'))
+console.log('  API base URL:', apiBaseURL)
+console.log('=================================================================')
 
 const Stack = createNativeStackNavigator()
 

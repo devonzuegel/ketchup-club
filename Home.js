@@ -3,7 +3,6 @@ import {StyleSheet, View} from 'react-native'
 import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone} from './Utils'
 import {callNumber} from './Phone'
 import api from './API'
-import {PhoneNumberUtil} from 'google-libphonenumber'
 
 const homeStyles = StyleSheet.create({
   toggleOuter: {
