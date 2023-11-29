@@ -22,6 +22,8 @@ eas build --profile preview --platform ios
 - [x] Store entire phone number and use `libphonenumber` to extract country code, instead of storing them separately: https://www.sitepoint.com/working-phone-numbers-javascript
 - [x] Check in the background if a friend is online, and if so send a push notification to the user
 - [x] Sign up flow
+- [x] App icon & splash screen
+- [ ] Scroll the list of friends so it doesn't overflow the screen
 
 ## Phase 2: Before friends use it
 - [ ] Publish to TestFlight so other friends can use it
