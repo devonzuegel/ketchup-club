@@ -4,23 +4,28 @@
 yarn start
 ```
 
+# TestFlight build
+
+```sh
+bin/build-ios.sh
+bin/submit-ios.sh
+```
+
 # Internal build
 
 ```sh
 eas build --profile preview --platform ios
 ```
 
-```sh
-eas build --profile preview --platform all
-```
-
 # TODOs
 ## Phase 1: Basic functionality
-- [ ] Store entire phone number and use `libphonenumber` to extract country code, instead of storing them separately: https://www.sitepoint.com/working-phone-numbers-javascript
-- [ ] Check in the background if a friend is online, and if so send a push notification to the user
+- [x] Store entire phone number and use `libphonenumber` to extract country code, instead of storing them separately: https://www.sitepoint.com/working-phone-numbers-javascript
+- [x] Check in the background if a friend is online, and if so send a push notification to the user
+- [x] Sign up flow
 
 ## Phase 2: Before friends use it
 - [ ] Publish to TestFlight so other friends can use it
+- [ ] Push notification when a friend is online
 - [ ] Have the PhoneInput component autosuggest the user's phone number. Note: This may require forking the library and adding the feature
 
 ## Phase 3: Before making it public
