@@ -30,6 +30,7 @@ eas build --profile preview --platform ios
 
 ## Phase 3: Before making it public
 - [ ] Protect all endpoints with authentication the same way `protected-endpoint` is protected
+- [ ] Store the whole user in the global state and fetch that rather than doing this messy thing of finding the user in the list of friends. More details in `Home.js`
 
 ## Phase 4: Low priority
 - [ ] Fix the screen flicker that happens at login. I think it's an issue of not using a proper navigation library. It may not be an issue if we simply stick with a white background, it might just be an issue while we have a black background
