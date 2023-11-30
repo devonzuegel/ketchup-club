@@ -24,12 +24,17 @@ const SettingItem = ({name, icon, value, dangerous, onPress}) => {
           fontSize: 18,
           fontFamily: 'SFCompactRounded_Medium',
           lineHeight: 48, // Emojis have a different lineHeight than text, so this is to normalize between the two
-          color: dangerous ? 'red' : themes.light.text_secondary,
+          color: dangerous ? 'red' : themes[theme].text_secondary,
         }}>
         {name}
       </Text>
-      <Text style={{fontSize: 18, fontFamily: 'SFCompactRounded_Medium', color: dangerous ? 'red' : themes.light.text_emphasis}}>
-        {value || icon || '❌'}
+      <Text
+        style={{
+          fontSize: 18,
+          fontFamily: 'SFCompactRounded_Medium',
+          color: dangerous ? 'red' : themes[theme].text_emphasis,
+        }}>
+        {value || icon || '🚧' || '❌'}
       </Text>
     </View>
   )

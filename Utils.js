@@ -12,9 +12,16 @@ const colors = {
   black_2: '#6E7C87',
   black_3: '#AAB7C0',
   grey_0: '#bbb',
+  grey_1: '#ccc',
+  grey_2: '#ddd',
   grey_4: 'rgba(0, 0, 0, 0.05)',
-  grey_5: 'rgba(255,255, 0.05)',
+  grey_5: 'rgba(255, 255, 255, 0.2)',
   white_0: '#fff',
+  white_1: '#ddd',
+  white_2: '#bbb',
+  white_3: '#999',
+  white_4: '#777',
+  white_5: '#555',
 }
 
 export const themes = {
@@ -30,10 +37,10 @@ export const themes = {
   dark: {
     backgroundColor: colors.black_0,
     text_emphasis: colors.white_0,
-    text_primary: colors.white_0,
-    text_secondary: colors.grey_0,
-    text_tertiary: colors.grey_4,
-    text_input_placeholder: colors.grey_0,
+    text_primary: colors.white_1,
+    text_secondary: colors.white_2,
+    text_tertiary: colors.white_3,
+    text_input_placeholder: colors.white_5,
     text_input_bkgd: colors.grey_5,
   },
 }

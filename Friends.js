@@ -96,11 +96,10 @@ export function FriendsScreen({navigation}) {
         ) : (
           <View style={{flex: 1 /* fill the rest of the screen */}}>
             <FlatList
-              scrollEnabled
-              keyboardShouldPersistTaps="always"
               data={friends}
-              keyExtractor={(meta_item, index) => index.toString()} //Add this line
               renderItem={({item: {screen_name, phone}, id}) => <Friend screen_name={screen_name} phone={phone} />}
+              keyExtractor={(meta_item, index) => index.toString()} //Add this line
+              scrollEnabled
             />
           </View>
         )}
