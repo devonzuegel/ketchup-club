@@ -1,4 +1,4 @@
-import {View, TouchableWithoutFeedback, Keyboard, TextInput, Dimensions} from 'react-native'
+import {View, Keyboard, TextInput, Dimensions, FlatList} from 'react-native'
 import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, themes, formatPhone} from './Utils'
 import api from './API'
 import React from 'react'
@@ -84,21 +84,29 @@ export function FriendsScreen({navigation}) {
   }, [])
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={{...styles(theme).container, ...styles(theme).flexColumn}}>
-        <View style={{marginTop: 48}}>
-          <Header style={{fontSize: 28, color: themes[theme].text_secondary}}>Friends</Header>
-          <SearchBar />
+    <View
+      style={{...styles(theme).container, ...styles(theme).flexColumn}}
+      onStartShouldSetResponder={(evt) => Keyboard.dismiss() && false}>
+      <View style={{marginTop: 48, flexDirection: 'column', flex: 1}}>
+        <Header style={{fontSize: 28, color: themes[theme].text_secondary}}>Friends</Header>
+        <SearchBar />
 
-          {friends == null ? (
-            <DotAnimation style={{alignSelf: 'center', width: 60, marginTop: 12}} />
-          ) : (
-            friends.map(({screen_name, phone}, i) => <Friend screen_name={screen_name} phone={phone} key={i} />)
-          )}
-        </View>
-
-        <NavBtns navigation={navigation} />
+        {friends == null ? (
+          <DotAnimation style={{alignSelf: 'center', width: 80, marginTop: 12}} />
+        ) : (
+          <View style={{flex: 1 /* fill the rest of the screen */}}>
+            <FlatList
+              scrollEnabled
+              keyboardShouldPersistTaps="always"
+              data={friends}
+              keyExtractor={(meta_item, index) => index.toString()} //Add this line
+              renderItem={({item: {screen_name, phone}, id}) => <Friend screen_name={screen_name} phone={phone} />}
+            />
+          </View>
+        )}
       </View>
-    </TouchableWithoutFeedback>
+
+      <NavBtns navigation={navigation} />
+    </View>
   )
 }

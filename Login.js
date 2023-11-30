@@ -1,6 +1,5 @@
 import React, {useState, useRef} from 'react'
-import {View, Keyboard, TouchableWithoutFeedback} from 'react-native'
-import {PhoneNumberUtil} from 'google-libphonenumber'
+import {View, Keyboard} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {Button, Text, TextInput, styles, GlobalContext, countryCode, removeCountryCode, themes} from './Utils'
 import PhoneInput from './PhoneInput'
@@ -89,54 +88,51 @@ export const LoginScreen = () => {
   }
   */
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles(theme).container}>
-        <View>
-          <Text style={{fontSize: 22, textAlign: 'center', color: themes[theme].text_secondary, marginTop: 120}}>Welcome to</Text>
-          <Text
-            style={{fontSize: 52, textAlign: 'center', color: themes[theme].text_primary, fontFamily: 'SFCompactRounded_Bold'}}>
-            Ketchup Club
-          </Text>
-        </View>
-        <View style={stylesheet.wrapper}>
-          {/* The spaces at the end of the "error" & "message" fields are to prevent the text from jumping */}
-          <Text style={{textAlign: 'center', color: 'red'}}>{error} </Text>
-          <Text style={{textAlign: 'center', color: 'green'}}>{message} </Text>
-          <PhoneInput
-            phone={removeCountryCode(phone)} // if pulling number from AsyncStorage, remove country code so that the country code is not displayed in the input field as a duplicate
-            defaultCountryCode={countryCode(phone)}
-            setPhone={setPhone}
-            validPhone={validPhone}
-            setValidPhone={(isValid) => {
-              if (isValid) setTimeout(() => smsCodeFieldRef.current.focus(), 0)
-              setValidPhone(isValid)
-            }}
-          />
-          {validPhone && (
-            <TextInput
-              style={{width: '80%'}}
-              placeholder="SMS code"
-              value={smsCode}
-              ref={smsCodeFieldRef}
-              onChangeText={(text) => {
-                setSmsCode(text)
-                if (text.length >= 4) setSmsCodeEntered(true)
-              }}
-              autoCapitalize="none"
-              keyboardType="number-pad"
-            />
-          )}
-          {validPhone && smsCodeEntered && <Button title="Login →" onPress={handleLogin} />}
-        </View>
-
-        {debug && (
-          <>
-            <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
-            <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(authToken)} />
-            <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} />
-          </>
-        )}
+    <View style={styles(theme).container} onStartShouldSetResponder={(evt) => Keyboard.dismiss() && false}>
+      <View>
+        <Text style={{fontSize: 22, textAlign: 'center', color: themes[theme].text_secondary, marginTop: 120}}>Welcome to</Text>
+        <Text style={{fontSize: 52, textAlign: 'center', color: themes[theme].text_primary, fontFamily: 'SFCompactRounded_Bold'}}>
+          Ketchup Club
+        </Text>
       </View>
-    </TouchableWithoutFeedback>
+      <View style={stylesheet.wrapper}>
+        {/* The spaces at the end of the "error" & "message" fields are to prevent the text from jumping */}
+        <Text style={{textAlign: 'center', color: 'red'}}>{error} </Text>
+        <Text style={{textAlign: 'center', color: 'green'}}>{message} </Text>
+        <PhoneInput
+          phone={removeCountryCode(phone)} // if pulling number from AsyncStorage, remove country code so that the country code is not displayed in the input field as a duplicate
+          defaultCountryCode={countryCode(phone)}
+          setPhone={setPhone}
+          validPhone={validPhone}
+          setValidPhone={(isValid) => {
+            if (isValid) setTimeout(() => smsCodeFieldRef.current.focus(), 0)
+            setValidPhone(isValid)
+          }}
+        />
+        {validPhone && (
+          <TextInput
+            style={{width: '80%'}}
+            placeholder="SMS code"
+            value={smsCode}
+            ref={smsCodeFieldRef}
+            onChangeText={(text) => {
+              setSmsCode(text)
+              if (text.length >= 4) setSmsCodeEntered(true)
+            }}
+            autoCapitalize="none"
+            keyboardType="number-pad"
+          />
+        )}
+        {validPhone && smsCodeEntered && <Button title="Login →" onPress={handleLogin} />}
+      </View>
+
+      {debug && (
+        <>
+          <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
+          <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(authToken)} />
+          <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} />
+        </>
+      )}
+    </View>
   )
 }
