@@ -1,5 +1,5 @@
-import {View, Keyboard, TextInput, Dimensions, FlatList} from 'react-native'
-import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, themes, formatPhone} from './Utils'
+import {View, Keyboard, Dimensions, FlatList} from 'react-native'
+import {Text, TextInput, styles, NavBtns, Header, DotAnimation, GlobalContext, themes, formatPhone} from './Utils'
 import api from './API'
 import React from 'react'
 
@@ -29,22 +29,22 @@ const SearchBar = () => {
         marginRight: 4,
         marginTop: 10,
         marginBottom: 24,
-        paddingTop: 5,
-        paddingBottom: 5,
-        paddingLeft: 10,
-        paddingRight: 10,
+        paddingVertical: 5,
+        paddingHorizontal: 10,
         borderRadius: 100,
         backgroundColor: themes[theme].text_input_bkgd,
       }}>
       <Text style={{fontSize: 16}}>🔍</Text>
       <TextInput
-        placeholder="Search"
-        placeholderTextColor={themes[theme].text_input_placeholder}
+        placeholder="Search for friends"
         style={{
           width: Dimensions.get('window').width - 80,
-          color: themes[theme].text_secondary,
+          height: 'auto',
           fontSize: 16,
+          padding: 0,
+          margin: 0,
           marginLeft: 6,
+          backgroundColor: 'transparent',
         }}
       />
     </View>
