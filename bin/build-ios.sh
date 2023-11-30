@@ -12,8 +12,8 @@ if [ "$answer" != "y" ]; then
 else
   echo ""
   echo "running command:"
-  echo "    eas build --platform ios --profile preview"
+  echo "    eas build --platform ios"
   echo ""
 
-  eas build --platform ios --profile preview
+  eas build --platform ios
 fi
