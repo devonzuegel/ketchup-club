@@ -21,7 +21,7 @@ const Stack = createNativeStackNavigator()
 
 const LoggedInNavigator = () => (
   <NavigationContainer>
-    <Stack.Navigator initialRouteName="Home" screenOptions={{animation: 'none'}}>
+    <Stack.Navigator initialRouteName="Settings" screenOptions={{animation: 'none'}}>
       <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}} initialParams={{itemId: 10}} />
       <Stack.Screen name="Settings" component={SettingsScreen} options={{headerShown: false}} />
       <Stack.Screen name="Friends" component={FriendsScreen} options={{headerShown: false}} />
@@ -33,7 +33,7 @@ export default function App() {
   const [authToken, setAuthToken] = React.useState(null)
   const [friends, setFriends] = React.useState(null)
   const [phone, setPhone] = React.useState(null)
-  const [theme, setTheme] = React.useState('dark')
+  const [theme, setTheme] = React.useState('light')
   const globalContextVars = {authToken, setAuthToken, friends, setFriends, phone, setPhone, theme, setTheme}
 
   const [fontsLoaded] = useFonts(fonts)

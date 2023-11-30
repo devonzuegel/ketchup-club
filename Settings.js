@@ -41,7 +41,7 @@ const SettingItem = ({name, icon, value, dangerous, onPress}) => {
 }
 
 export function SettingsScreen({navigation}) {
-  const {phone, friends, setAuthToken, theme} = React.useContext(GlobalContext)
+  const {phone, friends, setAuthToken, theme, setTheme} = React.useContext(GlobalContext)
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
   const user = friends ? friends.find(({phone: theirPhone}) => theirPhone == phone) : null
@@ -53,9 +53,30 @@ export function SettingsScreen({navigation}) {
   }
 
   const settings = [
-    ['System Permissions', {Contacts: null, 'Push Notifications': null}],
-    ['Profile', {Username: user?.screen_name ? '@' + user?.screen_name : null, Phone: formatPhone(phone), Avatar: null}],
-    ['Account', {Theme: '☀️ Light · Dark 🌙'}],
+    [
+      'System Permissions',
+      {
+        Contacts: {value: null},
+        'Push Notifications': {value: null},
+      },
+    ],
+    [
+      'Profile',
+      {
+        Username: {value: user?.screen_name ? '@' + user?.screen_name : null},
+        Phone: {value: formatPhone(phone)},
+        Avatar: {value: null},
+      },
+    ],
+    [
+      'Account',
+      {
+        Theme: {
+          value: theme == 'light' ? 'Light ☀️' : 'Dark 🌙',
+          onPress: () => setTheme(theme == 'light' ? 'dark' : 'light'),
+        },
+      },
+    ],
   ]
 
   return (
@@ -66,8 +87,8 @@ export function SettingsScreen({navigation}) {
         {settings.map(([section, sectionItems], i) => (
           <View key={i}>
             <Header style={{textAlign: 'left', fontSize: 16, marginLeft: 16, marginBottom: 2, marginTop: 32}}>{section}</Header>
-            {Object.entries(sectionItems).map(([name, value], j) => (
-              <SettingItem name={name} value={value} key={j} />
+            {Object.entries(sectionItems).map(([name, {value, onPress}], j) => (
+              <SettingItem name={name} value={value} key={j} onPress={onPress} />
             ))}
           </View>
         ))}
