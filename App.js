@@ -21,7 +21,7 @@ const Stack = createNativeStackNavigator()
 
 const LoggedInNavigator = () => (
   <NavigationContainer>
-    <Stack.Navigator initialRouteName="Settings" screenOptions={{animation: 'none'}}>
+    <Stack.Navigator initialRouteName="Home" screenOptions={{animation: 'none'}}>
       <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}} initialParams={{itemId: 10}} />
       <Stack.Screen name="Settings" component={SettingsScreen} options={{headerShown: false}} />
       <Stack.Screen name="Friends" component={FriendsScreen} options={{headerShown: false}} />
