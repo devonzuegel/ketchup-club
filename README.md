@@ -39,8 +39,14 @@ eas build --profile preview --platform ios
 
 - [x] Publish to TestFlight so other friends can use it
 - [ ] Push notification when a friend is online
+  - [x] Review Sebas' PRs for the frontend and backend
   - [ ] Handle how this is shown in the settings page
+  - [ ] Add a way for users to disable push notifications
+    - [ ] Delete the token from the database when they disable push notifications – or have a way to toggle whether the token is active, so that we don't have to ask for permission again if they want to re-enable push notifications
+    - [ ] Filter for people who don't have tokens
 - [ ] Have the PhoneInput component autosuggest the user's phone number. Note: This may require forking the library and adding the feature
+- [ ] Add friends
+  - [ ] Lucie L
 
 ## Phase 3: Before making it public
 
