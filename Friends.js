@@ -9,10 +9,13 @@ export const mockFriends = [
   {phoneNumber: '+1-123-123-1234', name: 'Charlie'},
 ]
 
-export const fetchFriends = (setFriends) => async () => {
+export const fetchFriends = (authToken, setFriends) => async () => {
+  console.log("auth token", authToken);
   console.log(new Date(Date.now()).toLocaleString() + ' fetchFriends')
   api
-    .get('/users')
+    .get('/users', {
+      headers: {'Authorization': `Bearer ${authToken}`},
+    })
     .then((result) => setFriends(result.data))
     .catch((err) => console.error('fetchFriends error:', err))
 }

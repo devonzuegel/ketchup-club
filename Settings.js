@@ -49,7 +49,9 @@ export function SettingsScreen({navigation}) {
   const logout = () => {
     console.log('logout')
     setAuthToken(null)
+    setPhone(null)
     AsyncStorage.removeItem('authToken')
+    AsyncStorage.removeItem('phone')
   }
 
   const settings = [
