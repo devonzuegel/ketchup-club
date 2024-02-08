@@ -4,6 +4,8 @@
 yarn start
 ```
 
+The backend is the same as the `small-world` project. Go to that repo to run the backend.
+
 # TestFlight build
 
 ```sh
@@ -35,8 +37,9 @@ eas build --profile preview --platform ios
 
 ## Phase 2: Before friends use it
 
-- [ ] Publish to TestFlight so other friends can use it
+- [x] Publish to TestFlight so other friends can use it
 - [ ] Push notification when a friend is online
+  - [ ] Handle how this is shown in the settings page
 - [ ] Have the PhoneInput component autosuggest the user's phone number. Note: This may require forking the library and adding the feature
 
 ## Phase 3: Before making it public

@@ -16,7 +16,7 @@ function OnlineOfflineToggle() {
     api
       .post('/ping', null, {
         params: {status},
-        headers: {"Authorization": `Bearer ${authToken}`}
+        headers: {Authorization: `Bearer ${authToken}`},
       })
       .then((result) => {
         console.log('        pingServer result:', result.data)
@@ -28,7 +28,7 @@ function OnlineOfflineToggle() {
 
   const startPingInterval = () => {
     pingServer({status: 'online'}) // ping the first time
-    const nSeconds = 10 // then every nSeconds
+    const nSeconds = 30 // then every nSeconds
     setPingInterval(setInterval(() => pingServer({status: 'online'}), nSeconds * 1000))
   }
 
@@ -250,4 +250,3 @@ const homeStyles = (theme) =>
     },
     toggleBtnTextSelected: {color: 'white'},
   })
-
