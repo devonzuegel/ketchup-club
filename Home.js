@@ -5,44 +5,19 @@ import {callNumber} from './Phone'
 import {fetchFriends} from './Friends'
 import api from './API'
 
-const homeStyles = (theme) =>
-  StyleSheet.create({
-    toggleOuter: {
-      backgroundColor: themes[theme].text_input_bkgd,
-      padding: 6,
-      borderRadius: 100,
-      margin: 4,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-    },
-    toggleBtn: {flex: 1, borderRadius: 100, padding: 14, flexDirection: 'column', justifyContent: 'center'},
-    toggleBtnSelected: {
-      color: 'white',
-      shadowColor: '#000',
-      shadowOffset: {width: 1, height: 2},
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 1,
-    },
-    toggleBtnText: {
-      textAlign: 'center',
-      fontSize: 32,
-      fontFamily: 'SFCompactRounded_Semibold',
-      color: themes[theme].text_input_placeholder,
-    },
-    toggleBtnTextSelected: {color: 'white'},
-  })
-
 function OnlineOfflineToggle() {
   const [status, setStatus] = React.useState('online')
   const [pingInterval, setPingInterval] = React.useState(null)
-  const {setFriends, phone, theme} = React.useContext(GlobalContext)
-  const fetchFriendsFn = fetchFriends(setFriends) // curried
+  const {setFriends, phone, theme, authToken} = React.useContext(GlobalContext)
+  const fetchFriendsFn = fetchFriends(authToken, setFriends) // curried
 
   async function pingServer({status}) {
     console.log(new Date(Date.now()).toLocaleString() + ' pingServer')
     api
-      .post('/ping', null, {params: {phone, status}})
+      .post('/ping', null, {
+        params: {status},
+        headers: {Authorization: `Bearer ${authToken}`},
+      })
       .then((result) => {
         console.log('        pingServer result:', result.data)
       })
@@ -53,7 +28,7 @@ function OnlineOfflineToggle() {
 
   const startPingInterval = () => {
     pingServer({status: 'online'}) // ping the first time
-    const nSeconds = 10 // then every nSeconds
+    const nSeconds = 30 // then every nSeconds
     setPingInterval(setInterval(() => pingServer({status: 'online'}), nSeconds * 1000))
   }
 
@@ -177,7 +152,7 @@ const fetchFromApi = (setResult) => async () => {
 
 export default function HomeScreen({navigation}) {
   const {friends, setFriends} = React.useContext(GlobalContext)
-  const {phone} = React.useContext(GlobalContext)
+  const {phone, authToken} = React.useContext(GlobalContext)
   const user = friends ? friends.find(({phone: theirPhone}) => theirPhone == phone) : null
 
   const onlineFriends = friends
@@ -186,7 +161,7 @@ export default function HomeScreen({navigation}) {
         .filter(({last_ping}) => timestampWithinMins(last_ping, 20))
     : []
 
-  const fetchFriendsFn = fetchFriends(setFriends) // curried
+  const fetchFriendsFn = fetchFriends(authToken, setFriends) // curried
 
   React.useEffect(() => {
     fetchFriendsFn()
@@ -247,3 +222,31 @@ export default function HomeScreen({navigation}) {
     </View>
   )
 }
+
+const homeStyles = (theme) =>
+  StyleSheet.create({
+    toggleOuter: {
+      backgroundColor: themes[theme].text_input_bkgd,
+      padding: 6,
+      borderRadius: 100,
+      margin: 4,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    toggleBtn: {flex: 1, borderRadius: 100, padding: 14, flexDirection: 'column', justifyContent: 'center'},
+    toggleBtnSelected: {
+      color: 'white',
+      shadowColor: '#000',
+      shadowOffset: {width: 1, height: 2},
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 1,
+    },
+    toggleBtnText: {
+      textAlign: 'center',
+      fontSize: 32,
+      fontFamily: 'SFCompactRounded_Semibold',
+      color: themes[theme].text_input_placeholder,
+    },
+    toggleBtnTextSelected: {color: 'white'},
+  })
