@@ -44,6 +44,8 @@ eas build --profile preview --platform ios
   - [ ] Add a way for users to disable push notifications
     - [ ] Delete the token from the database when they disable push notifications – or have a way to toggle whether the token is active, so that we don't have to ask for permission again if they want to re-enable push notifications
     - [ ] Filter for people who don't have tokens
+    - [ ] What if the user has multiple devices?
+    - [ ] What if the user disables push notifications from iOS settings, rather than via the app?
 - [ ] Have the PhoneInput component autosuggest the user's phone number. Note: This may require forking the library and adding the feature
 - [ ] Add friends
   - [ ] Lucie L

@@ -3,8 +3,13 @@ import {View, TouchableOpacity} from 'react-native'
 import {fonts, Text, styles, NavBtns, Header, GlobalContext, formatPhone, themes} from './Utils'
 import {useFonts} from 'expo-font'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { registerForPushNotificationsAsync } from './push'
+import {registerForPushNotificationsAsync} from './push'
 import api from './API'
+
+const ASYNC_STORAGE_KEYS = {
+  AUTH_TOKEN: 'authToken',
+  PHONE: 'phone',
+}
 
 const SettingItem = ({name, icon, value, dangerous, onPress}) => {
   const {theme} = React.useContext(GlobalContext)
@@ -54,16 +59,16 @@ export function SettingsScreen({navigation}) {
     console.log('logout')
     setAuthToken(null)
     setPhone(null)
-    AsyncStorage.removeItem('authToken')
-    AsyncStorage.removeItem('phone')
+    AsyncStorage.removeItem(ASYNC_STORAGE_KEYS.AUTH_TOKEN)
+    AsyncStorage.removeItem(ASYNC_STORAGE_KEYS.PHONE)
   }
 
   const onSetPushNotifications = async () => {
-    const push_token = await registerForPushNotificationsAsync();
+    const push_token = await registerForPushNotificationsAsync()
     if (push_token) {
-      const r = await api.post("/push", null, {
+      const r = await api.post('/push', null, {
         params: {push_token},
-        headers: {"Authorization": `Bearer ${authToken}`}
+        headers: {Authorization: `Bearer ${authToken}`},
       })
     }
   }
@@ -74,7 +79,7 @@ export function SettingsScreen({navigation}) {
       {
         Contacts: {value: null},
         'Push Notifications': {
-          value: null, 
+          value: null,
           onPress: onSetPushNotifications,
         },
       },
