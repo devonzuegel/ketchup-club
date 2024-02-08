@@ -1,6 +1,6 @@
 import React, {useState, useRef} from 'react'
 import {View, Keyboard} from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import AsyncStorage, {AUTH_TOKEN, PHONE} from './AsyncStorage'
 import {Button, Text, TextInput, styles, GlobalContext, countryCode, removeCountryCode, themes} from './Utils'
 import PhoneInput from './PhoneInput'
 import api from './API'
@@ -27,8 +27,8 @@ export const LoginScreen = () => {
   // when this component loads, check if we have a token in AsyncStorage
   React.useEffect(() => {
     async function fetchAuthToken() {
-      const authToken = await AsyncStorage.getItem('authToken')
-      const phone = await AsyncStorage.getItem('phone')
+      const authToken = await AsyncStorage.getItem(AUTH_TOKEN)
+      const phone = await AsyncStorage.getItem(PHONE)
       console.log('authToken from async storage: ', authToken || 'null')
       console.log('    phone from async storage: ', phone || 'null')
 
@@ -36,8 +36,8 @@ export const LoginScreen = () => {
       //          ... but it's the best solution we have for now, so let's stick with it
       if (authToken) setAuthToken(authToken)
       if (phone) setPhone(phone)
+      // TODO: maybe fetch pushToken too?
     }
-    console.log('fetching token from async storage..')
     fetchAuthToken()
   }, [])
 
@@ -55,8 +55,8 @@ export const LoginScreen = () => {
         const token = response.data.authToken
         setAuthToken(token)
         setPhone(phone)
-        await AsyncStorage.setItem('authToken', token)
-        await AsyncStorage.setItem('phone', phone)
+        await AsyncStorage.setItem(AUTH_TOKEN, token)
+        await AsyncStorage.setItem(PHONE, phone)
         setMessage(response.data.message)
       } else {
         throw new Error(response.data.message)

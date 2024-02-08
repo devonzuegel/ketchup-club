@@ -1,6 +1,7 @@
 import React, {useState, useEffect, forwardRef} from 'react'
 import {View, StyleSheet, TouchableOpacity, Text as RNText, TextInput as RNTextInput} from 'react-native'
 import {PhoneNumberUtil, PhoneNumberFormat} from 'google-libphonenumber'
+import AsyncStorage from './AsyncStorage'
 
 export const GlobalContext = React.createContext()
 
@@ -62,6 +63,11 @@ export const NavBtns = ({navigation}) => {
 
   return (
     <View>
+      {/* <Pre data={AsyncStorage.getAllKeys()} /> */}
+
+      {/* clear every key set in AsyncStorage: */}
+      <Button title="reset AsyncStorage" onPress={() => AsyncStorage.clear()} />
+
       <View flexDirection="row" justifyContent="space-around" style={{marginBottom: 40}}>
         <Button
           title="Friends"

@@ -28,8 +28,8 @@ function OnlineOfflineToggle() {
 
   const startPingInterval = () => {
     pingServer({status: 'online'}) // ping the first time
-    const nSeconds = 30 // then every nSeconds
-    setPingInterval(setInterval(() => pingServer({status: 'online'}), nSeconds * 1000))
+    // const nSeconds = 30 // then every nSeconds
+    // setPingInterval(setInterval(() => pingServer({status: 'online'}), nSeconds * 1000))
   }
 
   React.useEffect(() => {
