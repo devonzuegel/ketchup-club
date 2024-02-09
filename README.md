@@ -47,13 +47,14 @@ eas build --profile preview --platform ios
     - [ ] Filter for people who don't have tokens
     - [ ] What if the user has multiple devices?
     - [ ] What if the user disables push notifications from iOS settings, rather than via the app?
+- [ ] Give people a way to set how long they'll be online for, rather than just the default `setOfflineAfterNMins` value
 - [ ] Fix sign in page dark mode
-- [ ] Have the PhoneInput component autosuggest the user's phone number. Note: This may require forking the library and adding the feature
-- [ ] Add friends
-  - [ ] Lucie L
 
 ## Phase 3: Before making it public
 
+- [ ] Have the PhoneInput component autosuggest the user's phone number. Note: This may require forking the library and adding the feature
+- [ ] Add friends
+  - [ ] Lucie L
 - [ ] Style the whole app to match the design in Figma
 - [ ] Add idea of "friends" and "friend requests", rather than having all users be friends with each other
 - [ ] Make friend search actually work

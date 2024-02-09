@@ -5,6 +5,8 @@ import {callNumber} from './Phone'
 import {fetchFriends} from './Friends'
 import api from './API'
 
+const setOfflineAfterNMins = 15
+
 function OnlineOfflineToggle() {
   const [status, setStatus] = React.useState('online')
   const [pingInterval, setPingInterval] = React.useState(null)
@@ -78,6 +80,20 @@ function OnlineOfflineToggle() {
           </Text>
         </View>
       </View>
+
+      <Text
+        style={{
+          textAlign: 'center',
+          fontSize: 15,
+          color: themes[theme].text_tertiary,
+          marginVertical: 6,
+          fontFamily: 'SFCompactRounded_Medium',
+          maxWidth: '80%',
+          alignSelf: 'center',
+        }}>
+        If you don't use the app for {setOfflineAfterNMins} minutes, {'\n'}
+        you'll be set to offline automatically
+      </Text>
     </View>
   )
 }
@@ -158,7 +174,7 @@ export default function HomeScreen({navigation}) {
   const onlineFriends = friends
     ? friends
         .filter(({status, phone: theirPhone}) => status == 'online' && theirPhone != phone)
-        .filter(({last_ping}) => timestampWithinMins(last_ping, 20))
+        .filter(({last_ping}) => timestampWithinMins(last_ping, setOfflineAfterNMins))
     : []
 
   const fetchFriendsFn = fetchFriends(authToken, setFriends) // curried
@@ -185,6 +201,8 @@ export default function HomeScreen({navigation}) {
           }}>
           Ketchup Club
         </Text>
+
+        {__DEV__ ? <Text style={{textAlign: 'center', color: themes[theme].text_tertiary}}>DEV MODE</Text> : null}
 
         <Spacer />
         <Header
