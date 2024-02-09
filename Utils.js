@@ -66,7 +66,7 @@ export const NavBtns = ({navigation}) => {
       {/* <Pre data={AsyncStorage.getAllKeys()} /> */}
 
       {/* clear every key set in AsyncStorage: */}
-      <Button title="reset AsyncStorage" onPress={() => AsyncStorage.clear()} />
+      {/* <Button title="reset AsyncStorage" onPress={() => AsyncStorage.clear()} /> */}
 
       <View flexDirection="row" justifyContent="space-around" style={{marginBottom: 40}}>
         <Button

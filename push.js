@@ -33,11 +33,11 @@ export async function registerForPushNotificationsAsync() {
       console.log('existingStatus', existingStatus)
     }
 
-    if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification! — final status: ' + finalStatus)
-      console.log('finalStatus', finalStatus)
-      // return
-    }
+    // if (finalStatus !== 'granted') {
+    //   alert('Failed to get push token for push notification! — final status: ' + finalStatus)
+    //   console.log('finalStatus', finalStatus)
+    //   // return
+    // }
 
     const token = (
       await Notifications.getExpoPushTokenAsync({
