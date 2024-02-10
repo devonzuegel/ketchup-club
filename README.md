@@ -47,6 +47,11 @@ eas build --profile preview --platform ios
     - [ ] Filter for people who don't have tokens
     - [ ] What if the user has multiple devices?
     - [ ] What if the user disables push notifications from iOS settings, rather than via the app?
+- [ ] Fix the online/offline state issue
+  - when the app loads for the first time, if the user is ONLINE, it should start pinging the server every N seconds to ask for status
+  - when the app goes to the background, it should stop the ping interval
+  - when the app comes back to the foreground, if the user is ONLINE, it should start the ping interval again
+  - if the user is OFFLINE, it should not start the ping interval
 - [ ] Give people a way to set how long they'll be online for, rather than just the default `setOfflineAfterNMins` value
 - [ ] Fix sign in page dark mode
 
