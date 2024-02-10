@@ -1,12 +1,12 @@
 import React from 'react'
 import {StyleSheet, View, AppState} from 'react-native'
-import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone, themes} from './Utils'
+import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone, themes, Spacer} from './Utils'
 import {callNumber} from './Phone'
 import {fetchFriends} from './Friends'
 import api from './API'
 
-const setOfflineAfterNMins = 15
-const nSecondsFetchFriends = 5
+const setOfflineAfterNMins = __DEV__ ? 0.1 : 15
+const nSecondsFetchFriends = __DEV__ ? 20 : 5 // refetch more slowly in dev so we don't make ngrok mad
 
 function OnlineOfflineToggle() {
   const [pingInterval, setPingInterval] = React.useState(null)
@@ -127,8 +127,8 @@ function OnlineOfflineToggle() {
           maxWidth: '80%',
           alignSelf: 'center',
         }}>
-        If you don't use the app for {setOfflineAfterNMins} minutes, {'\n'}
-        you'll be set to offline automatically
+        If you don't open the app for {setOfflineAfterNMins} minutes,{'\n'}
+        we'll set you offline automatically
       </Text>
     </View>
   )
@@ -193,8 +193,6 @@ const Friend = ({name, phoneNumber, last_ping}) => {
   )
 }
 
-const Spacer = () => <View style={{marginTop: 48}} />
-
 const minsAgo = (mins) => new Date().getTime() - 1000 * 60 * mins
 const timestampWithinMins = (timestamp, nMins) => new Date(timestamp).getTime() > minsAgo(nMins)
 
@@ -257,7 +255,27 @@ export default function HomeScreen({navigation}) {
 
         {/* <Pre data={{friends}} /> */}
 
-        {onlineFriends.length < 1 ? <Header>No friends online right now</Header> : <Header>Friends online right now</Header>}
+        {onlineFriends.length < 1 ? (
+          <View>
+            <Header>No friends online right now</Header>
+
+            <Text
+              style={{
+                textAlign: 'center',
+                fontSize: 15,
+                color: themes[theme].text_tertiary,
+                marginVertical: 2,
+                fontFamily: 'SFCompactRounded_Medium',
+                maxWidth: '80%',
+                alignSelf: 'center',
+              }}>
+              But if you set your status to online,{'\n'}
+              they'll give you a call if they're free!
+            </Text>
+          </View>
+        ) : (
+          <Header>Friends online right now</Header>
+        )}
         {onlineFriends == null && <DotAnimation style={{alignSelf: 'center', width: 60, marginTop: 12}} />}
         {onlineFriends.length > 0 &&
           onlineFriends.map(({screen_name, phone, last_ping}, i) => (

@@ -1,5 +1,5 @@
 import {View, Keyboard, Dimensions, FlatList} from 'react-native'
-import {Text, TextInput, styles, NavBtns, Header, DotAnimation, GlobalContext, themes, formatPhone} from './Utils'
+import {Text, TextInput, styles, NavBtns, Header, DotAnimation, GlobalContext, themes, formatPhone, Spacer} from './Utils'
 import api from './API'
 import React from 'react'
 
@@ -90,11 +90,18 @@ const Friend = ({screen_name, phone}) => {
 }
 
 export function FriendsScreen({navigation}) {
-  const {friends, setFriends, authToken, theme} = React.useContext(GlobalContext)
+  const {friends, setFriends, authToken, theme, phone} = React.useContext(GlobalContext)
   React.useEffect(() => {
     fetchFriends(authToken, setFriends)()
     // console.log('friends', JSON.stringify(friends, null, 2), '\n')
   }, [])
+
+  const friendsExceptMe =
+    friends &&
+    friends.filter(({phone: theirPhone}) => {
+      // console.log('theirPhone', formatPhone(theirPhone), '  myPhone', formatPhone(phone))
+      return formatPhone(theirPhone) !== formatPhone(phone)
+    })
 
   return (
     <View
@@ -102,14 +109,15 @@ export function FriendsScreen({navigation}) {
       onStartShouldSetResponder={(evt) => Keyboard.dismiss() && false}>
       <View style={{marginTop: 48, flexDirection: 'column', flex: 1}}>
         <Header style={{fontSize: 28, color: themes[theme].text_secondary}}>Friends</Header>
-        <SearchBar />
+        {/* <SearchBar /> */}
+        <Spacer />
 
-        {friends == null ? (
+        {friendsExceptMe == null ? (
           <DotAnimation style={{alignSelf: 'center', width: 80, marginTop: 12}} />
         ) : (
           <View style={{flex: 1 /* fill the rest of the screen */}}>
             <FlatList
-              data={friends}
+              data={friendsExceptMe}
               renderItem={({item: {screen_name, phone}, id}) => <Friend screen_name={screen_name} phone={phone} />}
               keyExtractor={(meta_item, index) => index.toString()} //Add this line
               scrollEnabled

@@ -58,6 +58,9 @@ eas build --profile preview --platform ios
 
 ## Phase 3: Before making it public
 
+- [ ] Dark theme improvements
+  - [ ] Store the user's chosen theme in AsyncStorage so that it doesn't get reset every time they open the app
+  - [ ] Make the splash screen match the theme
 - [ ] Have the PhoneInput component autosuggest the user's phone number. Note: This may require forking the library and adding the feature
 - [ ] Add friends
   - [ ] Lucie L

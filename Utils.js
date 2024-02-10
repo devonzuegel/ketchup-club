@@ -169,7 +169,7 @@ export const Header = ({children, style}) => {
     <Text
       style={{
         textAlign: 'center',
-        fontSize: 20,
+        fontSize: 24,
         color: themes[theme].text_tertiary,
         marginBottom: 4,
         fontFamily: 'SFCompactRounded_Semibold',
@@ -220,6 +220,8 @@ export const Pre = ({data, children}) => (
     {children || JSON.stringify(data, null, 2)}
   </Text>
 )
+
+export const Spacer = () => <View style={{marginTop: 48}} />
 
 export const fonts = {
   SFCompactRounded_Thin: require('./assets/fonts/SF-Compact-Rounded-Thin.otf'),
