@@ -22,6 +22,9 @@
     ],
     "ios": {
       "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
       "bundleIdentifier": "com.adventurelandinstitute.ketchupclub"
     },
     "android": {
