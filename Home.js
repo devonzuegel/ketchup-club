@@ -5,49 +5,29 @@ import {callNumber} from './Phone'
 import {fetchFriends} from './Friends'
 import api from './API'
 
-const setOfflineAfterNMins = 0.1
+const setOfflineAfterNMins = 0.5
+const nSecondsFetchFriends = 5
 
 function OnlineOfflineToggle() {
   const [pingInterval, setPingInterval] = React.useState(null)
-  const {friends, setFriends, phone, theme, authToken, status, setStatus} = React.useContext(GlobalContext)
-  const fetchFriendsFn = fetchFriends(authToken, setFriends) // curried
+  const {setFriends, phone, theme, authToken, status, setStatus} = React.useContext(GlobalContext)
 
-  async function pingServer({status}) {
-    console.log(new Date(Date.now()).toLocaleString() + ' pingServer')
-    api
-      .post('/ping', null, {
-        params: {status},
-        headers: {Authorization: `Bearer ${authToken}`},
-      })
-      .then((result) => {
-        console.log('        pingServer result:', result.data)
-      })
-      .catch((err) => {
-        console.log('        pingServer error:', err)
-      })
-  }
-
-  const startPingInterval = () => {
-    // pingServer({status: 'online'}) // ping the first time
-    // const nSeconds = 30 // then every nSeconds
-    // setPingInterval(setInterval(() => pingServer({status: 'online'}), nSeconds * 1000))
-  }
-
-  const getStatusFromDB = async () => {
-    // console.log('\n\n\n------------------ getStatusFromDB ------------------\n\n\n')
+  const refreshStatusFromDB = async () => {
+    // console.log('\n\n\n------------------ refreshStatusFromDB ------------------\n\n\n')
     try {
-      await fetchFriends(authToken, (newFriends) => {
+      await fetchFriends(authToken, (freshFriends) => {
         // console.log('modifiedSetFriends')
-        // console.log('      newFriends: ', newFriends)
-        setFriends(newFriends)
+        // console.log('      freshFriends: ', freshFriends)
+        setFriends(freshFriends)
         const myPhone = phone
-        const myProfile = newFriends ? newFriends.find(({phone: thisPhone}) => thisPhone == myPhone) : null
+        const myProfile = freshFriends ? freshFriends.find(({phone: thisPhone}) => thisPhone == myPhone) : null
         const lastUpdatedDate = new Date(myProfile?.updated_at)
         const lastUpdatedMins = (Date.now() - lastUpdatedDate) / 1000 / 60
         if (myProfile?.status) {
-          const newStatus = lastUpdatedMins < setOfflineAfterNMins ? myProfile.status : 'offline' // default to offline
-          console.log(JSON.stringify({lastUpdatedDate, lastUpdatedMins, statusFromDB: myProfile?.status, newStatus}, null, 2))
+          const newStatus = lastUpdatedMins < setOfflineAfterNMins ? myProfile.status : 'offline' // if last updated >N mins ago, set to offline
+          console.log(JSON.stringify({lastUpdatedMins, statusFromDB: myProfile?.status, newStatus}, null, 2))
           setStatus(newStatus)
+          // once we've calculated the new status, update the db
           api.post('/ping', null, {
             params: {status: newStatus},
             headers: {Authorization: `Bearer ${authToken}`},
@@ -59,12 +39,21 @@ function OnlineOfflineToggle() {
     }
   }
 
-  const nSecondsPing = 5
+  async function pingServer({status}) {
+    console.log(new Date(Date.now()).toLocaleString() + ' pingServer – new status: ' + status)
+    api
+      .post('/ping', null, {
+        params: {status},
+        headers: {Authorization: `Bearer ${authToken}`},
+      })
+      .then((result) => console.log('        pingServer result:', result.data))
+      .catch((error) => console.log('        pingServer  error:', error))
+  }
 
   const handleAppGoesToForeground = () => {
     console.log('App has come to the foreground! 👀')
-    getStatusFromDB()
-    setPingInterval(setInterval(() => getStatusFromDB(), nSecondsPing * 1000))
+    refreshStatusFromDB()
+    // setPingInterval(setInterval(() => refreshStatusFromDB(), nSecondsPing * 1000))
   }
 
   const handleAppGoesToBackground = () => {
@@ -72,17 +61,29 @@ function OnlineOfflineToggle() {
     clearInterval(pingInterval)
   }
 
+  // React.useEffect(() => {
+  //   // fetchFriendsFn()
+  //   const nSeconds = __DEV__ ? 15 : 3
+  //   const interval = setInterval(fetchFriendsFn, nSeconds * 1000)
+  //   return () => clearInterval(interval) // clear interval on component unmount
+  // }, [])
+
   React.useEffect(() => {
-    getStatusFromDB()
-    setPingInterval(setInterval(() => getStatusFromDB(), nSecondsPing * 1000)) // TODO: add this to global state like we did with setPingInterval so we can clear it on unmount
+    fetchFriends(authToken, setFriends)()
+    const fetchFriendsInterval = setInterval(() => fetchFriends(authToken, setFriends)(), 1000 * nSecondsFetchFriends) // fetch friends every 5 minutes
+    refreshStatusFromDB()
+    // setPingInterval(setInterval(() => refreshStatusFromDB(), nSecondsPing * 1000)) // TODO: add this to global state like we did with setPingInterval so we can clear it on unmount
 
     const handleAppStateChange = (nextAppState) => {
       if (nextAppState === 'active') handleAppGoesToForeground()
       if (nextAppState === 'background') handleAppGoesToBackground()
     }
-
     AppState.addEventListener('change', handleAppStateChange)
-    return () => clearInterval(pingInterval) // clear interval on component unmount
+
+    return () => {
+      clearInterval(fetchFriendsInterval)
+      // clearInterval(pingInterval) // clear interval on component unmount
+    }
   }, [])
 
   return (
@@ -99,7 +100,7 @@ function OnlineOfflineToggle() {
             onPress={() => {
               setStatus('offline')
               pingServer({status: 'offline'}) //.then(() => setTimeout(fetchFriendsFn, 10))
-              clearInterval(pingInterval)
+              // clearInterval(pingInterval)
               console.log('set offline + ping interval cleared')
             }}
             style={{
@@ -210,17 +211,13 @@ export default function HomeScreen({navigation}) {
   const onlineFriends = friends
     ? friends
         .filter(({status, phone: theirPhone}) => status == 'online' && theirPhone != phone)
-        .filter(({last_ping}) => timestampWithinMins(last_ping, setOfflineAfterNMins))
+        .filter(({last_ping}) =>
+          timestampWithinMins(
+            last_ping,
+            setOfflineAfterNMins + 1 // the +1 is to account for the fact that the server might be a few seconds behind
+          )
+        )
     : []
-
-  const fetchFriendsFn = fetchFriends(authToken, setFriends) // curried
-
-  // React.useEffect(() => {
-  //   // fetchFriendsFn()
-  //   const nSeconds = __DEV__ ? 15 : 3
-  //   const interval = setInterval(fetchFriendsFn, nSeconds * 1000)
-  //   return () => clearInterval(interval) // clear interval on component unmount
-  // }, [])
 
   const {theme} = React.useContext(GlobalContext)
 
