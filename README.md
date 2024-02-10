@@ -1,5 +1,11 @@
 # Development
 
+## Install dependencies
+
+```sh
+yarn install
+```
+
 ## Frontend
 
 This is the command Devon uses to run the frontend:
