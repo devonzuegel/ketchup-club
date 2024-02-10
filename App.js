@@ -34,7 +34,8 @@ export default function App() {
   const [friends, setFriends] = React.useState(null)
   const [phone, setPhone] = React.useState(null)
   const [theme, setTheme] = React.useState('light')
-  const globalContextVars = {authToken, setAuthToken, friends, setFriends, phone, setPhone, theme, setTheme}
+  const [status, setStatus] = React.useState('offline')
+  const globalContextVars = {authToken, setAuthToken, friends, setFriends, phone, setPhone, theme, setTheme, status, setStatus}
 
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null

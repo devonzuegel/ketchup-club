@@ -10,13 +10,24 @@ export const mockFriends = [
 ]
 
 export const fetchFriends = (authToken, setFriends) => async () => {
-  console.log("auth token", authToken);
+  // console.log('auth token', authToken)
   console.log(new Date(Date.now()).toLocaleString() + ' fetchFriends')
   api
     .get('/users', {
-      headers: {'Authorization': `Bearer ${authToken}`},
+      headers: {Authorization: `Bearer ${authToken}`},
     })
-    .then((result) => setFriends(result.data))
+    .then((result) => {
+      setFriends(result.data)
+      // console.log('fetchFriends result count: ' + result.data.length)
+      // console.log(
+      //   JSON.stringify(
+      //     result.data.map(({screen_name, phone}) => ({screen_name})),
+      //     null,
+      //     2
+      //   )
+      // )
+      return result.data
+    })
     .catch((err) => console.error('fetchFriends error:', err))
 }
 

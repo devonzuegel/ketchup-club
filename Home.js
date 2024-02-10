@@ -1,16 +1,15 @@
 import React from 'react'
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet, View, AppState} from 'react-native'
 import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone, themes} from './Utils'
 import {callNumber} from './Phone'
 import {fetchFriends} from './Friends'
 import api from './API'
 
-const setOfflineAfterNMins = 15
+const setOfflineAfterNMins = 0.1
 
 function OnlineOfflineToggle() {
-  const [status, setStatus] = React.useState('online')
   const [pingInterval, setPingInterval] = React.useState(null)
-  const {setFriends, phone, theme, authToken} = React.useContext(GlobalContext)
+  const {friends, setFriends, phone, theme, authToken, status, setStatus} = React.useContext(GlobalContext)
   const fetchFriendsFn = fetchFriends(authToken, setFriends) // curried
 
   async function pingServer({status}) {
@@ -29,13 +28,60 @@ function OnlineOfflineToggle() {
   }
 
   const startPingInterval = () => {
-    pingServer({status: 'online'}) // ping the first time
+    // pingServer({status: 'online'}) // ping the first time
     // const nSeconds = 30 // then every nSeconds
     // setPingInterval(setInterval(() => pingServer({status: 'online'}), nSeconds * 1000))
   }
 
+  const getStatusFromDB = async () => {
+    // console.log('\n\n\n------------------ getStatusFromDB ------------------\n\n\n')
+    try {
+      await fetchFriends(authToken, (newFriends) => {
+        // console.log('modifiedSetFriends')
+        // console.log('      newFriends: ', newFriends)
+        setFriends(newFriends)
+        const myPhone = phone
+        const myProfile = newFriends ? newFriends.find(({phone: thisPhone}) => thisPhone == myPhone) : null
+        const lastUpdatedDate = new Date(myProfile?.updated_at)
+        const lastUpdatedMins = (Date.now() - lastUpdatedDate) / 1000 / 60
+        if (myProfile?.status) {
+          const newStatus = lastUpdatedMins < setOfflineAfterNMins ? myProfile.status : 'offline' // default to offline
+          console.log(JSON.stringify({lastUpdatedDate, lastUpdatedMins, statusFromDB: myProfile?.status, newStatus}, null, 2))
+          setStatus(newStatus)
+          api.post('/ping', null, {
+            params: {status: newStatus},
+            headers: {Authorization: `Bearer ${authToken}`},
+          })
+        }
+      })()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const nSecondsPing = 5
+
+  const handleAppGoesToForeground = () => {
+    console.log('App has come to the foreground! 👀')
+    getStatusFromDB()
+    setPingInterval(setInterval(() => getStatusFromDB(), nSecondsPing * 1000))
+  }
+
+  const handleAppGoesToBackground = () => {
+    console.log('App has gone to the background 🙈 clearing the ping interval:')
+    clearInterval(pingInterval)
+  }
+
   React.useEffect(() => {
-    if (status == 'online') startPingInterval()
+    getStatusFromDB()
+    setPingInterval(setInterval(() => getStatusFromDB(), nSecondsPing * 1000)) // TODO: add this to global state like we did with setPingInterval so we can clear it on unmount
+
+    const handleAppStateChange = (nextAppState) => {
+      if (nextAppState === 'active') handleAppGoesToForeground()
+      if (nextAppState === 'background') handleAppGoesToBackground()
+    }
+
+    AppState.addEventListener('change', handleAppStateChange)
     return () => clearInterval(pingInterval) // clear interval on component unmount
   }, [])
 
@@ -52,7 +98,7 @@ function OnlineOfflineToggle() {
           <Text
             onPress={() => {
               setStatus('offline')
-              pingServer({status: 'offline'}).then(() => setTimeout(fetchFriendsFn, 10))
+              pingServer({status: 'offline'}) //.then(() => setTimeout(fetchFriendsFn, 10))
               clearInterval(pingInterval)
               console.log('set offline + ping interval cleared')
             }}
@@ -72,7 +118,7 @@ function OnlineOfflineToggle() {
           <Text
             onPress={() => {
               setStatus('online')
-              pingServer({status: 'online'}).then(() => setTimeout(fetchFriendsFn, 10))
+              pingServer({status: 'online'}) //.then(() => setTimeout(fetchFriendsFn, 10))
               // startPingInterval()
             }}
             style={{...homeStyles(theme).toggleBtnText, ...(status == 'online' ? homeStyles(theme).toggleBtnTextSelected : {})}}>
@@ -156,16 +202,6 @@ const Spacer = () => <View style={{marginTop: 48}} />
 const minsAgo = (mins) => new Date().getTime() - 1000 * 60 * mins
 const timestampWithinMins = (timestamp, nMins) => new Date(timestamp).getTime() > minsAgo(nMins)
 
-const fetchFromApi = (setResult) => async () => {
-  console.log(new Date(Date.now()).toLocaleString() + ' Fetching from API:', endpoint)
-  try {
-    const result = await api.get(endpoint)
-    setResult(result.data)
-  } catch (err) {
-    console.error('API fetch error:', err)
-  }
-}
-
 export default function HomeScreen({navigation}) {
   const {friends, setFriends} = React.useContext(GlobalContext)
   const {phone, authToken} = React.useContext(GlobalContext)
@@ -179,12 +215,12 @@ export default function HomeScreen({navigation}) {
 
   const fetchFriendsFn = fetchFriends(authToken, setFriends) // curried
 
-  React.useEffect(() => {
-    fetchFriendsFn()
-    const nSeconds = __DEV__ ? 15 : 3
-    const interval = setInterval(fetchFriendsFn, nSeconds * 1000)
-    return () => clearInterval(interval) // clear interval on component unmount
-  }, [])
+  // React.useEffect(() => {
+  //   // fetchFriendsFn()
+  //   const nSeconds = __DEV__ ? 15 : 3
+  //   const interval = setInterval(fetchFriendsFn, nSeconds * 1000)
+  //   return () => clearInterval(interval) // clear interval on component unmount
+  // }, [])
 
   const {theme} = React.useContext(GlobalContext)
 
@@ -197,12 +233,13 @@ export default function HomeScreen({navigation}) {
             textAlign: 'center',
             marginTop: 52,
             fontFamily: 'SFCompactRounded_Bold',
-            // color: themes[theme].text_secondary,
           }}>
           Ketchup Club
         </Text>
 
-        {__DEV__ ? <Text style={{textAlign: 'center', color: themes[theme].text_tertiary}}>DEV MODE</Text> : null}
+        {__DEV__ ? (
+          <Text style={{textAlign: 'center', fontFamily: 'SFCompactRounded_Bold', color: 'orange'}}>DEV MODE</Text>
+        ) : null}
 
         <Spacer />
         <Header

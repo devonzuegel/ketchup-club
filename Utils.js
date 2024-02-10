@@ -169,7 +169,7 @@ export const Header = ({children, style}) => {
     <Text
       style={{
         textAlign: 'center',
-        fontSize: 22,
+        fontSize: 20,
         color: themes[theme].text_tertiary,
         marginBottom: 4,
         fontFamily: 'SFCompactRounded_Semibold',

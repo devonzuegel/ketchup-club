@@ -53,11 +53,19 @@ export function SettingsScreen({navigation}) {
 
   const logout = () => {
     console.log('logout')
-    // TODO: create fn to handle setting both the global state & AsyncStorage at the same time
-    setAuthToken(null)
-    setPhone(null)
-    AsyncStorage.removeItem(AUTH_TOKEN)
-    AsyncStorage.removeItem(PHONE)
+    api
+      .post('/ping', null, {
+        params: {status: 'offline'},
+        headers: {Authorization: `Bearer ${authToken}`},
+      })
+      .then(() => {
+        // TODO: create fn to handle setting both the global state & AsyncStorage at the same time so we don't have to always remember to do both
+        setAuthToken(null)
+        setPhone(null)
+        AsyncStorage.removeItem(AUTH_TOKEN)
+        AsyncStorage.removeItem(PHONE)
+      })
+      .catch((err) => console.error('Error logging out of server:', err))
   }
 
   const onSetPushNotifications = async () => {
