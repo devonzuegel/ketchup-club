@@ -5,7 +5,7 @@ import {callNumber} from './Phone'
 import {fetchFriends} from './Friends'
 import api from './API'
 
-const setOfflineAfterNMins = 15
+const setOfflineAfterNMins = 0.2
 const nSecondsFetchFriends = 5
 
 function OnlineOfflineToggle() {
@@ -13,11 +13,8 @@ function OnlineOfflineToggle() {
   const {setFriends, phone, theme, authToken, status, setStatus} = React.useContext(GlobalContext)
 
   const refreshStatusFromDB = async () => {
-    // console.log('\n\n\n------------------ refreshStatusFromDB ------------------\n\n\n')
     try {
       await fetchFriends(authToken, (freshFriends) => {
-        // console.log('modifiedSetFriends')
-        // console.log('      freshFriends: ', freshFriends)
         setFriends(freshFriends)
         const myPhone = phone
         const myProfile = freshFriends ? freshFriends.find(({phone: thisPhone}) => thisPhone == myPhone) : null
@@ -25,7 +22,7 @@ function OnlineOfflineToggle() {
         const lastUpdatedMins = (Date.now() - lastUpdatedDate) / 1000 / 60
         if (myProfile?.status) {
           const newStatus = lastUpdatedMins < setOfflineAfterNMins ? myProfile.status : 'offline' // if last updated >N mins ago, set to offline
-          console.log(JSON.stringify({lastUpdatedMins, statusFromDB: myProfile?.status, newStatus}, null, 2))
+          console.log(JSON.stringify({authToken, lastUpdatedMins, statusFromDB: myProfile?.status, newStatus}, null, 2))
           setStatus(newStatus)
           // once we've calculated the new status, update the db
           // TODO: send the user a push notification letting them know we set them to offline automatically
@@ -52,39 +49,30 @@ function OnlineOfflineToggle() {
   }
 
   const handleAppGoesToForeground = () => {
-    console.log('App has come to the foreground! 👀')
+    console.log(authToken.slice(-5) + '  —  App has come to the foreground! 👀 ')
+    fetchFriends(authToken, setFriends)()
     refreshStatusFromDB()
-    // setPingInterval(setInterval(() => refreshStatusFromDB(), nSecondsPing * 1000))
   }
 
   const handleAppGoesToBackground = () => {
-    console.log('App has gone to the background 🙈 clearing the ping interval:')
+    console.log(authToken.slice(-5) + '  —  App has gone to the background 🙈 ')
     clearInterval(pingInterval)
   }
 
-  // React.useEffect(() => {
-  //   // fetchFriendsFn()
-  //   const nSeconds = __DEV__ ? 15 : 3
-  //   const interval = setInterval(fetchFriendsFn, nSeconds * 1000)
-  //   return () => clearInterval(interval) // clear interval on component unmount
-  // }, [])
-
   React.useEffect(() => {
-    fetchFriends(authToken, setFriends)()
-    const fetchFriendsInterval = setInterval(() => fetchFriends(authToken, setFriends)(), 1000 * nSecondsFetchFriends) // fetch friends every 5 minutes
-    refreshStatusFromDB()
-    // setPingInterval(setInterval(() => refreshStatusFromDB(), nSecondsPing * 1000)) // TODO: add this to global state like we did with setPingInterval so we can clear it on unmount
-
     const handleAppStateChange = (nextAppState) => {
       if (nextAppState === 'active') handleAppGoesToForeground()
       if (nextAppState === 'background') handleAppGoesToBackground()
     }
     AppState.addEventListener('change', handleAppStateChange)
 
-    return () => {
-      clearInterval(fetchFriendsInterval)
-      // clearInterval(pingInterval) // clear interval on component unmount
-    }
+    // fetchFriends(authToken, setFriends)()
+    refreshStatusFromDB()
+    const refreshFriendsAndStatusInterval = setInterval(() => {
+      // fetchFriends(authToken, setFriends)()
+      refreshStatusFromDB()
+    }, 1000 * nSecondsFetchFriends)
+    return () => clearInterval(refreshFriendsAndStatusInterval)
   }, [])
 
   return (

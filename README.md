@@ -47,7 +47,8 @@ eas build --profile preview --platform ios
     - [ ] Filter for people who don't have tokens
     - [ ] What if the user has multiple devices?
     - [ ] What if the user disables push notifications from iOS settings, rather than via the app?
-- [ ] Fix the online/offline state issue
+- [x] Fix the online/offline state issue
+  - [ ] When you go online, then leave the app, then come back >N minutes later, it should show you as offline
   - when the app loads for the first time, if the user is ONLINE, it should start pinging the server every N seconds to ask for status
   - when the app goes to the background, it should stop the ping interval
   - when the app comes back to the foreground, if the user is ONLINE, it should start the ping interval again

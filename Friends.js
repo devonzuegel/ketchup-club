@@ -10,8 +10,7 @@ export const mockFriends = [
 ]
 
 export const fetchFriends = (authToken, setFriends) => async () => {
-  // console.log('auth token', authToken)
-  console.log(new Date(Date.now()).toLocaleString() + ' fetchFriends — ' + authToken.substring(0, 5) + '...')
+  console.log(authToken.slice(-5) + '  ' + new Date(Date.now()).toLocaleString() + ' fetchFriends — ')
   api
     .get('/users', {
       headers: {Authorization: `Bearer ${authToken}`},
