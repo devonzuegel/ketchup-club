@@ -38,26 +38,28 @@ eas build --profile preview --platform ios
 ## Phase 2: Before friends use it
 
 - [x] Publish to TestFlight so other friends can use it
-- [ ] Push notification when a friend is online
+- [x] Push notification when a friend is online
   - [x] Review Sebas' PRs for the frontend and backend
   - [x] Handle how this is shown in the settings page
   - [x] Add a way for users to disable push notifications
     - [x] Delete the token from the database when they disable push notifications – or have a way to toggle whether the token is active, so that we don't have to ask for permission again if they want to re-enable push notifications
+    - [x] Filter for people who don't have tokens
     - [ ] Fetch the token from the database if it exists, then make the settings page reflect that
-    - [ ] Filter for people who don't have tokens
-    - [ ] What if the user has multiple devices?
-    - [ ] What if the user disables push notifications from iOS settings, rather than via the app?
-- [x] Fix the online/offline state issue
-  - [ ] When you go online, then leave the app, then come back >N minutes later, it should show you as offline
+- [x] Fix the online/offline state issue that Andy reported
+  - [x] When you go online, then leave the app, then come back >N minutes later, it should show you as offline
   - when the app loads for the first time, if the user is ONLINE, it should start pinging the server every N seconds to ask for status
   - when the app goes to the background, it should stop the ping interval
   - when the app comes back to the foreground, if the user is ONLINE, it should start the ping interval again
   - if the user is OFFLINE, it should not start the ping interval
-- [ ] Give people a way to set how long they'll be online for, rather than just the default `setOfflineAfterNMins` value
-- [ ] Fix sign in page dark mode
+- [ ] Store `push notifications` & `theme` in AsyncStorage so they don't get reset every time they open the app
 
 ## Phase 3: Before making it public
 
+- [ ] Give people a way to set how long they'll be online for, rather than just the default `setOfflineAfterNMins` value
+- [ ] Fix sign in page dark mode
+- [ ] Add an "About" link in the Settings page
+- [ ] Landing page with link to TestFlight beta
+- [ ] Only show YOUR friends. Currently the app shows all users
 - [ ] Dark theme improvements
   - [ ] Store the user's chosen theme in AsyncStorage so that it doesn't get reset every time they open the app
   - [ ] Make the splash screen match the theme
@@ -71,6 +73,9 @@ eas build --profile preview --platform ios
 
 ## Phase 4: Low priority
 
+- [ ] Push notification edge cases
+    - [ ] What if the user has multiple devices?
+    - [ ] What if the user disables push notifications from iOS settings, rather than via the app?
 - [ ] Fix the screen flicker that happens at login. I think it's an issue of not using a proper navigation library. It may not be an issue if we simply stick with a white background, it might just be an issue while we have a black background
 - [ ] Store the whole user in the global state and fetch that rather than doing this messy thing of finding the user in the list of friends. More details in `Home.js`
 - [ ] Make the light/dark mode setting item into a pretty toggle element, rather than just clickable text

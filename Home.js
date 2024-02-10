@@ -127,8 +127,7 @@ function OnlineOfflineToggle() {
           maxWidth: '80%',
           alignSelf: 'center',
         }}>
-        If you don't open the app for {setOfflineAfterNMins} minutes,{'\n'}
-        we'll set you offline automatically
+        You'll go offline after {setOfflineAfterNMins} mins of inactivity
       </Text>
     </View>
   )
