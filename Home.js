@@ -5,7 +5,7 @@ import {callNumber} from './Phone'
 import {fetchFriends} from './Friends'
 import api from './API'
 
-const setOfflineAfterNMins = 0.2
+const setOfflineAfterNMins = 15
 const nSecondsFetchFriends = 5
 
 function OnlineOfflineToggle() {
