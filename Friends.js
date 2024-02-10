@@ -91,10 +91,10 @@ const Friend = ({screen_name, phone}) => {
 }
 
 export function FriendsScreen({navigation}) {
-  const {friends, setFriends, theme} = React.useContext(GlobalContext)
+  const {friends, setFriends, authToken, theme} = React.useContext(GlobalContext)
   React.useEffect(() => {
-    fetchFriends(setFriends)()
-    console.log('friends', JSON.stringify(friends, null, 2), '\n')
+    fetchFriends(authToken, setFriends)()
+    // console.log('friends', JSON.stringify(friends, null, 2), '\n')
   }, [])
 
   return (
