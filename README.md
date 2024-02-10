@@ -1,28 +1,42 @@
 # Development
 
+## Frontend
+
+This is the command Devon uses to run the frontend:
 ```sh
 yarn start
 ```
 
-The backend is the same as the `small-world` project. Go to that repo to run the backend.
-
-# TestFlight build
-
+If that doesn't work, this may work instead:
 ```sh
-bin/build-ios.sh
-bin/submit-ios.sh
+yarn add expo && npx expo start
 ```
 
-# Ngrok
+## Backend
+
+The backend is in the [`smallworld`](https://github.com/devonzuegel/smallworld) repo. (Yes, I was lazy and created just 1 backend to serve 3 different apps. Sue me.) Go to that repo to run the backend.
+
+You will need to use `ngrok` to expose the backend to the internet. Run this command to do so:
 
 ```sh
-ngrok http 3001
+ngrok http 3001 # or whatever port you have the backend running on
 ```
+
+`ngrok` will give you a URL that you can use to access the backend from the frontend. Replace the first part of `DEVELOPMENT_URL` in `api.js` with the URL that `ngrok` gives you.
+
+# Builds
 
 # Internal build
 
 ```sh
 eas build --profile preview --platform ios
+```
+
+## TestFlight build
+
+```sh
+bin/build-ios.sh
+bin/submit-ios.sh
 ```
 
 # TODOs
@@ -52,6 +66,10 @@ eas build --profile preview --platform ios
   - when the app comes back to the foreground, if the user is ONLINE, it should start the ping interval again
   - if the user is OFFLINE, it should not start the ping interval
 - [ ] Store `push notifications` & `theme` in AsyncStorage so they don't get reset every time they open the app
+- [ ] Only show YOUR friends. Currently the app shows all users
+- [ ] Dark theme improvements
+  - [ ] Store the user's chosen theme in AsyncStorage so that it doesn't get reset every time they open the app
+  - [ ] Make the splash screen match the theme
 
 ## Phase 3: Before making it public
 
@@ -59,10 +77,6 @@ eas build --profile preview --platform ios
 - [ ] Fix sign in page dark mode
 - [ ] Add an "About" link in the Settings page
 - [ ] Landing page with link to TestFlight beta
-- [ ] Only show YOUR friends. Currently the app shows all users
-- [ ] Dark theme improvements
-  - [ ] Store the user's chosen theme in AsyncStorage so that it doesn't get reset every time they open the app
-  - [ ] Make the splash screen match the theme
 - [ ] Have the PhoneInput component autosuggest the user's phone number. Note: This may require forking the library and adding the feature
 - [ ] Add friends
   - [ ] Lucie L
@@ -71,7 +85,12 @@ eas build --profile preview --platform ios
 - [ ] Make friend search actually work
 - [ ] Protect all endpoints with authentication the same way `protected-endpoint` is protected
 
-## Phase 4: Low priority
+## Phase 4: Enhancements
+- [ ] Home screen widget so that you can:
+  - see who's online without opening the app
+  - set your status without opening the app
+
+## Phase 5: Low priority polish
 
 - [ ] Push notification edge cases
     - [ ] What if the user has multiple devices?
