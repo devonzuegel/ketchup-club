@@ -5,7 +5,7 @@ import {callNumber} from './Phone'
 import {fetchFriends} from './Friends'
 import api from './API'
 
-const setOfflineAfterNMins = 0.5
+const setOfflineAfterNMins = 15
 const nSecondsFetchFriends = 5
 
 function OnlineOfflineToggle() {
@@ -28,6 +28,7 @@ function OnlineOfflineToggle() {
           console.log(JSON.stringify({lastUpdatedMins, statusFromDB: myProfile?.status, newStatus}, null, 2))
           setStatus(newStatus)
           // once we've calculated the new status, update the db
+          // TODO: send the user a push notification letting them know we set them to offline automatically
           api.post('/ping', null, {
             params: {status: newStatus},
             headers: {Authorization: `Bearer ${authToken}`},
@@ -169,6 +170,12 @@ const longAgoInEnglish = (timestamp) => {
   return `${years} years ago`
 }
 
+const longAgoInSeconds = (timestamp) => {
+  const now = new Date().getTime()
+  const diff = now - new Date(timestamp).getTime()
+  return Math.floor(diff / 1000) + ' seconds ago'
+}
+
 const Friend = ({name, phoneNumber, last_ping}) => {
   const {theme} = React.useContext(GlobalContext)
   return (
@@ -214,7 +221,7 @@ export default function HomeScreen({navigation}) {
         .filter(({last_ping}) =>
           timestampWithinMins(
             last_ping,
-            setOfflineAfterNMins + 1 // the +1 is to account for the fact that the server might be a few seconds behind
+            setOfflineAfterNMins //+ 1 // the +1 is to account for the fact that the server might be a few seconds behind
           )
         )
     : []
