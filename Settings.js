@@ -5,7 +5,8 @@ import {useFonts} from 'expo-font'
 import {registerForPushNotificationsAsync} from './push'
 import AsyncStorage, {AUTH_TOKEN, PHONE, THEME, PUSH_TOKEN} from './AsyncStorage'
 import api from './API'
-import {locationPermissionGranted, setLocationPermissions} from './Location'
+import {enableLocation} from './Location'
+import {useStore} from './Store'
 
 const SettingItem = ({name, icon, value, dangerous, onPress}) => {
   const {theme} = React.useContext(GlobalContext)
@@ -49,6 +50,7 @@ export function SettingsScreen({navigation}) {
   const {phone, setPhone, friends, setAuthToken, authToken, theme, setTheme, pushToken, setPushToken} =
     React.useContext(GlobalContext)
   const user = friends ? friends.find(({phone: theirPhone}) => theirPhone == phone) : null
+  const {locationPermissionGranted} = useStore()
 
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
@@ -105,7 +107,7 @@ export function SettingsScreen({navigation}) {
         },
         Location: {
           value: locationPermissionGranted ? 'Enabled ✅' : 'Disabled ❌',
-          onPress: setLocationPermissions,
+          onPress: enableLocation,
         },
       },
     ],
