@@ -5,6 +5,7 @@ import {LoginScreen} from './Login'
 import {NavigationContainer} from '@react-navigation/native'
 import {createNativeStackNavigator} from '@react-navigation/native-stack'
 import HomeScreen from './Home'
+import AsyncStorage, {AUTH_TOKEN, PHONE, THEME, PUSH_TOKEN} from './AsyncStorage'
 import {FriendsScreen} from './Friends'
 import {SettingsScreen} from './Settings'
 import {apiBaseURL} from './API'
@@ -35,7 +36,42 @@ export default function App() {
   const [phone, setPhone] = React.useState(null)
   const [theme, setTheme] = React.useState('light')
   const [status, setStatus] = React.useState('offline')
-  const globalContextVars = {authToken, setAuthToken, friends, setFriends, phone, setPhone, theme, setTheme, status, setStatus}
+  const [pushToken, setPushToken] = React.useState(null)
+  const globalContextVars = {
+    authToken,
+    setAuthToken,
+    friends,
+    setFriends,
+    phone,
+    setPhone,
+    theme,
+    setTheme,
+    status,
+    setStatus,
+    pushToken,
+    setPushToken,
+  }
+
+  React.useEffect(() => {
+    async function fetchFromLocalStorage() {
+      const authToken = await AsyncStorage.getItem(AUTH_TOKEN)
+      const phone = await AsyncStorage.getItem(PHONE)
+      const theme = await AsyncStorage.getItem(THEME)
+      const pushToken = await AsyncStorage.getItem(PUSH_TOKEN)
+      console.log('🗄️ authToken from async storage: ', authToken || 'null')
+      console.log('🗄️     phone from async storage: ', phone || 'null')
+      console.log('🗄️     theme from async storage: ', theme || 'null')
+      console.log('🗄️ pushToken from async storage: ', pushToken || 'null')
+
+      // WARNING: storing in the component state AND in AsyncStorage may cause confusion in the future...
+      //          ... but it's the best solution we have for now, so let's stick with it
+      if (authToken) setAuthToken(authToken)
+      if (phone) setPhone(phone)
+      if (theme) setTheme(theme)
+      if (pushToken) setPushToken(pushToken)
+    }
+    fetchFromLocalStorage()
+  }, [])
 
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null

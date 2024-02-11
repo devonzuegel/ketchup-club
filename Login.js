@@ -21,28 +21,8 @@ export const LoginScreen = () => {
   const [smsCodeEntered, setSmsCodeEntered] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const {setAuthToken, phone, setPhone, theme, setTheme} = React.useContext(GlobalContext)
+  const {setAuthToken, phone, setPhone, theme} = React.useContext(GlobalContext)
   const smsCodeFieldRef = useRef()
-
-  // when this component loads, check if we have a token in AsyncStorage
-  React.useEffect(() => {
-    async function fetchAuthToken() {
-      const authToken = await AsyncStorage.getItem(AUTH_TOKEN)
-      const phone = await AsyncStorage.getItem(PHONE)
-      const theme = await AsyncStorage.getItem(THEME)
-      console.log('authToken from async storage: ', authToken || 'null')
-      console.log('    phone from async storage: ', phone || 'null')
-      console.log('    theme from async storage: ', theme || 'null')
-
-      // WARNING: storing in the component state AND in AsyncStorage may cause confusion in the future...
-      //          ... but it's the best solution we have for now, so let's stick with it
-      if (authToken) setAuthToken(authToken)
-      if (phone) setPhone(phone)
-      if (theme) setTheme(theme)
-      // TODO: maybe fetch pushToken too?
-    }
-    fetchAuthToken()
-  }, [])
 
   const handleLogin = async () => {
     if (phone === '' && smsCode === '') return setError("Oops, phone number and SMS code can't be blank!")
