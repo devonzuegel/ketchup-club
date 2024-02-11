@@ -8,6 +8,7 @@ import HomeScreen from './Home'
 import {FriendsScreen} from './Friends'
 import {SettingsScreen} from './Settings'
 import {apiBaseURL} from './API'
+import {checkLocationPermissions} from './Location'
 
 export const debug = false
 
@@ -39,6 +40,8 @@ export default function App() {
 
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
+
+  checkLocationPermissions()
 
   return (
     <GlobalContext.Provider value={globalContextVars}>

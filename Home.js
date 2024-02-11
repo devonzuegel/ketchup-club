@@ -4,6 +4,7 @@ import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone,
 import {callNumber} from './Phone'
 import {fetchFriends} from './Friends'
 import api from './API'
+import {address} from './Location'
 
 const setOfflineAfterNMins = __DEV__ ? 0.1 : 15
 const nSecondsFetchFriends = __DEV__ ? 20 : 5 // refetch more slowly in dev so we don't make ngrok mad
@@ -245,7 +246,7 @@ export default function HomeScreen({navigation}) {
             {/* TODO: in the future, we'll store the whole user in the global state and fetch that rather than doing this messy thing of finding the user in the list of friends */}
             {user && user.screen_name ? '@' + user.screen_name : formatPhone(phone)}
           </Text>
-          ! Nice to see you
+          ! Nice to see you {address != null && address.city != null ? "\nHow's " + address.city + '?' : null}
         </Header>
         <Spacer />
         <OnlineOfflineToggle />

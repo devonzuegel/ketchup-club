@@ -5,6 +5,7 @@ import {useFonts} from 'expo-font'
 import {registerForPushNotificationsAsync} from './push'
 import AsyncStorage, {AUTH_TOKEN, PHONE} from './AsyncStorage'
 import api from './API'
+import {locationPermissionGranted, setLocationPermissions} from './Location'
 
 const SettingItem = ({name, icon, value, dangerous, onPress}) => {
   const {theme} = React.useContext(GlobalContext)
@@ -95,6 +96,10 @@ export function SettingsScreen({navigation}) {
         'Push notifications': {
           value: pushToken ? 'Enabled ✅' : 'Disabled ❌',
           onPress: onSetPushNotifications,
+        },
+        Location: {
+          value: locationPermissionGranted ? 'Enabled ✅' : 'Disabled ❌',
+          onPress: setLocationPermissions,
         },
       },
     ],
