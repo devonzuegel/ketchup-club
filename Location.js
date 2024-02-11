@@ -6,7 +6,7 @@ export var locationPermissionGranted = false
 
 export async function requestLocationPermission() {
   const {granted} = await Location.requestForegroundPermissionsAsync()
-  setLocationPermissionGranted = granted
+  locationPermissionGranted = granted
   if (granted) {
     startMonitoringLocation()
   }
