@@ -26,7 +26,6 @@ export async function checkLocationPermissions() {
 export async function setLocationPermissions() {
   if (locationPermissionGranted) {
     startMonitoringLocation()
-    return
   } else {
     requestLocationPermission()
   }
