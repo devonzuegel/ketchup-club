@@ -1,6 +1,6 @@
 import React, {useState, useRef} from 'react'
 import {View, Keyboard} from 'react-native'
-import AsyncStorage, {AUTH_TOKEN, PHONE} from './AsyncStorage'
+import AsyncStorage, {AUTH_TOKEN, PHONE, THEME} from './AsyncStorage'
 import {Button, Text, TextInput, styles, GlobalContext, countryCode, removeCountryCode, themes} from './Utils'
 import PhoneInput from './PhoneInput'
 import api from './API'
@@ -23,23 +23,6 @@ export const LoginScreen = () => {
   const [message, setMessage] = useState('')
   const {setAuthToken, phone, setPhone, theme} = React.useContext(GlobalContext)
   const smsCodeFieldRef = useRef()
-
-  // when this component loads, check if we have a token in AsyncStorage
-  React.useEffect(() => {
-    async function fetchAuthToken() {
-      const authToken = await AsyncStorage.getItem(AUTH_TOKEN)
-      const phone = await AsyncStorage.getItem(PHONE)
-      console.log('authToken from async storage: ', authToken || 'null')
-      console.log('    phone from async storage: ', phone || 'null')
-
-      // WARNING: storing in the component state AND in AsyncStorage may cause confusion in the future...
-      //          ... but it's the best solution we have for now, so let's stick with it
-      if (authToken) setAuthToken(authToken)
-      if (phone) setPhone(phone)
-      // TODO: maybe fetch pushToken too?
-    }
-    fetchAuthToken()
-  }, [])
 
   const handleLogin = async () => {
     if (phone === '' && smsCode === '') return setError("Oops, phone number and SMS code can't be blank!")

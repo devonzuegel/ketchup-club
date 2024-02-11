@@ -3,7 +3,7 @@ import {View, TouchableOpacity} from 'react-native'
 import {fonts, Text, styles, NavBtns, Header, GlobalContext, formatPhone, themes} from './Utils'
 import {useFonts} from 'expo-font'
 import {registerForPushNotificationsAsync} from './push'
-import AsyncStorage, {AUTH_TOKEN, PHONE} from './AsyncStorage'
+import AsyncStorage, {AUTH_TOKEN, PHONE, THEME, PUSH_TOKEN} from './AsyncStorage'
 import api from './API'
 import {locationPermissionGranted, setLocationPermissions} from './Location'
 
@@ -46,11 +46,12 @@ const SettingItem = ({name, icon, value, dangerous, onPress}) => {
 }
 
 export function SettingsScreen({navigation}) {
-  const {phone, setPhone, friends, setAuthToken, authToken, theme, setTheme} = React.useContext(GlobalContext)
-  const [pushToken, setPushToken] = React.useState(null)
+  const {phone, setPhone, friends, setAuthToken, authToken, theme, setTheme, pushToken, setPushToken} =
+    React.useContext(GlobalContext)
+  const user = friends ? friends.find(({phone: theirPhone}) => theirPhone == phone) : null
+
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
-  const user = friends ? friends.find(({phone: theirPhone}) => theirPhone == phone) : null
 
   const logout = () => {
     console.log('logout')
@@ -63,8 +64,11 @@ export function SettingsScreen({navigation}) {
         // TODO: create fn to handle setting both the global state & AsyncStorage at the same time so we don't have to always remember to do both
         setAuthToken(null)
         setPhone(null)
+        setPushToken(null)
         AsyncStorage.removeItem(AUTH_TOKEN)
         AsyncStorage.removeItem(PHONE)
+        AsyncStorage.removeItem(PUSH_TOKEN)
+        // not necessary remove the theme, that can stay on the device since it's not sensitive
       })
       .catch((err) => console.error('Error logging out of server:', err))
   }
@@ -74,6 +78,7 @@ export function SettingsScreen({navigation}) {
       const newPushToken = await registerForPushNotificationsAsync()
       if (newPushToken) {
         setPushToken(newPushToken)
+        AsyncStorage.setItem(PUSH_TOKEN, newPushToken)
         await api
           .post('/push', null, {params: {push_token: newPushToken}, headers: {Authorization: `Bearer ${authToken}`}})
           .catch((err) => console.error('Error setting push token:', err))
@@ -82,6 +87,7 @@ export function SettingsScreen({navigation}) {
       }
     } else {
       setPushToken(null)
+      AsyncStorage.setItem(PUSH_TOKEN, null)
       await api
         .post('/push', null, {params: {push_token: null}, headers: {Authorization: `Bearer ${authToken}`}})
         .catch((err) => console.error('Error clearing push token:', err))
@@ -94,7 +100,7 @@ export function SettingsScreen({navigation}) {
       {
         // Contacts: {value: null}, // TODO: put me back
         'Push notifications': {
-          value: pushToken ? 'Enabled ✅' : 'Disabled ❌',
+          value: pushToken || AsyncStorage.getItem(PUSH_TOKEN) ? 'Enabled ✅' : 'Disabled ❌',
           onPress: onSetPushNotifications,
         },
         Location: {
@@ -116,7 +122,11 @@ export function SettingsScreen({navigation}) {
       {
         Theme: {
           value: theme == 'light' ? 'Light ☀️' : 'Dark 🌙',
-          onPress: () => setTheme(theme == 'light' ? 'dark' : 'light'),
+          onPress: () => {
+            const newTheme = theme == 'light' ? 'dark' : 'light'
+            setTheme(newTheme)
+            AsyncStorage.setItem(THEME, newTheme)
+          },
         },
       },
     ],
