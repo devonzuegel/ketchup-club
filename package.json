@@ -36,5 +36,15 @@
     "@babel/core": "^7.20.0",
     "@expo/webpack-config": "^19.0.1"
   },
-  "private": true
+  "private": true,
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true,
+    "useTabs": false,
+    "printWidth": 130,
+    "bracketSpacing": false,
+    "bracketSameLine": true
+  }
 }
