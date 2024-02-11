@@ -127,7 +127,9 @@ function OnlineOfflineToggle() {
           maxWidth: '80%',
           alignSelf: 'center',
         }}>
-        You'll go offline after {setOfflineAfterNMins} mins of inactivity
+        {status == 'offline' // TODO: add countdown to show how long before we set you offline
+          ? "You'll go offline after " + setOfflineAfterNMins + ' mins of inactivity'
+          : "You'll go offline after " + setOfflineAfterNMins + ' mins of inactivity'}
       </Text>
     </View>
   )

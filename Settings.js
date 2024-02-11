@@ -3,7 +3,7 @@ import {View, TouchableOpacity} from 'react-native'
 import {fonts, Text, styles, NavBtns, Header, GlobalContext, formatPhone, themes} from './Utils'
 import {useFonts} from 'expo-font'
 import {registerForPushNotificationsAsync} from './push'
-import AsyncStorage, {AUTH_TOKEN, PHONE} from './AsyncStorage'
+import AsyncStorage, {AUTH_TOKEN, PHONE, THEME} from './AsyncStorage'
 import api from './API'
 
 const SettingItem = ({name, icon, value, dangerous, onPress}) => {
@@ -111,7 +111,11 @@ export function SettingsScreen({navigation}) {
       {
         Theme: {
           value: theme == 'light' ? 'Light ☀️' : 'Dark 🌙',
-          onPress: () => setTheme(theme == 'light' ? 'dark' : 'light'),
+          onPress: () => {
+            const newTheme = theme == 'light' ? 'dark' : 'light'
+            setTheme(newTheme)
+            AsyncStorage.setItem(THEME, newTheme)
+          },
         },
       },
     ],
