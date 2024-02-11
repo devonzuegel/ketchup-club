@@ -248,8 +248,22 @@ export default function HomeScreen({navigation}) {
             {/* TODO: in the future, we'll store the whole user in the global state and fetch that rather than doing this messy thing of finding the user in the list of friends */}
             {user && user.screen_name ? '@' + user.screen_name : formatPhone(phone)}
           </Text>
-          ! Nice to see you {address != null && address.city != null ? "\nHow's " + address.city + '?' : null}
+          !
         </Header>
+        {address?.city && (
+          <Text
+            style={{
+              textAlign: 'center',
+              fontSize: 15,
+              color: themes[theme].text_tertiary,
+              marginVertical: 2,
+              fontFamily: 'SFCompactRounded_Medium',
+              maxWidth: '80%',
+              alignSelf: 'center',
+            }}>
+            How's {address.city}?
+          </Text>
+        )}
         <Spacer />
         <OnlineOfflineToggle />
 
