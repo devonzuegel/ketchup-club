@@ -4,7 +4,7 @@ import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone,
 import {callNumber} from './Phone'
 import {fetchFriends} from './Friends'
 import api from './API'
-import {address} from './Location'
+import {useStore} from './Store'
 
 const setOfflineAfterNMins = __DEV__ ? 0.1 : 15
 const nSecondsFetchFriends = __DEV__ ? 20 : 5 // refetch more slowly in dev so we don't make ngrok mad
@@ -202,6 +202,7 @@ export default function HomeScreen({navigation}) {
   const {friends, setFriends} = React.useContext(GlobalContext)
   const {phone, authToken} = React.useContext(GlobalContext)
   const user = friends ? friends.find(({phone: theirPhone}) => theirPhone == phone) : null
+  const {address} = useStore()
 
   const onlineFriends = friends
     ? friends
