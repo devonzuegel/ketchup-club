@@ -1,53 +1,62 @@
 import * as Location from 'expo-location'
 import {store} from './Store'
+import {Platform} from 'react-native'
+import * as NativeLocation from './modules/native-location'
 
 let lastGeocodeTime = 0
 
-export async function requestLocationPermission() {
-  var {granted} = await Location.requestForegroundPermissionsAsync()
-  const fg = granted
-  if (granted) {
-    var {granted} = await Location.requestBackgroundPermissionsAsync()
-  }
-  const {setLocationPermissionGranted} = store.getState()
-  setLocationPermissionGranted(fg)
-  if (fg) {
-    startMonitoringLocation()
-  }
-}
+// export async function requestLocationPermission() {
+//   var {granted} = await Location.requestForegroundPermissionsAsync()
+//   const fg = granted
+//   if (granted) {
+//     var {granted} = await Location.requestBackgroundPermissionsAsync()
+//   }
+//   const {setLocationPermissionGranted} = store.getState()
+//   setLocationPermissionGranted(fg)
+//   if (fg) {
+//     startMonitoringLocation()
+//   }
+// }
 
 // use this function to start monitoring location on app startup
 export async function checkLocationPermissions() {
-  var {granted} = await Location.getForegroundPermissionsAsync()
-  const fg = granted
-  var {granted} = await Location.getBackgroundPermissionsAsync()
-  const bg = granted
-  if (fg && !bg) {
-    var {granted} = await Location.requestBackgroundPermissionsAsync()
-  }
-  const {setLocationPermissionGranted} = store.getState()
-  setLocationPermissionGranted(fg)
-  if (fg) {
+  const {granted} = await Location.getForegroundPermissionsAsync()
+  if (granted) {
     startMonitoringLocation()
   }
-  return granted
+
+  // var {granted} = await Location.getForegroundPermissionsAsync()
+  // const fg = granted
+  // var {granted} = await Location.getBackgroundPermissionsAsync()
+  // const bg = granted
+  // if (fg && !bg) {
+  //   var {granted} = await Location.requestBackgroundPermissionsAsync()
+  // }
+  // const {setLocationPermissionGranted} = store.getState()
+  // setLocationPermissionGranted(fg)
+  // if (fg) {
+  //   startMonitoringLocation()
+  // }
+  // return granted
 }
 
 // this function is triggered by the user on the settings page
 export async function enableLocation() {
-  const {locationPermissionGranted} = store.getState()
-  if (locationPermissionGranted) {
-    startMonitoringLocation()
-    return
-  } else {
-    requestLocationPermission()
-  }
+  NativeLocation.requestPermission()
+  // const {locationPermissionGranted} = store.getState()
+  // if (locationPermissionGranted) {
+  //   startMonitoringLocation()
+  //   return
+  // } else {
+  //   requestLocationPermission()
+  // }
 }
 
 function startMonitoringLocation() {
+  NativeLocation.startMonitoring()
   // note that the timeInterval parameter only works on Android and seems to negate distanceInterval, so don't use it
   // distanceInterval is definitely not working, so we may have to go with native code here to get the desired behavior
-  Location.watchPositionAsync({distanceInterval: 2000}, receiveLocationUpdate)
+  // Location.watchPositionAsync({distanceInterval: 2000}, receiveLocationUpdate)
 }
 
 async function receiveLocationUpdate(loc) {
