@@ -1,4 +1,4 @@
-import { requireNativeModule, EventEmitter, Subscription } from 'expo-modules-core';
+import { NativeModulesProxy, EventEmitter, Subscription } from 'expo-modules-core';
 
 // Import the native module. On web, it will be resolved to NativeLocation.web.ts
 // and on native platforms to NativeLocation.ts
@@ -17,7 +17,7 @@ export async function requestPermission() {
   return await NativeLocationModule.requestPermission();
 }
 
-const emitter = new EventEmitter(NativeLocationModule ?? requireNativeModule('NativeLocation'));
+const emitter = new EventEmitter(NativeLocationModule ?? NativeModulesProxy.NativeLocation);
 
 export function addLocationUpdateListener(listener: (event: LocationUpdatePayload) => void): Subscription {
   return emitter.addListener<LocationUpdatePayload>('onLocationUpdate', listener);

@@ -1,6 +1,6 @@
 import * as Location from 'expo-location'
 import {store} from './Store'
-import {Platform} from 'react-native'
+// import {Platform} from 'react-native'
 import * as NativeLocation from './modules/native-location'
 
 let lastGeocodeTime = 0
