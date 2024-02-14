@@ -3,6 +3,10 @@
 # dependencies
 node_modules/
 
+# native project folders
+ios/
+android/
+
 # Expo
 .expo/
 dist/

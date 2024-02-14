@@ -77,8 +77,6 @@ export default function App() {
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
 
-  checkLocationPermissions()
-
   return (
     <GlobalContext.Provider value={globalContextVars}>
       {authToken ? <LoggedInNavigator /> : <LoginScreen />}

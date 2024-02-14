@@ -1,13 +1,14 @@
-import { Int32 } from "react-native/Libraries/Types/CodegenTypes";
+// import {Int32} from 'react-native/Libraries/Types/CodegenTypes'
+import {LocationObject} from 'expo-location'
 
 export type LocationUpdatePayload = {
-  value: any;
-};
+  location: LocationObject
+}
 
 export type AuthorizationPayload = {
-  value: Int32;
-};
+  status: number
+}
 
 export type LocationErrorPayload = {
-  value: string;
-};
+  error: string
+}

@@ -2,16 +2,26 @@ import {useStore as use} from 'zustand'
 import {createStore} from 'zustand/vanilla'
 import {createJSONStorage, persist} from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import {LocationGeocodedAddress, LocationObject} from 'expo-location'
+
+export interface StoreState {
+  address: LocationGeocodedAddress
+  location: LocationObject
+  locationPermissionGranted: boolean
+  setAddress: (a: LocationGeocodedAddress) => void
+  setLocation: (l: LocationObject) => void
+  setLocationPermissionGranted: (lpg: boolean) => void
+}
 
 export const store = createStore(
   persist(
     (set) => ({
       address: null,
-      setAddress: (a) => set({address: a}),
+      setAddress: (a: LocationGeocodedAddress) => set({address: a}),
       location: null,
-      setLocation: (l) => set({location: l}),
+      setLocation: (l: LocationObject) => set({location: l}),
       locationPermissionGranted: false,
-      setLocationPermissionGranted: (lpg) => set({locationPermissionGranted: lpg}),
+      setLocationPermissionGranted: (lpg: boolean) => set({locationPermissionGranted: lpg}),
     }),
     {
       name: 'global-storage', // unique name
