@@ -2,8 +2,16 @@ import * as Location from 'expo-location'
 import {store} from './Store'
 // import {Platform} from 'react-native'
 import * as NativeLocation from './modules/native-location'
+import { EventEmitter, Subscription } from 'expo-modules-core';
+
 
 let lastGeocodeTime = 0
+
+export function addLocationUpdateListener(listener: (event: LocationUpdatePayload) => void): Subscription {
+
+  // const emitter = new EventEmitter(NativeLocationModule ?? NativeModulesProxy.NativeLocation);
+  // return emitter.addListener<LocationUpdatePayload>('onLocationUpdate', listener);
+}
 
 // export async function requestLocationPermission() {
 //   var {granted} = await Location.requestForegroundPermissionsAsync()
