@@ -1,12 +1,14 @@
 import * as Location from 'expo-location'
 import {store} from './Store'
+import Constants, {ExecutionEnvironment} from 'expo-constants'
 
 let lastGeocodeTime = 0
+const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient
 
 export async function requestLocationPermission() {
   var {granted} = await Location.requestForegroundPermissionsAsync()
   const fg = granted
-  if (granted) {
+  if (granted && !isExpoGo) {
     var {granted} = await Location.requestBackgroundPermissionsAsync()
   }
   const {setLocationPermissionGranted} = store.getState()
@@ -20,10 +22,12 @@ export async function requestLocationPermission() {
 export async function checkLocationPermissions() {
   var {granted} = await Location.getForegroundPermissionsAsync()
   const fg = granted
-  var {granted} = await Location.getBackgroundPermissionsAsync()
-  const bg = granted
-  if (fg && !bg) {
-    var {granted} = await Location.requestBackgroundPermissionsAsync()
+  if (!isExpoGo) {
+    var {granted} = await Location.getBackgroundPermissionsAsync()
+    const bg = granted
+    if (fg && !bg) {
+      var {granted} = await Location.requestBackgroundPermissionsAsync()
+    }
   }
   const {setLocationPermissionGranted} = store.getState()
   setLocationPermissionGranted(fg)
