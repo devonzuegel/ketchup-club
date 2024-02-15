@@ -2,6 +2,7 @@ import React, {useState, useEffect, forwardRef} from 'react'
 import {View, StyleSheet, TouchableOpacity, Text as RNText, TextInput as RNTextInput} from 'react-native'
 import {PhoneNumberUtil, PhoneNumberFormat} from 'google-libphonenumber'
 import AsyncStorage from './AsyncStorage'
+import {useStore} from './Store'
 
 export const GlobalContext = React.createContext()
 
@@ -53,7 +54,7 @@ const navBtnBorderColor = (name_of_screen, current_screen, theme) =>
   name_of_screen == current_screen ? themes[theme].text_emphasis : themes[theme].text_input_placeholder
 
 export const NavBtns = ({navigation}) => {
-  const {theme} = React.useContext(GlobalContext)
+  const {theme} = useStore()
 
   const getCurrentScreen = () => {
     const {routes, index} = navigation.getState()
@@ -164,7 +165,7 @@ export const debugStyles = (theme) =>
   })
 
 export const Header = ({children, style}) => {
-  const {theme} = React.useContext(GlobalContext)
+  const {theme} = useStore()
   return (
     <Text
       style={{
@@ -181,7 +182,7 @@ export const Header = ({children, style}) => {
 }
 
 export const Text = (props) => {
-  const {theme} = React.useContext(GlobalContext)
+  const {theme} = useStore()
   return (
     <RNText {...props} style={{fontFamily: 'SFCompactRounded_Medium', color: themes[theme].text_primary, ...props.style}}>
       {props.children}
@@ -190,7 +191,7 @@ export const Text = (props) => {
 }
 
 export const TextInput = forwardRef((props, ref) => {
-  const {theme} = React.useContext(GlobalContext)
+  const {theme} = useStore()
   return (
     <RNTextInput
       ref={ref}
@@ -202,7 +203,7 @@ export const TextInput = forwardRef((props, ref) => {
 })
 
 export const Button = ({onPress, title, btnStyle, textStyle}) => {
-  const {theme} = React.useContext(GlobalContext)
+  const {theme} = useStore()
   return (
     <TouchableOpacity
       onPress={onPress}

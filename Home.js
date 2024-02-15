@@ -11,7 +11,8 @@ const nSecondsFetchFriends = __DEV__ ? 20 : 5 // refetch more slowly in dev so w
 
 function OnlineOfflineToggle() {
   const [pingInterval, setPingInterval] = React.useState(null)
-  const {setFriends, phone, theme, authToken, status, setStatus} = React.useContext(GlobalContext)
+  const {setFriends, phone, authToken, status, setStatus} = React.useContext(GlobalContext)
+  const {theme} = useStore()
 
   const refreshStatusFromDB = async () => {
     try {
@@ -167,7 +168,7 @@ const longAgoInSeconds = (timestamp) => {
 }
 
 const Friend = ({name, phoneNumber, last_ping}) => {
-  const {theme} = React.useContext(GlobalContext)
+  const {theme} = useStore()
   return (
     <View
       style={{
@@ -215,7 +216,7 @@ export default function HomeScreen({navigation}) {
         )
     : []
 
-  const {theme} = React.useContext(GlobalContext)
+  const {theme} = useStore()
 
   return (
     <View style={{...styles(theme).container, ...styles(theme).flexColumn}}>
