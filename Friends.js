@@ -2,6 +2,7 @@ import {View, Keyboard, Dimensions, FlatList} from 'react-native'
 import {Text, TextInput, styles, NavBtns, Header, DotAnimation, GlobalContext, themes, formatPhone, Spacer} from './Utils'
 import api from './API'
 import React from 'react'
+import {useStore} from './Store'
 
 export const mockFriends = [
   {phoneNumber: '+1-123-123-1234', name: 'Alicia'},
@@ -31,7 +32,7 @@ export const fetchFriends = (authToken, setFriends) => async () => {
 }
 
 const SearchBar = () => {
-  const {theme} = React.useContext(GlobalContext)
+  const {theme} = useStore()
   return (
     <View
       style={{
@@ -65,7 +66,7 @@ const SearchBar = () => {
 }
 
 const Friend = ({screen_name, phone}) => {
-  const {theme} = React.useContext(GlobalContext)
+  const {theme} = useStore()
   return (
     <View
       style={{
@@ -90,7 +91,8 @@ const Friend = ({screen_name, phone}) => {
 }
 
 export function FriendsScreen({navigation}) {
-  const {friends, setFriends, authToken, theme, phone} = React.useContext(GlobalContext)
+  const {friends, setFriends, authToken, phone} = React.useContext(GlobalContext)
+  const {theme} = useStore()
   React.useEffect(() => {
     fetchFriends(authToken, setFriends)()
     // console.log('friends', JSON.stringify(friends, null, 2), '\n')

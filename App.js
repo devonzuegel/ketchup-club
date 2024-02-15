@@ -9,6 +9,7 @@ import AsyncStorage, {AUTH_TOKEN, PHONE, THEME, PUSH_TOKEN} from './AsyncStorage
 import {FriendsScreen} from './Friends'
 import {SettingsScreen} from './Settings'
 import {apiBaseURL} from './API'
+import {useStore} from './Store'
 
 export const debug = false
 
@@ -34,7 +35,8 @@ export default function App() {
   const [authToken, setAuthToken] = React.useState(null)
   const [friends, setFriends] = React.useState(null)
   const [phone, setPhone] = React.useState(null)
-  const [theme, setTheme] = React.useState('light')
+  // const [theme, setTheme] = React.useState('light')
+  const {theme, setTheme} = useStore()
   const [status, setStatus] = React.useState('offline')
   const [pushToken, setPushToken] = React.useState(null)
   const globalContextVars = {
@@ -44,8 +46,8 @@ export default function App() {
     setFriends,
     phone,
     setPhone,
-    theme,
-    setTheme,
+    // theme,
+    // setTheme,
     status,
     setStatus,
     pushToken,
@@ -56,18 +58,18 @@ export default function App() {
     async function fetchFromLocalStorage() {
       const authToken = await AsyncStorage.getItem(AUTH_TOKEN)
       const phone = await AsyncStorage.getItem(PHONE)
-      const theme = await AsyncStorage.getItem(THEME)
+      // const theme = await AsyncStorage.getItem(THEME)
       const pushToken = await AsyncStorage.getItem(PUSH_TOKEN)
       console.log('🗄️ authToken from async storage: ', authToken || 'null')
       console.log('🗄️     phone from async storage: ', phone || 'null')
-      console.log('🗄️     theme from async storage: ', theme || 'null')
+      // console.log('🗄️     theme from async storage: ', theme || 'null')
       console.log('🗄️ pushToken from async storage: ', pushToken || 'null')
 
       // WARNING: storing in the component state AND in AsyncStorage may cause confusion in the future...
       //          ... but it's the best solution we have for now, so let's stick with it
       if (authToken) setAuthToken(authToken)
       if (phone) setPhone(phone)
-      if (theme) setTheme(theme)
+      // if (theme) setTheme(theme)
       if (pushToken) setPushToken(pushToken)
     }
     fetchFromLocalStorage()

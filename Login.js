@@ -1,9 +1,10 @@
 import React, {useState, useRef} from 'react'
 import {View, Keyboard} from 'react-native'
-import AsyncStorage, {AUTH_TOKEN, PHONE, THEME} from './AsyncStorage'
+import AsyncStorage, {AUTH_TOKEN, PHONE} from './AsyncStorage'
 import {Button, Text, TextInput, styles, GlobalContext, countryCode, removeCountryCode, themes} from './Utils'
 import PhoneInput from './PhoneInput'
 import api from './API'
+import {useStore} from './Store'
 
 const debug = false
 
@@ -21,7 +22,8 @@ export const LoginScreen = () => {
   const [smsCodeEntered, setSmsCodeEntered] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const {setAuthToken, phone, setPhone, theme} = React.useContext(GlobalContext)
+  const {setAuthToken, phone, setPhone} = React.useContext(GlobalContext)
+  const {theme} = useStore()
   const smsCodeFieldRef = useRef()
 
   const handleLogin = async () => {
