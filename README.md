@@ -13,9 +13,25 @@ This is the command Devon uses to run the frontend:
 yarn start
 ```
 
-If that doesn't work, this may work instead:
+If that doesn't work, you may first need to add expo:
 ```sh
-yarn add expo && npx expo start
+yarn add expo
+```
+
+## Building native code
+
+Now that we have a native module, it's a little more involved to build the app.
+
+A native build requires cocoapods, which can be installed with Homebrew:
+```sh
+brew install cocoapods
+```
+
+We also require Xcode with the iOS 17.2 SDK installed. To ensure the correct SDK is installed, open Xcode and go to Settings > Platforms and get the iOS 17.2 SDK.
+
+Then you can build and run the app using
+```sh
+yarn ios
 ```
 
 ## Backend
