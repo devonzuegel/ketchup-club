@@ -28,15 +28,22 @@ public class NativeLocationModule: Module {
     Events("onLocationUpdate", "onAuthorizationChange", "onLocationError")
 
     AsyncFunction("startMonitoring") {
-      print("starting location monitoring")
-      self.locationManager!.startMonitoringSignificantLocationChanges()
+      if self.locationManager != nil {
+        print("starting location monitoring")
+        self.locationManager!.startMonitoringSignificantLocationChanges()
+      }
     }
     AsyncFunction("stopMonitoring") {
-      print("stopping location monitoring")
-      self.locationManager!.stopMonitoringSignificantLocationChanges()
+      if self.locationManager != nil {
+        print("stopping location monitoring")
+        self.locationManager!.stopMonitoringSignificantLocationChanges()
+      }
     }
     AsyncFunction("requestPermission") {
-      self.locationManager!.requestAlwaysAuthorization()
+      if self.locationManager != nil {
+        print("requesting location permission")
+        self.locationManager!.requestAlwaysAuthorization()
+      }
     }
   }
 

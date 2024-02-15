@@ -1,4 +1,3 @@
-// import {Int32} from 'react-native/Libraries/Types/CodegenTypes'
 import {LocationObject} from 'expo-location'
 
 export type LocationUpdatePayload = {

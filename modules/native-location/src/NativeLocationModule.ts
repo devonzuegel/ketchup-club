@@ -1,5 +1,7 @@
-import { requireNativeModule } from 'expo-modules-core';
+import {requireOptionalNativeModule} from 'expo-modules-core'
+
+// Message from default code which used requireNativeModule:
 
 // It loads the native module object from the JSI or falls back to
 // the bridge module (from NativeModulesProxy) if the remote debugger is on.
-export default requireNativeModule('NativeLocation');
+export default requireOptionalNativeModule('NativeLocation')

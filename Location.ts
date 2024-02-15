@@ -1,49 +1,34 @@
 import * as Location from 'expo-location'
 import {store, StoreState} from './Store'
 import {Platform} from 'react-native'
-import {NativeModules} from 'react-native'
-// import * as NativeLocation from './modules/native-location'
-import {requireOptionalNativeModule, EventEmitter, Subscription} from 'expo-modules-core'
+import * as NativeLocation from './modules/native-location'
+import {Subscription} from 'expo-modules-core'
 import Constants, {ExecutionEnvironment} from 'expo-constants'
 
+/*
+
+NativeLocation is not available on Expo or Android, but it can be imported because the native module uses requireOptionalNativeModule instead of requireNativeModule. This means that the app will not crash if the module is not available. However, referring to the module without verifying that we are not in Expo or Android will cause an error. So we need to check the execution environment before referring to the module.
+
+(I wanted to use if(NativeLocation) but this doesn't work.)
+
+*/
+
 const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient
-
-interface NativeLocation {
-  startMonitoring(): Promise<void>
-  stopMonitoring(): Promise<void>
-  requestPermission(): Promise<void>
-  addLocationUpdateListener(listener: (event: {location: Location.LocationObject}) => void): Subscription
-  addAuthorizationChangeListener(listener: (event: {status: number}) => void): Subscription
-  addLocationErrorListener(listener: (event: {error: string}) => void): Subscription
-}
-
-let NativeLocation: NativeLocation | null = null
+const useNativeLocation = Platform.OS === 'ios' && !isExpoGo
+console.log('useNativeLocation:', useNativeLocation)
 
 let lastGeocodeTime = 0
 let locationSubscription: Subscription | null = null
 
 init()
 
-async function init() {
-  await initializeNativeModule()
+function init() {
+  initializeSubscriptions()
   initializeLocationServices()
 }
 
-async function initializeNativeModule() {
-  if (Platform.OS === 'ios' && !isExpoGo) {
-    NativeLocation = await requireOptionalNativeModule('NativeLocation')
-  }
-  initializeSubscriptions()
-}
-
 function initializeSubscriptions() {
-  if (NativeLocation) {
-    if (typeof NativeLocation.addAuthorizationChangeListener !== 'function') {
-      console.error('addAuthorizationChangeListener is not a function on NativeLocation')
-      return
-    }
-
-    console.log('NativeLocation module initialized')
+  if (useNativeLocation) {
     const statusSubscription = NativeLocation.addAuthorizationChangeListener(({status: status}) => {
       console.log('NativeLocation permission status changed', status)
 
@@ -73,7 +58,7 @@ function initializeSubscriptions() {
       console.log('NativeLocation error', error)
     })
   } else {
-    console.log('NativeLocation module not available')
+    console.log('NativeLocation module not in use')
   }
 }
 
@@ -100,7 +85,7 @@ export async function enableLocation() {
 }
 
 async function requestLocationPermission() {
-  if (NativeLocation) {
+  if (useNativeLocation) {
     NativeLocation.requestPermission()
     return
   } else {
@@ -116,21 +101,19 @@ async function requestLocationPermission() {
 }
 
 async function startMonitoringLocation() {
-  if (NativeLocation) {
+  if (useNativeLocation) {
     NativeLocation.startMonitoring()
   } else {
     // note that the timeInterval parameter only works on Android and seems to negate distanceInterval, so don't use it
     // distanceInterval is definitely not working, so we may have to go with native code here to get the desired behavior
-    locationSubscription = await Location.watchPositionAsync({distanceInterval: 2000}, receiveLocationUpdate)
+    locationSubscription = await Location.watchPositionAsync({distanceInterval: 500}, receiveLocationUpdate)
   }
 }
 
 function stopMonitoringLocation() {
-  if (NativeLocation) {
-    NativeLocation.startMonitoring()
+  if (useNativeLocation) {
+    NativeLocation.stopMonitoring()
   } else {
-    // note that the timeInterval parameter only works on Android and seems to negate distanceInterval, so don't use it
-    // distanceInterval is definitely not working, so we may have to go with native code here to get the desired behavior
     locationSubscription?.remove()
   }
 }
@@ -141,10 +124,10 @@ async function receiveLocationUpdate(loc: Location.LocationObject) {
 
   const {setLocation} = store.getState() as StoreState
   setLocation(loc)
-  if (NativeLocation) {
+  if (useNativeLocation) {
     performGeocode(loc)
   } else {
-    // We need to conserve on-device geocoding resources. We have asked the Expo Location module to only send us updates every 2km, but it seems to give us updates more often than that. So we will only reverse geocode if at least two minutes have passed.
+    // We need to conserve on-device geocoding resources. We have asked the Expo Location module to only send us updates every 500 meters, but it seems to give us updates more often than that. So we will only reverse geocode if at least two minutes have passed.
     if (loc.timestamp - lastGeocodeTime > 120000) {
       performGeocode(loc)
     } else {
