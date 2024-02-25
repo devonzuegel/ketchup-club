@@ -1,6 +1,6 @@
 import {Linking, Alert, Platform} from 'react-native'
 
-export const callNumber = (phone) => {
+export const callNumber = (phone: string) => {
   console.log('callNumber ----> ', phone)
   let phoneNumber = phone
   if (Platform.OS !== 'android') {

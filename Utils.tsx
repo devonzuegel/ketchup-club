@@ -1,8 +1,7 @@
-import React, {useState, useEffect, forwardRef} from 'react'
-import {View, StyleSheet, TouchableOpacity, Text as RNText, TextInput as RNTextInput} from 'react-native'
-import {PhoneNumberUtil, PhoneNumberFormat} from 'google-libphonenumber'
-import AsyncStorage from './AsyncStorage'
-import {useStore} from './Store'
+import {PhoneNumberFormat, PhoneNumberUtil} from 'google-libphonenumber'
+import React, {forwardRef, useEffect, useState} from 'react'
+import {Text as RNText, TextInput as RNTextInput, StyleSheet, TouchableOpacity, View} from 'react-native'
+import {StoreState, useStore} from './Store'
 
 export const GlobalContext = React.createContext()
 
@@ -122,7 +121,7 @@ export const styles = (theme) =>
     container: {
       flex: 1,
       fontFamily: 'SFCompactRounded_Medium',
-      backgroundColor: themes[theme].backgroundColor,
+      backgroundColor: themes[theme as 'light' | 'dark'].backgroundColor,
       padding: containerPadding,
       paddingBottom: 0,
       paddingTop: 48,
@@ -138,15 +137,15 @@ export const styles = (theme) =>
       marginTop: 4,
       marginBottom: 4,
       padding: 10,
-      color: themes[theme].text_primary,
+      color: themes[theme as 'light' | 'dark'].text_primary,
       fontFamily: 'SFCompactRounded_Medium',
       borderRadius: 10,
       fontSize: 15,
-      backgroundColor: themes[theme].text_input_bkgd,
+      backgroundColor: themes[theme as 'light' | 'dark'].text_input_bkgd,
     },
   })
 
-export const debugStyles = (theme) =>
+export const debugStyles = (theme: 'light' | 'dark') =>
   StyleSheet.create({
     message: {
       padding: 12,
@@ -165,7 +164,7 @@ export const debugStyles = (theme) =>
   })
 
 export const Header = ({children, style}) => {
-  const {theme} = useStore()
+  const theme = useStore((state: StoreState) => state.theme)
   return (
     <Text
       style={{
@@ -274,17 +273,17 @@ export const DotAnimation = ({style}) => {
 //   return phone
 // }
 
-export const removeCountryCode = (fullPhoneNumber) => {
-  if (fullPhoneNumber == null) return null
+export const removeCountryCode = (fullPhoneNumber: string) => {
+  if (fullPhoneNumber == '') return ''
   try {
     const phoneUtil = PhoneNumberUtil.getInstance()
     const parsedPhone = phoneUtil.parse(fullPhoneNumber)
     const domesticNumber = phoneUtil.getNationalSignificantNumber(parsedPhone)
-    const countryCode = phoneUtil.getCountryCodeForRegion(phoneUtil.getRegionCodeForNumber(parsedPhone))
-    if (debug) console.log({fullPhoneNumber, domesticNumber, countryCode})
+    // const countryCode = phoneUtil.getCountryCodeForRegion(phoneUtil.getRegionCodeForNumber(parsedPhone) || '')
+    // if (debug) console.log({fullPhoneNumber, domesticNumber, countryCode})
     return domesticNumber
   } catch (error) {
-    return null
+    return ''
   }
 }
 
@@ -294,14 +293,14 @@ export const countryCode = (fullPhoneNumber) => {
     const phoneUtil = PhoneNumberUtil.getInstance()
     const parsedPhone = phoneUtil.parse(fullPhoneNumber)
     const countryCodeName = phoneUtil.getRegionCodeForNumber(parsedPhone)
-    if (debug) console.log({fullPhoneNumber, countryCodeName})
+    // if (debug) console.log({fullPhoneNumber, countryCodeName})
     return countryCodeName
   } catch (error) {
     return null
   }
 }
 
-export const formatPhone = (phoneNumberString) => {
+export const formatPhone = (phoneNumberString: string) => {
   if (!phoneNumberString) return null
   try {
     const phoneUtil = PhoneNumberUtil.getInstance()

@@ -6,10 +6,33 @@ import {registerForPushNotificationsAsync} from './push'
 import AsyncStorage, {AUTH_TOKEN, PHONE, THEME, PUSH_TOKEN} from './AsyncStorage'
 import api from './API'
 import {enableLocation} from './Location'
-import {useStore} from './Store'
+import {useStore, StoreState} from './Store'
 
-const SettingItem = ({name, icon, value, dangerous, onPress}) => {
-  const {theme} = useStore()
+type GlobalContextType = {
+  phone: string
+  setPhone: (phone: string) => void
+  // WHAT IS THE FRIENDS TYPE?
+  friends: any[]
+  setAuthToken: (authToken: string) => void
+  authToken: string
+  pushToken: string
+  setPushToken: (pushToken: string) => void
+}
+
+const SettingItem = ({
+  name,
+  icon,
+  value,
+  dangerous,
+  onPress,
+}: {
+  name: string
+  icon: string
+  value: string
+  dangerous: boolean
+  onPress: () => any
+}) => {
+  const theme = useStore((state: StoreState) => state.theme)
   return (
     <TouchableOpacity onPress={onPress}>
       <View
@@ -21,7 +44,7 @@ const SettingItem = ({name, icon, value, dangerous, onPress}) => {
           paddingLeft: 14,
           paddingRight: 14,
           margin: 4,
-          backgroundColor: themes[theme].text_input_bkgd,
+          backgroundColor: themes[theme as 'light' | 'dark'].text_input_bkgd,
           borderRadius: 8,
         }}>
         <Text
@@ -29,7 +52,7 @@ const SettingItem = ({name, icon, value, dangerous, onPress}) => {
             fontSize: 18,
             fontFamily: 'SFCompactRounded_Medium',
             lineHeight: 48, // Emojis have a different lineHeight than text, so this is to normalize between the two
-            color: dangerous ? 'red' : themes[theme].text_secondary,
+            color: dangerous ? 'red' : themes[theme as 'light' | 'dark'].text_secondary,
           }}>
           {name}
         </Text>
@@ -37,7 +60,7 @@ const SettingItem = ({name, icon, value, dangerous, onPress}) => {
           style={{
             fontSize: 18,
             fontFamily: 'SFCompactRounded_Medium',
-            color: dangerous ? 'red' : themes[theme].text_emphasis,
+            color: dangerous ? 'red' : themes[theme as 'light' | 'dark'].text_emphasis,
           }}>
           {value || icon || '🚧' || '❌'}
         </Text>
@@ -47,9 +70,13 @@ const SettingItem = ({name, icon, value, dangerous, onPress}) => {
 }
 
 export function SettingsScreen({navigation}) {
-  const {phone, setPhone, friends, setAuthToken, authToken, pushToken, setPushToken} = React.useContext(GlobalContext)
-  const user = friends ? friends.find(({phone: theirPhone}) => theirPhone == phone) : null
-  const {theme, setTheme, locationPermissionGranted} = useStore()
+  const {phone, setPhone, friends, setAuthToken, authToken, pushToken, setPushToken} = React.useContext(
+    GlobalContext
+  ) as GlobalContextType
+  const user = friends ? friends.find(({phone: theirPhone}: {phone: string}) => theirPhone == phone) : null
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
+  const setTheme = useStore((state: StoreState) => state.setTheme) as (theme: 'light' | 'dark') => void
+  const locationPermissionGranted = useStore((state: StoreState) => state.locationPermissionGranted)
 
   const [fontsLoaded] = useFonts(fonts)
   if (!fontsLoaded) return null
@@ -63,9 +90,9 @@ export function SettingsScreen({navigation}) {
       })
       .then(() => {
         // TODO: create fn to handle setting both the global state & AsyncStorage at the same time so we don't have to always remember to do both
-        setAuthToken(null)
-        setPhone(null)
-        setPushToken(null)
+        setAuthToken('')
+        setPhone('')
+        setPushToken('')
         AsyncStorage.removeItem(AUTH_TOKEN)
         AsyncStorage.removeItem(PHONE)
         AsyncStorage.removeItem(PUSH_TOKEN)
@@ -87,8 +114,8 @@ export function SettingsScreen({navigation}) {
         console.error('Error getting push token from registerForPushNotificationsAsync()')
       }
     } else {
-      setPushToken(null)
-      AsyncStorage.setItem(PUSH_TOKEN, null)
+      setPushToken('')
+      AsyncStorage.removeItem(PUSH_TOKEN)
       await api
         .post('/push', null, {params: {push_token: null}, headers: {Authorization: `Bearer ${authToken}`}})
         .catch((err) => console.error('Error clearing push token:', err))
@@ -142,11 +169,11 @@ export function SettingsScreen({navigation}) {
           <View key={i}>
             <Header style={{textAlign: 'left', fontSize: 16, marginLeft: 16, marginBottom: 2, marginTop: 32}}>{section}</Header>
             {Object.entries(sectionItems).map(([name, {value, onPress}], j) => (
-              <SettingItem name={name} value={value} key={j} onPress={onPress} />
+              <SettingItem name={name} value={value} key={j} onPress={onPress} icon={''} dangerous={false} />
             ))}
           </View>
         ))}
-        <SettingItem name={'Sign out'} icon="➡️" dangerous onPress={logout} />
+        <SettingItem name={'Sign out'} icon="➡️" value="" dangerous onPress={logout} />
       </View>
 
       <NavBtns navigation={navigation} />

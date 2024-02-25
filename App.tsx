@@ -1,15 +1,15 @@
-import {GlobalContext, fonts, Pre, View, Text} from './Utils'
-import React from 'react'
-import {useFonts} from 'expo-font'
-import {LoginScreen} from './Login'
 import {NavigationContainer} from '@react-navigation/native'
 import {createNativeStackNavigator} from '@react-navigation/native-stack'
-import HomeScreen from './Home'
-import AsyncStorage, {AUTH_TOKEN, PHONE, THEME, PUSH_TOKEN} from './AsyncStorage'
-import {FriendsScreen} from './Friends'
-import {SettingsScreen} from './Settings'
+import {useFonts} from 'expo-font'
+import React from 'react'
 import {apiBaseURL} from './API'
-import {useStore} from './Store'
+import AsyncStorage, {AUTH_TOKEN, PHONE, PUSH_TOKEN} from './AsyncStorage'
+import {FriendsScreen} from './Friends'
+import HomeScreen from './Home'
+import {LoginScreen} from './Login'
+import {SettingsScreen} from './Settings'
+import {StoreState, useStore} from './Store'
+import {GlobalContext, Pre, fonts} from './Utils'
 
 export const debug = false
 
@@ -32,13 +32,12 @@ const LoggedInNavigator = () => (
 )
 
 export default function App() {
-  const [authToken, setAuthToken] = React.useState(null)
+  const [authToken, setAuthToken] = React.useState<string>()
   const [friends, setFriends] = React.useState(null)
-  const [phone, setPhone] = React.useState(null)
-  // const [theme, setTheme] = React.useState('light')
-  const {theme, setTheme} = useStore()
+  const [phone, setPhone] = React.useState<string>()
+  const theme = useStore((state: StoreState) => state.theme)
   const [status, setStatus] = React.useState('offline')
-  const [pushToken, setPushToken] = React.useState(null)
+  const [pushToken, setPushToken] = React.useState<string>()
   const globalContextVars = {
     authToken,
     setAuthToken,
@@ -46,8 +45,6 @@ export default function App() {
     setFriends,
     phone,
     setPhone,
-    // theme,
-    // setTheme,
     status,
     setStatus,
     pushToken,
@@ -58,18 +55,16 @@ export default function App() {
     async function fetchFromLocalStorage() {
       const authToken = await AsyncStorage.getItem(AUTH_TOKEN)
       const phone = await AsyncStorage.getItem(PHONE)
-      // const theme = await AsyncStorage.getItem(THEME)
       const pushToken = await AsyncStorage.getItem(PUSH_TOKEN)
       console.log('🗄️ authToken from async storage: ', authToken || 'null')
       console.log('🗄️     phone from async storage: ', phone || 'null')
-      // console.log('🗄️     theme from async storage: ', theme || 'null')
+      console.log('🗄️     theme from Zustand store: ', theme || 'null')
       console.log('🗄️ pushToken from async storage: ', pushToken || 'null')
 
       // WARNING: storing in the component state AND in AsyncStorage may cause confusion in the future...
       //          ... but it's the best solution we have for now, so let's stick with it
       if (authToken) setAuthToken(authToken)
       if (phone) setPhone(phone)
-      // if (theme) setTheme(theme)
       if (pushToken) setPushToken(pushToken)
     }
     fetchFromLocalStorage()
@@ -81,7 +76,7 @@ export default function App() {
   return (
     <GlobalContext.Provider value={globalContextVars}>
       {authToken ? <LoggedInNavigator /> : <LoginScreen />}
-      {debug && <Pre data={{...globalContextVars, friends: friends && friends.length}} />}
+      {debug && <Pre data={{...globalContextVars, friends: friends && friends.length}} children={null} />}
     </GlobalContext.Provider>
   )
 }

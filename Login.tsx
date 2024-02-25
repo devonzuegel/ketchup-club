@@ -4,7 +4,7 @@ import AsyncStorage, {AUTH_TOKEN, PHONE} from './AsyncStorage'
 import {Button, Text, TextInput, styles, GlobalContext, countryCode, removeCountryCode, themes} from './Utils'
 import PhoneInput from './PhoneInput'
 import api from './API'
-import {useStore} from './Store'
+import {useStore, StoreState} from './Store'
 
 const debug = false
 
@@ -22,15 +22,19 @@ export const LoginScreen = () => {
   const [smsCodeEntered, setSmsCodeEntered] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const {setAuthToken, phone, setPhone} = React.useContext(GlobalContext)
-  const {theme} = useStore()
+  const {setAuthToken, phone, setPhone} = React.useContext(GlobalContext) as {
+    setAuthToken: (token: string) => void
+    phone: string
+    setPhone: (phone: string) => void
+  }
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   const smsCodeFieldRef = useRef()
 
   const handleLogin = async () => {
     if (phone === '' && smsCode === '') return setError("Oops, phone number and SMS code can't be blank!")
     if (phone === '') return setError("Oops, phone number can't be blank!")
     if (smsCode === '') return setError("Oops, SMS code can't be blank!")
-    setError(null) // clear error messages from screen
+    setError('') // clear error messages from screen
 
     try {
       const response = await api.post('/login', null, {params: {phone, smsCode}})
@@ -73,7 +77,12 @@ export const LoginScreen = () => {
   }
   */
   return (
-    <View style={styles(theme).container} onStartShouldSetResponder={(evt) => Keyboard.dismiss() && false}>
+    <View
+      style={styles(theme).container}
+      onStartShouldSetResponder={(evt) => {
+        Keyboard.dismiss()
+        return false
+      }}>
       <View>
         <Text style={{fontSize: 22, textAlign: 'center', color: themes[theme].text_secondary, marginTop: 120}}>Welcome to</Text>
         <Text style={{fontSize: 52, textAlign: 'center', color: themes[theme].text_primary, fontFamily: 'SFCompactRounded_Bold'}}>
@@ -108,16 +117,13 @@ export const LoginScreen = () => {
             keyboardType="number-pad"
           />
         )}
-        {validPhone && smsCodeEntered && <Button title="Login →" onPress={handleLogin} />}
+        {validPhone && smsCodeEntered && <Button title="Login →" onPress={handleLogin} btnStyle={null} textStyle={null} />}
       </View>
 
-      {debug && (
-        <>
-          <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} />
-          <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(authToken)} />
-          <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} />
-        </>
-      )}
+      {/* Turning these off for now because the functions don't exist */}
+      {/* <Button title="Clear except AsyncStorage" onPress={clearExceptAsyncStorage} btnStyle={null} textStyle={null} />
+      <Button title="Test GOOD authenticated request" onPress={authenticatedRequest(authToken)} btnStyle={null} textStyle={null} />
+      <Button title="Test BAD authenticated request" onPress={authenticatedRequest('garbage')} btnStyle={null} textStyle={null} /> */}
     </View>
   )
 }

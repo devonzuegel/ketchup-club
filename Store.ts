@@ -8,7 +8,7 @@ export interface StoreState {
   address: LocationGeocodedAddress
   location: LocationObject
   locationPermissionGranted: boolean
-  theme: string
+  theme: 'light' | 'dark'
   setAddress: (a: LocationGeocodedAddress) => void
   setLocation: (l: LocationObject) => void
   setLocationPermissionGranted: (lpg: boolean) => void
@@ -48,7 +48,12 @@ In a React component:
 
       or
 
-      const {address} = useStore() as StoreState # in typescript
+      const {address} = useStore((state: StoreState) => state.address) as StoreState # in typescript
+
+      or possibly better:
+
+      const address = useStore((state: StoreState) => state.address)
+
 
     The component will be bound to value in the store, so the UI will update when the store updates.
 

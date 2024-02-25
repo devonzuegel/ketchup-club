@@ -61,44 +61,44 @@ export async function registerForPushNotificationsAsync() {
   }
 }
 
-// currently un-used
-export const usePushNotificationRouter = () => {
-  const notificationListener = useRef()
-  const responseListener = useRef()
-  const [expoPushToken, setExpoPushToken] = useState('')
+// currently un-used: Commenting out since it is giving us some type errors
+// export const usePushNotificationRouter = () => {
+//   const notificationListener = useRef()
+//   const responseListener = useRef()
+//   const [expoPushToken, setExpoPushToken] = useState('')
 
-  //   const router = useRouter();
+//   //   const router = useRouter();
 
-  useEffect(() => {
-    // This listener is fired whenever a notification is received while the app is foregrounded
-    notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
-      console.log('notification', notification)
-    })
+//   useEffect(() => {
+//     // This listener is fired whenever a notification is received while the app is foregrounded
+//     notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
+//       console.log('notification', notification)
+//     })
 
-    // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
-    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log('incoming notification', response)
-      const {
-        notification: {
-          request: {
-            content: {
-              data: {url},
-            },
-          },
-        },
-      } = response
+//     // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
+//     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+//       console.log('incoming notification', response)
+//       const {
+//         notification: {
+//           request: {
+//             content: {
+//               data: {url},
+//             },
+//           },
+//         },
+//       } = response
 
-      if (url) {
-        console.log('should navigate to', url)
-        //   router.push(url);
-      }
-    })
+//       if (url) {
+//         console.log('should navigate to', url)
+//         //   router.push(url);
+//       }
+//     })
 
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current)
-      Notifications.removeNotificationSubscription(responseListener.current)
-    }
-  }, [])
+//     return () => {
+//       Notifications.removeNotificationSubscription(notificationListener.current)
+//       Notifications.removeNotificationSubscription(responseListener.current)
+//     }
+//   }, [])
 
-  return [expoPushToken, setExpoPushToken]
-}
+//   return [expoPushToken, setExpoPushToken]
+// }
