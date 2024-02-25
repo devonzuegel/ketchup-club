@@ -2,7 +2,7 @@ import {View, Keyboard, Dimensions, FlatList} from 'react-native'
 import {Text, TextInput, styles, NavBtns, Header, DotAnimation, GlobalContext, themes, formatPhone, Spacer} from './Utils'
 import api from './API'
 import React from 'react'
-import {useStore} from './Store'
+import {StoreState, useStore} from './Store'
 
 export const mockFriends = [
   {phoneNumber: '+1-123-123-1234', name: 'Alicia'},
@@ -10,7 +10,8 @@ export const mockFriends = [
   {phoneNumber: '+1-123-123-1234', name: 'Charlie'},
 ]
 
-export const fetchFriends = (authToken, setFriends) => async () => {
+// I need to figure out the type of the friends array
+export const fetchFriends = (authToken: string, setFriends: React.Dispatch<React.SetStateAction<any[]>>) => async () => {
   console.log(authToken.slice(-5) + '  ' + new Date(Date.now()).toLocaleString() + ' fetchFriends — ')
   api
     .get('/users', {
@@ -32,7 +33,7 @@ export const fetchFriends = (authToken, setFriends) => async () => {
 }
 
 const SearchBar = () => {
-  const {theme} = useStore()
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   return (
     <View
       style={{
@@ -46,7 +47,7 @@ const SearchBar = () => {
         paddingVertical: 5,
         paddingHorizontal: 10,
         borderRadius: 100,
-        backgroundColor: themes[theme].text_input_bkgd,
+        backgroundColor: (themes[theme] as any).text_input_bkgd,
       }}>
       <Text style={{fontSize: 16}}>🔍</Text>
       <TextInput
@@ -65,8 +66,8 @@ const SearchBar = () => {
   )
 }
 
-const Friend = ({screen_name, phone}) => {
-  const {theme} = useStore()
+const Friend = ({screen_name, phone}: {screen_name: string; phone: string}) => {
+  const {theme} = useStore((state: StoreState) => state) as StoreState
   return (
     <View
       style={{
@@ -90,9 +91,16 @@ const Friend = ({screen_name, phone}) => {
   )
 }
 
-export function FriendsScreen({navigation}) {
-  const {friends, setFriends, authToken, phone} = React.useContext(GlobalContext)
-  const {theme} = useStore()
+// Not sure what the type is here
+// export function FriendsScreen({navigation}) {
+export function FriendsScreen({navigation}: {navigation: any}) {
+  const {friends, setFriends, authToken, phone} = React.useContext(GlobalContext) as {
+    friends: any[]
+    setFriends: React.Dispatch<React.SetStateAction<any[]>>
+    authToken: string
+    phone: string
+  }
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   React.useEffect(() => {
     fetchFriends(authToken, setFriends)()
     // console.log('friends', JSON.stringify(friends, null, 2), '\n')
@@ -100,7 +108,7 @@ export function FriendsScreen({navigation}) {
 
   const friendsExceptMe =
     friends &&
-    friends.filter(({phone: theirPhone}) => {
+    friends.filter(({phone: theirPhone}: {phone: string}) => {
       // console.log('theirPhone', formatPhone(theirPhone), '  myPhone', formatPhone(phone))
       return formatPhone(theirPhone) !== formatPhone(phone)
     })
@@ -108,19 +116,22 @@ export function FriendsScreen({navigation}) {
   return (
     <View
       style={{...styles(theme).container, ...styles(theme).flexColumn}}
-      onStartShouldSetResponder={(evt) => Keyboard.dismiss() && false}>
+      onStartShouldSetResponder={(evt) => {
+        Keyboard.dismiss()
+        return false
+      }}>
       <View style={{marginTop: 48, flexDirection: 'column', flex: 1}}>
         <Header style={{fontSize: 28, color: themes[theme].text_secondary}}>Friends</Header>
         {/* <SearchBar /> */}
         <Spacer />
-
         {friendsExceptMe == null ? (
           <DotAnimation style={{alignSelf: 'center', width: 80, marginTop: 12}} />
         ) : (
           <View style={{flex: 1 /* fill the rest of the screen */}}>
             <FlatList
               data={friendsExceptMe}
-              renderItem={({item: {screen_name, phone}, id}) => <Friend screen_name={screen_name} phone={phone} />}
+              // renderItem={({item: {screen_name, phone}, id}) => <Friend screen_name={screen_name} phone={phone} />}
+              renderItem={({item: {screen_name, phone}}) => <Friend screen_name={screen_name} phone={phone} />}
               keyExtractor={(meta_item, index) => index.toString()} //Add this line
               scrollEnabled
             />

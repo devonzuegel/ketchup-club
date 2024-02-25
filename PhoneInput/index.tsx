@@ -10,6 +10,7 @@ import CountryPicker, {
 } from 'react-native-country-picker-modal'
 import {PhoneNumberUtil} from 'google-libphonenumber'
 import styles from './styles'
+import {useStore, StoreState} from '../Store'
 
 const debug = false
 
@@ -129,7 +130,26 @@ class PhoneInput extends PureComponent {
 
   render() {
     // const {theme} = React.useContext(GlobalContext)
-    const theme = 'light'
+    const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
+
+    interface PhoneInputProps {
+      withDarkTheme: boolean
+      codeTextStyle: object
+      textInputProps: object
+      textInputStyle: object
+      autoFocus: boolean
+      placeholder: string
+      disableArrowIcon: boolean
+      flagButtonStyle: object
+      containerStyle: object
+      textContainerStyle: object
+      renderDropdownImage: object
+      countryPickerProps: object
+      filterProps: object
+      countryPickerButtonStyle: object
+      layout: string
+    }
+
     const {
       withDarkTheme,
       codeTextStyle,
@@ -146,8 +166,17 @@ class PhoneInput extends PureComponent {
       filterProps = {},
       countryPickerButtonStyle,
       layout = 'first',
-    } = this.props
-    const {modalVisible, code, countryCode, number, disabled} = this.state
+    } = this.props as PhoneInputProps
+
+    interface PhoneInputState {
+      modalVisible: boolean
+      code: string
+      countryCode: string
+      number: string
+      disabled: boolean
+    }
+
+    const {modalVisible, code, countryCode, number, disabled} = this.state as PhoneInputState
     return (
       <CountryModalProvider>
         <View style={[styles.container, containerStyle ? containerStyle : {}]}>
@@ -215,9 +244,21 @@ export const isValidNumber = (number, countryCode) => {
   }
 }
 
-const PhoneInputComponent = ({phone, setPhone, validPhone, setValidPhone, defaultCountryCode}) => {
+const PhoneInputComponent = ({
+  phone,
+  setPhone,
+  validPhone,
+  setValidPhone,
+  defaultCountryCode,
+}: {
+  phone: string
+  setPhone: (phone: string) => void
+  validPhone: boolean
+  setValidPhone: (validPhone: boolean) => void
+  defaultCountryCode: string
+}) => {
   const ref = useRef()
-  const {theme} = React.useContext(GlobalContext)
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
 
   return (
     <>
