@@ -106,6 +106,8 @@ class Firestore {
         // destroy database subscriptions
         store.setState((state: StoreState) => {
           state.setUser(null)
+          state.setLocation(null)
+          state.setStatus(null)
           state.setFriends([])
           // state.setOnlineFriends([])
           state.setStatuses([])
@@ -120,6 +122,12 @@ class Firestore {
         }
         if (this.userUnsubsriber) {
           this.userUnsubsriber()
+        }
+        if (this.locationUnsubscriber) {
+          this.locationUnsubscriber()
+        }
+        if (this.statusUnsubscriber) {
+          this.statusUnsubscriber()
         }
         // if (this.onlineFriendsUnsubscriber) {
         //   this.onlineFriendsUnsubscriber()
@@ -146,7 +154,7 @@ class Firestore {
         const users = querySnapshot.docs.map((doc) => ({
           ...(doc.data() as User),
           uid: doc.id,
-          // remove location and status from user object
+          // remove location and status from user object because they are doc references and can't be stored in JSON
           location: undefined,
           status: undefined,
         }))
@@ -158,6 +166,7 @@ class Firestore {
   private subscribeToLocationsInFirestore(): Unsubscribe {
     const subscriber = firestore()
       .collection('locations')
+      .where('visibility', '==', 'public')
       .onSnapshot((querySnapshot) => {
         if (!querySnapshot) {
           // console.log('no Friends querySnapshot')
@@ -177,16 +186,19 @@ class Firestore {
     const subscriber = firestore()
       .collection('statuses')
       .where('online', '==', true)
-      .where('expiry', '>', firestore.Timestamp.now())
+      // .where('expiry', '>', firestore.Timestamp.now()) // this doesn't work well
+      .where('visibility', '==', 'public')
       .onSnapshot((querySnapshot) => {
         if (!querySnapshot) {
+          console.log('no statuses querySnapshot')
           return
         }
-        // console.log('getting data about statuses:', querySnapshot.docs.length)
-        const statuses = querySnapshot.docs.map((doc) => ({
+        console.log('getting data about statuses:', querySnapshot.docs.length)
+        let statuses = querySnapshot.docs.map((doc) => ({
           ...(doc.data() as Status),
           uid: doc.id,
         }))
+        statuses = statuses.filter((status) => status.expiry.toMillis() > Date.now())
         for (const status of statuses) {
           if (status.expiry && status.expiry.toMillis() > Date.now()) {
             const timer = setTimeout(() => {
@@ -279,10 +291,6 @@ class Firestore {
     const {user} = store.getState() as StoreState
     // console.log('user:', user)
     if (user) {
-      // let l: {} = {}
-      // if (!location.visibility) {
-      //   location = {...location, visibility: 'public'}
-      // }
       firestore()
         .collection('locations')
         .doc(user.uid)
@@ -302,21 +310,23 @@ class Firestore {
     }
   }
 
+  public follow(uid: string): void {
+    const {user} = store.getState() as StoreState
+    if (user) {
+      firestore().collection('users').doc(user.uid).collection('following').doc(uid).set({})
+    }
+  }
+
+  public unfollow(uid: string): void {
+    const {user} = store.getState() as StoreState
+    if (user) {
+      firestore().collection('users').doc(user.uid).collection('following').doc(uid).delete()
+    }
+  }
+
   public setStatusOnline(expiry?: FirebaseFirestoreTypes.Timestamp, visibility?: string): void {
     const {user} = store.getState() as StoreState
     if (user) {
-      // let status = new Object() as statusForPublishing
-      // status.online = true
-      // status.went_online = firestore.FieldValue.serverTimestamp()
-      // if (expiry) {
-      //   status.expiry = expiry
-      // }
-      // if (visibility) {
-      //   status.visibility = visibility
-      // } else {
-      //   status.visibility = 'public'
-      // }
-
       firestore()
         .collection('statuses')
         .doc(user.uid)
