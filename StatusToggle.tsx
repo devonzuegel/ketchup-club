@@ -7,7 +7,7 @@ import {StyleSheet} from 'react-native'
 import firestore from '@react-native-firebase/firestore'
 import {hasPlatformFeatureAsync} from 'expo-device'
 
-const setOfflineAfterNMins = __DEV__ ? 0.2 : 15
+const setOfflineAfterNMins = __DEV__ ? 0.1 : 15
 
 export function StatusToggle() {
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'

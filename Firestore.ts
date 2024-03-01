@@ -142,7 +142,7 @@ class Firestore {
           // console.log('no Friends querySnapshot')
           return
         }
-        console.log('getting data about friends:', querySnapshot.docs.length)
+        // console.log('getting data about friends:', querySnapshot.docs.length)
         const users = querySnapshot.docs.map((doc) => ({
           ...(doc.data() as User),
           uid: doc.id,
@@ -163,7 +163,7 @@ class Firestore {
           // console.log('no Friends querySnapshot')
           return
         }
-        console.log('getting data about locations:', querySnapshot.docs.length)
+        // console.log('getting data about locations:', querySnapshot.docs.length)
         const locations = querySnapshot.docs.map((doc) => ({
           ...(doc.data() as Location),
           uid: doc.id,
@@ -182,7 +182,7 @@ class Firestore {
         if (!querySnapshot) {
           return
         }
-        console.log('getting data about statuses:', querySnapshot.docs.length)
+        // console.log('getting data about statuses:', querySnapshot.docs.length)
         const statuses = querySnapshot.docs.map((doc) => ({
           ...(doc.data() as Status),
           uid: doc.id,
@@ -210,10 +210,10 @@ class Firestore {
       .doc(user.uid)
       .onSnapshot((doc) => {
         if (!doc) {
-          console.log('no doc for user:', user.uid)
+          // console.log('no doc for user:', user.uid)
           return
         }
-        console.log('getting data for user:', user.uid)
+        // console.log('getting data for user:', user.uid)
         const u = {
           ...(doc.data() as User),
           uid: doc.id,
@@ -232,10 +232,10 @@ class Firestore {
       .doc(user.uid)
       .onSnapshot((doc) => {
         if (!doc) {
-          console.log('no location for user:', user.uid)
+          // console.log('no location for user:', user.uid)
           return
         }
-        console.log('getting location for user:', user.uid)
+        // console.log('getting location for user:', user.uid)
         const l = {
           ...(doc.data() as Location),
           uid: doc.id,
@@ -251,10 +251,10 @@ class Firestore {
       .doc(user.uid)
       .onSnapshot((doc) => {
         if (!doc) {
-          console.log('no status for user:', user.uid)
+          // console.log('no status for user:', user.uid)
           return
         }
-        console.log('getting status for user:', user.uid)
+        // console.log('getting status for user:', user.uid)
         const s = {
           ...(doc.data() as Status),
           uid: doc.id,
