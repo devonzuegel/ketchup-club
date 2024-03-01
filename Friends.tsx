@@ -2,7 +2,7 @@ import {View, Keyboard, Dimensions, FlatList} from 'react-native'
 import {Text, TextInput, styles, NavBtns, Header, DotAnimation, themes, formatPhone, Spacer} from './Utils'
 import React from 'react'
 import {StoreState, useStore} from './Store'
-import {fs, User} from './Firestore'
+import {fs, User, Location, RenderedUser} from './Firestore'
 import {FriendsScreenNavigationProp} from './App'
 
 const SearchBar = () => {
@@ -81,6 +81,20 @@ const Friend = ({
 export function FriendsScreen({navigation}: {navigation: FriendsScreenNavigationProp}) {
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   const friends = useStore((state: StoreState) => state.friends) as User[]
+  const locations = useStore((state: StoreState) => state.locations) as Location[]
+  const [friendsWithLocations, setFriendsWithLocations] = React.useState<RenderedUser[]>([])
+
+  React.useEffect(() => {
+    // console.log('friends:', friends)
+    // console.log('locations:', locations)
+    if (friends == null || locations == null) return
+    const friendsWithLocations = friends.map((friend) => {
+      const location = locations.find((loc) => loc.uid === friend.uid)
+      return {...friend, location: location}
+    })
+    // console.log('friendsWithLocations:', friendsWithLocations)
+    setFriendsWithLocations(friendsWithLocations)
+  }, [friends, locations])
 
   return (
     <View
@@ -93,12 +107,12 @@ export function FriendsScreen({navigation}: {navigation: FriendsScreenNavigation
         <Header style={{fontSize: 28, color: themes[theme].text_secondary}}>Friends</Header>
         <SearchBar />
         <Spacer />
-        {friends == null ? (
+        {friendsWithLocations == null ? (
           <DotAnimation style={{alignSelf: 'center', width: 80, marginTop: 12}} />
         ) : (
           <View style={{flex: 1 /* fill the rest of the screen */}}>
             <FlatList
-              data={friends}
+              data={friendsWithLocations}
               // renderItem={({item: {screen_name, phone}, id}) => <Friend screen_name={screen_name} phone={phone} />}
               renderItem={({item: {name, phone, location}}) => <Friend name={name} phone={phone} location={location} />}
               keyExtractor={(meta_item, index) => index.toString()} //Add this line

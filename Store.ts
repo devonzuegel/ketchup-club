@@ -2,20 +2,29 @@ import {useStore as use} from 'zustand'
 import {createStore} from 'zustand/vanilla'
 import {createJSONStorage, persist} from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {User} from './Firestore'
+import {User, Status, Location} from './Firestore'
 
 export interface StoreState {
   user: User | null
   setUser: (u: User | null) => void
+  status: Status | null
+  setStatus: (s: Status | null) => void
+  location: Location | null
+  setLocation: (l: Location | null) => void
   friends: User[]
   setFriends: (f: User[]) => void
-  onlineFriends: User[]
-  setOnlineFriends: (f: User[]) => void
+  statuses: Status[]
+  setStatuses: (s: Status[]) => void
+  removeStatus: (id: string) => void
+  locations: Location[]
+  setLocations: (l: Location[]) => void
+  // onlineFriends: User[]
+  // setOnlineFriends: (f: User[]) => void
   locationPermissionGranted: boolean
   setLocationPermissionGranted: (lpg: boolean) => void
   theme: 'light' | 'dark'
   setTheme: (t: 'light' | 'dark') => void
-  removeOnlineFriend: (id: string) => void
+  // removeOnlineFriend: (id: string) => void
 }
 
 export const store = createStore<StoreState>()(
@@ -27,14 +36,26 @@ export const store = createStore<StoreState>()(
       setLocationPermissionGranted: (lpg: boolean) => set({locationPermissionGranted: lpg}),
       user: null,
       setUser: (u: User | null) => set({user: u}),
+      status: null,
+      setStatus: (s: Status | null) => set({status: s}),
+      location: null,
+      setLocation: (l: Location | null) => set({location: l}),
       friends: [],
       setFriends: (f: User[]) => set({friends: f}),
-      onlineFriends: [],
-      setOnlineFriends: (f: User[]) => set({onlineFriends: f}),
-      removeOnlineFriend: (id: string) =>
+      statuses: [],
+      setStatuses: (s: Status[]) => set({statuses: s}),
+      removeStatus: (id: string) =>
         set((state: StoreState) => ({
-          onlineFriends: state.onlineFriends.filter((user: User) => user.uid !== id),
+          statuses: state.statuses.filter((status: Status) => status.uid !== id),
         })),
+      locations: [],
+      setLocations: (l: Location[]) => set({locations: l}),
+      // onlineFriends: [],
+      // setOnlineFriends: (f: User[]) => set({onlineFriends: f}),
+      // removeOnlineFriend: (id: string) =>
+      //   set((state: StoreState) => ({
+      //     onlineFriends: state.onlineFriends.filter((user: User) => user.uid !== id),
+      //   })),
     }),
     {
       name: 'global-storage', // unique name

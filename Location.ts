@@ -17,8 +17,8 @@ NativeLocation is not available on Expo or Android, but it can be imported becau
 
 // const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient
 
-class Location {
-  private static instance: Location
+class LocationController {
+  private static instance: LocationController
   private static isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient
   private static useNativeLocation = Platform.OS === 'ios' && !this.isExpoGo
   private lastGeocodeTime = 0
@@ -26,21 +26,21 @@ class Location {
   private locationSubscription: Subscription | null = null
 
   private constructor() {
-    console.log('useNativeLocation:', Location.useNativeLocation)
+    console.log('useNativeLocation:', LocationController.useNativeLocation)
     this.initializeSubscriptions()
     this.initializeLocationServices()
   }
 
-  public static getInstance(): Location {
-    if (!Location.instance) {
-      Location.instance = new Location()
+  public static getInstance(): LocationController {
+    if (!LocationController.instance) {
+      LocationController.instance = new LocationController()
       console.log('Location instance created')
     }
-    return Location.instance
+    return LocationController.instance
   }
 
   private initializeSubscriptions() {
-    if (Location.useNativeLocation) {
+    if (LocationController.useNativeLocation) {
       const statusSubscription = NativeLocation.addAuthorizationChangeListener(({status: status}) => {
         console.log('NativeLocation permission status changed', status)
 
@@ -95,7 +95,7 @@ class Location {
   }
 
   public async requestLocationPermission() {
-    if (Location.useNativeLocation) {
+    if (LocationController.useNativeLocation) {
       NativeLocation.requestPermission()
       return
     } else {
@@ -110,7 +110,7 @@ class Location {
     }
   }
   public async startMonitoringLocation() {
-    if (Location.useNativeLocation) {
+    if (LocationController.useNativeLocation) {
       NativeLocation.startMonitoring()
     } else {
       // note that the timeInterval parameter only works on Android and seems to negate distanceInterval, so don't use it
@@ -120,7 +120,7 @@ class Location {
   }
 
   public stopMonitoringLocation() {
-    if (Location.useNativeLocation) {
+    if (LocationController.useNativeLocation) {
       NativeLocation.stopMonitoring()
     } else {
       this.locationSubscription?.remove()
@@ -131,7 +131,7 @@ class Location {
     // console.log('Location updated', loc)
     if (loc == null) return
 
-    if (Location.useNativeLocation) {
+    if (LocationController.useNativeLocation) {
       locationService.performGeocode(loc)
     } else {
       // We need to conserve on-device geocoding resources. We have asked the Expo Location module to only send us updates every 500 meters, but it seems to give us updates more often than that. So we will only reverse geocode if at least two minutes have passed.
@@ -171,7 +171,7 @@ class Location {
   }
 }
 
-export const locationService = Location.getInstance()
+export const locationService = LocationController.getInstance()
 
 // this function is triggered by the user on the settings page
 export const enableLocation = () => {

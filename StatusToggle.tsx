@@ -1,7 +1,7 @@
 import React from 'react'
 import {View, Text} from 'react-native'
 import {useStore, StoreState} from './Store'
-import {fs, User} from './Firestore'
+import {fs, Status} from './Firestore'
 import {themes, Header} from './Utils'
 import {StyleSheet} from 'react-native'
 import firestore from '@react-native-firebase/firestore'
@@ -11,21 +11,14 @@ const setOfflineAfterNMins = __DEV__ ? 0.2 : 15
 
 export function StatusToggle() {
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
-  const user = useStore((state: StoreState) => state.user) as User | null
-  const [isOnline, setIsOnline] = React.useState(false)
+  const status = useStore((state: StoreState) => state.status) as Status | null
+
   const [timeRemaining, setTimeRemaining] = React.useState('eventually')
 
   React.useEffect(() => {
-    function isOnline() {
-      if (!user?.status) return false
-      return user.status?.online && user.status?.expiry.toMillis() > Date.now()
-    }
-
-    if (user) setIsOnline(isOnline())
-
     const updateTimeRemaining = () => {
-      if (user) {
-        const expiry = user?.status?.expiry.toMillis()
+      if (status) {
+        const expiry = status.expiry.toMillis()
         if (expiry) {
           setTimeRemaining(soonInEnglish(expiry))
         }
@@ -34,7 +27,7 @@ export function StatusToggle() {
 
     let interval: NodeJS.Timeout
 
-    if (user && isOnline()) {
+    if (status?.online) {
       updateTimeRemaining()
       interval = setInterval(updateTimeRemaining, 5000)
     }
@@ -42,7 +35,7 @@ export function StatusToggle() {
     return () => {
       clearInterval(interval)
     }
-  }, [user])
+  }, [status])
 
   return (
     <View>
@@ -52,7 +45,7 @@ export function StatusToggle() {
           style={{
             ...homeStyles(theme).toggleBtn,
             backgroundColor: themes[theme].text_input_placeholder,
-            ...(!isOnline ? homeStyles(theme).toggleBtnSelected : {backgroundColor: 'transparent'}),
+            ...(!status?.online ? homeStyles(theme).toggleBtnSelected : {backgroundColor: 'transparent'}),
           }}>
           <Text
             onPress={() => {
@@ -60,7 +53,7 @@ export function StatusToggle() {
             }}
             style={{
               ...homeStyles(theme).toggleBtnText,
-              ...(!isOnline ? homeStyles(theme).toggleBtnTextSelected : {}),
+              ...(!status?.online ? homeStyles(theme).toggleBtnTextSelected : {}),
             }}>
             Offline
           </Text>
@@ -69,7 +62,7 @@ export function StatusToggle() {
           style={{
             ...homeStyles(theme).toggleBtn,
             backgroundColor: '#32C084',
-            ...(isOnline ? homeStyles(theme).toggleBtnSelected : {backgroundColor: 'transparent'}),
+            ...(status?.online ? homeStyles(theme).toggleBtnSelected : {backgroundColor: 'transparent'}),
           }}>
           <Text
             onPress={() => {
@@ -78,7 +71,7 @@ export function StatusToggle() {
             }}
             style={{
               ...homeStyles(theme).toggleBtnText,
-              ...(isOnline ? homeStyles(theme).toggleBtnTextSelected : {}),
+              ...(status?.online ? homeStyles(theme).toggleBtnTextSelected : {}),
             }}>
             Online
           </Text>
@@ -95,7 +88,7 @@ export function StatusToggle() {
           maxWidth: '80%',
           alignSelf: 'center',
         }}>
-        {!isOnline // TODO: make countdown timer dynamic
+        {!status?.online // TODO: make countdown timer dynamic
           ? "You'll go offline after " + setOfflineAfterNMins + ' minutes'
           : "You'll go offline " + timeRemaining}
       </Text>

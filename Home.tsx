@@ -3,7 +3,7 @@ import {StyleSheet, View, AppState} from 'react-native'
 import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone, themes, Spacer} from './Utils'
 import {callNumber} from './Phone'
 import {useStore, StoreState} from './Store'
-import {fs, User} from './Firestore'
+import {fs, User, RenderedUser, Location, Status} from './Firestore'
 import auth from '@react-native-firebase/auth'
 import firestore, {FirebaseFirestoreTypes} from '@react-native-firebase/firestore'
 import {HomeScreenNavigationProp} from './App'
@@ -85,20 +85,30 @@ const minsAgo = (mins: number) => new Date().getTime() - 1000 * 60 * mins
 const timestampWithinMins = (timestamp: number, nMins: number) => new Date(timestamp).getTime() > minsAgo(nMins)
 
 export default function HomeScreen({navigation}: {navigation: HomeScreenNavigationProp}) {
-  const {user, onlineFriends} = useStore((state: StoreState) => ({
-    user: state.user,
-    onlineFriends: state.onlineFriends,
-  })) as StoreState
-  // const [unexpiredFriends, setUnexpiredFriends] = React.useState<User[]>([])
-  const [location, setLocation] = React.useState<{city: string; region: string; country: string} | undefined>(undefined)
+  // const {theme, user, location, friends, statuses} = useStore((state: StoreState) => ({
+  //   theme: state.theme,
+  //   user: state.user,
+  //   location: state.location,
+  //   friends: state.onlineFriends,
+  //   statuses: state.statuses,
+  // })) as StoreState
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
+  const user = useStore((state: StoreState) => state.user) as User | null
+  const location = useStore((state: StoreState) => state.location) as Location
+  const friends = useStore((state: StoreState) => state.friends) as User[] | null
+  const statuses = useStore((state: StoreState) => state.statuses) as Status[] | null
+  const [onlineFriends, setOnlineFriends] = React.useState<RenderedUser[]>([])
 
   React.useEffect(() => {
-    if (user) {
-      setLocation(user.location)
-    }
-  }, [user, onlineFriends])
-
-  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
+    if (friends == null || statuses == null) return
+    const onlineFriends = friends
+      .map((f) => {
+        const status = statuses.find((s) => s.uid == f.uid)
+        return {...f, status}
+      })
+      .filter((f) => f.status?.online)
+    setOnlineFriends(onlineFriends)
+  }, [friends, statuses])
 
   return (
     <View style={{...styles(theme).container, ...styles(theme).flexColumn}}>
