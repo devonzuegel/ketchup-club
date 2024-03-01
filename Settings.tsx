@@ -2,22 +2,11 @@ import React from 'react'
 import {View, TouchableOpacity} from 'react-native'
 import {fonts, Text, styles, NavBtns, Header, GlobalContext, formatPhone, themes} from './Utils'
 import {useFonts} from 'expo-font'
-import {registerForPushNotificationsAsync} from './push'
-import AsyncStorage, {AUTH_TOKEN, PHONE, THEME, PUSH_TOKEN} from './AsyncStorage'
-import api from './API'
 import {enableLocation} from './Location'
 import {useStore, StoreState} from './Store'
-
-type GlobalContextType = {
-  phone: string
-  setPhone: (phone: string) => void
-  // WHAT IS THE FRIENDS TYPE?
-  friends: any[]
-  setAuthToken: (authToken: string) => void
-  authToken: string
-  pushToken: string
-  setPushToken: (pushToken: string) => void
-}
+import auth from '@react-native-firebase/auth'
+import {User} from './Firestore'
+import {SettingsScreenNavigationProp} from './App'
 
 const SettingItem = ({
   name,
@@ -69,11 +58,9 @@ const SettingItem = ({
   )
 }
 
-export function SettingsScreen({navigation}) {
-  const {phone, setPhone, friends, setAuthToken, authToken, pushToken, setPushToken} = React.useContext(
-    GlobalContext
-  ) as GlobalContextType
-  const user = friends ? friends.find(({phone: theirPhone}: {phone: string}) => theirPhone == phone) : null
+export function SettingsScreen({navigation}: {navigation: SettingsScreenNavigationProp}) {
+  const user = useStore((state: StoreState) => state.user) as User | null
+
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   const setTheme = useStore((state: StoreState) => state.setTheme) as (theme: 'light' | 'dark') => void
   const locationPermissionGranted = useStore((state: StoreState) => state.locationPermissionGranted)
@@ -83,54 +70,28 @@ export function SettingsScreen({navigation}) {
 
   const logout = () => {
     console.log('logout')
-    api
-      .post('/ping', null, {
-        params: {status: 'offline'},
-        headers: {Authorization: `Bearer ${authToken}`},
-      })
+    auth()
+      .signOut()
       .then(() => {
-        // TODO: create fn to handle setting both the global state & AsyncStorage at the same time so we don't have to always remember to do both
-        setAuthToken('')
-        setPhone('')
-        setPushToken('')
-        AsyncStorage.removeItem(AUTH_TOKEN)
-        AsyncStorage.removeItem(PHONE)
-        AsyncStorage.removeItem(PUSH_TOKEN)
-        // not necessary remove the theme, that can stay on the device since it's not sensitive
+        console.log('Signed out successfully')
       })
-      .catch((err) => console.error('Error logging out of server:', err))
+      .catch((e: Error) => {
+        // ignore error, it appears to be a Firebase bug with accounts that are only Phone Auth
+      })
   }
 
-  const onSetPushNotifications = async () => {
-    if (!pushToken) {
-      const newPushToken = await registerForPushNotificationsAsync()
-      if (newPushToken) {
-        setPushToken(newPushToken)
-        AsyncStorage.setItem(PUSH_TOKEN, newPushToken)
-        await api
-          .post('/push', null, {params: {push_token: newPushToken}, headers: {Authorization: `Bearer ${authToken}`}})
-          .catch((err) => console.error('Error setting push token:', err))
-      } else {
-        console.error('Error getting push token from registerForPushNotificationsAsync()')
-      }
-    } else {
-      setPushToken('')
-      AsyncStorage.removeItem(PUSH_TOKEN)
-      await api
-        .post('/push', null, {params: {push_token: null}, headers: {Authorization: `Bearer ${authToken}`}})
-        .catch((err) => console.error('Error clearing push token:', err))
-    }
-  }
+  const onSetPushNotifications = async () => {}
 
   const settings = [
     [
       'System Permissions',
       {
-        // Contacts: {value: null}, // TODO: put me back
-        'Push notifications': {
-          value: pushToken || AsyncStorage.getItem(PUSH_TOKEN) ? 'Enabled ✅' : 'Disabled ❌',
-          onPress: onSetPushNotifications,
-        },
+        Contacts: {value: null}, // TODO: put me back
+        'Push notifications': {value: null}, // TODO: re-do with Google Cloud Messaging (should be easy)
+        // 'Push notifications': {
+        //   value: pushToken || AsyncStorage.getItem(PUSH_TOKEN) ? 'Enabled ✅' : 'Disabled ❌',
+        //   onPress: onSetPushNotifications,
+        // },
         Location: {
           value: locationPermissionGranted ? 'Enabled ✅' : 'Disabled ❌',
           onPress: enableLocation,
@@ -140,8 +101,8 @@ export function SettingsScreen({navigation}) {
     [
       'Profile',
       {
-        Username: {value: user?.screen_name ? '@' + user?.screen_name : null},
-        Phone: {value: formatPhone(phone)},
+        Username: {value: user?.name ? '@' + user?.name : null},
+        Phone: {value: user?.phone ? formatPhone(user.phone) : null},
         // Avatar: {value: null}, // TODO: put me back
       },
     ],
@@ -173,7 +134,15 @@ export function SettingsScreen({navigation}) {
             ))}
           </View>
         ))}
-        <SettingItem name={'Sign out'} icon="➡️" value="" dangerous onPress={logout} />
+        <SettingItem
+          name={'Sign out'}
+          icon="➡️"
+          value=""
+          dangerous
+          onPress={() => {
+            logout()
+          }}
+        />
       </View>
 
       <NavBtns navigation={navigation} />

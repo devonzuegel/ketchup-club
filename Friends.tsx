@@ -1,36 +1,9 @@
 import {View, Keyboard, Dimensions, FlatList} from 'react-native'
-import {Text, TextInput, styles, NavBtns, Header, DotAnimation, GlobalContext, themes, formatPhone, Spacer} from './Utils'
-import api from './API'
+import {Text, TextInput, styles, NavBtns, Header, DotAnimation, themes, formatPhone, Spacer} from './Utils'
 import React from 'react'
 import {StoreState, useStore} from './Store'
-
-export const mockFriends = [
-  {phoneNumber: '+1-123-123-1234', name: 'Alicia'},
-  {phoneNumber: '+1-123-123-1234', name: 'Bobby'},
-  {phoneNumber: '+1-123-123-1234', name: 'Charlie'},
-]
-
-// I need to figure out the type of the friends array
-export const fetchFriends = (authToken: string, setFriends: React.Dispatch<React.SetStateAction<any[]>>) => async () => {
-  console.log(authToken.slice(-5) + '  ' + new Date(Date.now()).toLocaleString() + ' fetchFriends — ')
-  api
-    .get('/users', {
-      headers: {Authorization: `Bearer ${authToken}`},
-    })
-    .then((result) => {
-      setFriends(result.data)
-      // console.log('fetchFriends result count: ' + result.data.length)
-      // console.log(
-      //   JSON.stringify(
-      //     result.data.map(({screen_name, phone}) => ({screen_name})),
-      //     null,
-      //     2
-      //   )
-      // )
-      return result.data
-    })
-    .catch((err) => console.error('fetchFriends error:', err))
-}
+import {fs, User} from './Firestore'
+import {FriendsScreenNavigationProp} from './App'
 
 const SearchBar = () => {
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
@@ -66,8 +39,21 @@ const SearchBar = () => {
   )
 }
 
-const Friend = ({screen_name, phone}: {screen_name: string; phone: string}) => {
-  const {theme} = useStore((state: StoreState) => state) as StoreState
+const formatLocation = (location: {city: string; region: string; country: string}) => {
+  if (!location) return ''
+  return `${location.city}, ${location.region}`
+}
+
+const Friend = ({
+  name,
+  phone,
+  location,
+}: {
+  name: string
+  phone: string
+  location?: {city: string; region: string; country: string}
+}) => {
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   return (
     <View
       style={{
@@ -82,36 +68,19 @@ const Friend = ({screen_name, phone}: {screen_name: string; phone: string}) => {
         backgroundColor: themes[theme].text_input_bkgd,
         borderRadius: 8,
       }}>
-      <Text style={{fontSize: 32, color: themes[theme].text_emphasis, fontFamily: 'SFCompactRounded_Semibold'}}>
-        @{screen_name}
-      </Text>
-      <Text style={{fontSize: 16, color: themes[theme].text_secondary}}>{formatPhone(phone)}</Text>
+      <Text style={{fontSize: 32, color: themes[theme].text_emphasis, fontFamily: 'SFCompactRounded_Semibold'}}>@{name}</Text>
+      <View style={{flexDirection: 'column', alignItems: 'flex-end'}}>
+        {location ? <Text style={{fontSize: 16, color: themes[theme].text_secondary}}>{formatLocation(location)}</Text> : null}
+        <Text style={{fontSize: 16, color: themes[theme].text_secondary}}>{formatPhone(phone)}</Text>
+      </View>
       {/* <Text style={{fontSize: 32}}>{screen_name.length % 5 == 0 ? '🔔' : '🔕'}</Text> */}
     </View>
   )
 }
 
-// Not sure what the type is here
-// export function FriendsScreen({navigation}) {
-export function FriendsScreen({navigation}: {navigation: any}) {
-  const {friends, setFriends, authToken, phone} = React.useContext(GlobalContext) as {
-    friends: any[]
-    setFriends: React.Dispatch<React.SetStateAction<any[]>>
-    authToken: string
-    phone: string
-  }
+export function FriendsScreen({navigation}: {navigation: FriendsScreenNavigationProp}) {
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
-  React.useEffect(() => {
-    fetchFriends(authToken, setFriends)()
-    // console.log('friends', JSON.stringify(friends, null, 2), '\n')
-  }, [])
-
-  const friendsExceptMe =
-    friends &&
-    friends.filter(({phone: theirPhone}: {phone: string}) => {
-      // console.log('theirPhone', formatPhone(theirPhone), '  myPhone', formatPhone(phone))
-      return formatPhone(theirPhone) !== formatPhone(phone)
-    })
+  const friends = useStore((state: StoreState) => state.friends) as User[]
 
   return (
     <View
@@ -122,16 +91,16 @@ export function FriendsScreen({navigation}: {navigation: any}) {
       }}>
       <View style={{marginTop: 48, flexDirection: 'column', flex: 1}}>
         <Header style={{fontSize: 28, color: themes[theme].text_secondary}}>Friends</Header>
-        {/* <SearchBar /> */}
+        <SearchBar />
         <Spacer />
-        {friendsExceptMe == null ? (
+        {friends == null ? (
           <DotAnimation style={{alignSelf: 'center', width: 80, marginTop: 12}} />
         ) : (
           <View style={{flex: 1 /* fill the rest of the screen */}}>
             <FlatList
-              data={friendsExceptMe}
+              data={friends}
               // renderItem={({item: {screen_name, phone}, id}) => <Friend screen_name={screen_name} phone={phone} />}
-              renderItem={({item: {screen_name, phone}}) => <Friend screen_name={screen_name} phone={phone} />}
+              renderItem={({item: {name, phone, location}}) => <Friend name={name} phone={phone} location={location} />}
               keyExtractor={(meta_item, index) => index.toString()} //Add this line
               scrollEnabled
             />

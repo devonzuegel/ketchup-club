@@ -56,7 +56,7 @@ class PhoneInput extends PureComponent {
     return this.state.code
   }
 
-  isValidNumber = (number) => {
+  isValidNumber = (number: string) => {
     try {
       const {countryCode} = this.state
       const parsedNumber = phoneUtil.parse(number, countryCode)
@@ -130,7 +130,7 @@ class PhoneInput extends PureComponent {
 
   render() {
     // const {theme} = React.useContext(GlobalContext)
-    const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
+    const {theme} = this.props
 
     interface PhoneInputProps {
       withDarkTheme: boolean
@@ -235,7 +235,7 @@ class PhoneInput extends PureComponent {
   }
 }
 
-export const isValidNumber = (number, countryCode) => {
+export const isValidNumber = (number: string, countryCode: string) => {
   try {
     const parsedNumber = phoneUtil.parse(number, countryCode)
     return phoneUtil.isValidNumber(parsedNumber)
@@ -257,7 +257,7 @@ const PhoneInputComponent = ({
   setValidPhone: (validPhone: boolean) => void
   defaultCountryCode: string
 }) => {
-  const ref = useRef()
+  const ref = useRef<PhoneInput>(null)
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
 
   return (
@@ -272,15 +272,16 @@ const PhoneInputComponent = ({
         <PhoneInput
           disableArrowIcon
           ref={ref}
+          theme={theme}
           defaultValue={phone}
           defaultCode={defaultCountryCode || 'US'}
           layout="first"
-          onChangeFormattedText={(formatted) => {
+          onChangeFormattedText={(formatted: string) => {
             const checkValid = ref.current?.isValidNumber(formatted)
-            setValidPhone(checkValid)
+            setValidPhone(Boolean(checkValid))
             setPhone(formatted)
           }}
-          onChangeCountry={(text) => {
+          onChangeCountry={(text: string) => {
             console.log('onChangeCountry text:')
             console.log(JSON.stringify(text, null, 2))
             console.log()

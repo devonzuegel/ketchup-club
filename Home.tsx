@@ -2,142 +2,14 @@ import React from 'react'
 import {StyleSheet, View, AppState} from 'react-native'
 import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone, themes, Spacer} from './Utils'
 import {callNumber} from './Phone'
-import {fetchFriends} from './Friends'
-import api from './API'
-import {useStore} from './Store'
+import {useStore, StoreState} from './Store'
+import {fs, User} from './Firestore'
+import auth from '@react-native-firebase/auth'
+import firestore, {FirebaseFirestoreTypes} from '@react-native-firebase/firestore'
+import {HomeScreenNavigationProp} from './App'
+import {StatusToggle} from './StatusToggle'
 
-const setOfflineAfterNMins = __DEV__ ? 0.1 : 15
-const nSecondsFetchFriends = __DEV__ ? 20 : 5 // refetch more slowly in dev so we don't make ngrok mad
-
-function OnlineOfflineToggle() {
-  const [pingInterval, setPingInterval] = React.useState(null)
-  const {setFriends, phone, authToken, status, setStatus} = React.useContext(GlobalContext)
-  const {theme} = useStore()
-
-  const refreshStatusFromDB = async () => {
-    try {
-      await fetchFriends(authToken, (freshFriends) => {
-        setFriends(freshFriends)
-        const myPhone = phone
-        const myProfile = freshFriends ? freshFriends.find(({phone: thisPhone}) => thisPhone == myPhone) : null
-        const lastUpdatedDate = new Date(myProfile?.updated_at)
-        const lastUpdatedMins = (Date.now() - lastUpdatedDate) / 1000 / 60
-        if (myProfile?.status) {
-          const newStatus = lastUpdatedMins < setOfflineAfterNMins ? myProfile.status : 'offline' // if last updated >N mins ago, set to offline
-          console.log(JSON.stringify({authToken, lastUpdatedMins, statusFromDB: myProfile?.status, newStatus}, null, 2))
-          setStatus(newStatus)
-          // once we've calculated the new status, update the db
-          // TODO: send the user a push notification letting them know we set them to offline automatically
-          api.post('/ping', null, {
-            params: {status: newStatus},
-            headers: {Authorization: `Bearer ${authToken}`},
-          })
-        }
-      })()
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  async function pingServer({status}) {
-    console.log(new Date(Date.now()).toLocaleString() + ' pingServer – new status: ' + status)
-    api
-      .post('/ping', null, {
-        params: {status},
-        headers: {Authorization: `Bearer ${authToken}`},
-      })
-      .then((result) => console.log('        pingServer result:', result.data))
-      .catch((error) => console.log('        pingServer  error:', error))
-  }
-
-  const handleAppGoesToForeground = () => {
-    console.log(authToken.slice(-5) + '  —  App has come to the foreground! 👀 ')
-    fetchFriends(authToken, setFriends)()
-    refreshStatusFromDB()
-  }
-
-  const handleAppGoesToBackground = () => {
-    console.log(authToken.slice(-5) + '  —  App has gone to the background 🙈 ')
-    clearInterval(pingInterval)
-  }
-
-  React.useEffect(() => {
-    const handleAppStateChange = (nextAppState) => {
-      if (nextAppState === 'active') handleAppGoesToForeground()
-      if (nextAppState === 'background') handleAppGoesToBackground()
-    }
-    AppState.addEventListener('change', handleAppStateChange)
-
-    // fetchFriends(authToken, setFriends)()
-    refreshStatusFromDB()
-    const refreshFriendsAndStatusInterval = setInterval(() => {
-      // fetchFriends(authToken, setFriends)()
-      refreshStatusFromDB()
-    }, 1000 * nSecondsFetchFriends)
-    return () => clearInterval(refreshFriendsAndStatusInterval)
-  }, [])
-
-  return (
-    <View>
-      <Header>Set your status</Header>
-      <View style={homeStyles(theme).toggleOuter}>
-        <View
-          style={{
-            ...homeStyles(theme).toggleBtn,
-            backgroundColor: themes[theme].text_input_placeholder,
-            ...(status == 'offline' ? homeStyles(theme).toggleBtnSelected : {backgroundColor: 'transparent'}),
-          }}>
-          <Text
-            onPress={() => {
-              setStatus('offline')
-              pingServer({status: 'offline'}) //.then(() => setTimeout(fetchFriendsFn, 10))
-              // clearInterval(pingInterval)
-              console.log('set offline + ping interval cleared')
-            }}
-            style={{
-              ...homeStyles(theme).toggleBtnText,
-              ...(status == 'offline' ? homeStyles(theme).toggleBtnTextSelected : {}),
-            }}>
-            Offline
-          </Text>
-        </View>
-        <View
-          style={{
-            ...homeStyles(theme).toggleBtn,
-            backgroundColor: '#32C084',
-            ...(status == 'online' ? homeStyles(theme).toggleBtnSelected : {backgroundColor: 'transparent'}),
-          }}>
-          <Text
-            onPress={() => {
-              setStatus('online')
-              pingServer({status: 'online'}) //.then(() => setTimeout(fetchFriendsFn, 10))
-              // startPingInterval()
-            }}
-            style={{...homeStyles(theme).toggleBtnText, ...(status == 'online' ? homeStyles(theme).toggleBtnTextSelected : {})}}>
-            Online
-          </Text>
-        </View>
-      </View>
-
-      <Text
-        style={{
-          textAlign: 'center',
-          fontSize: 15,
-          color: themes[theme].text_tertiary,
-          marginVertical: 6,
-          fontFamily: 'SFCompactRounded_Medium',
-          maxWidth: '80%',
-          alignSelf: 'center',
-        }}>
-        {status == 'offline' // TODO: add countdown to show how long before we set you offline
-          ? "You'll go offline after " + setOfflineAfterNMins + ' mins of inactivity'
-          : "You'll go offline after " + setOfflineAfterNMins + ' mins of inactivity'}
-      </Text>
-    </View>
-  )
-}
-
-const longAgoInEnglish = (timestamp) => {
+const longAgoInEnglish = (timestamp: number) => {
   const now = new Date().getTime()
   const diff = now - new Date(timestamp).getTime()
   const mins = Math.floor(diff / 1000 / 60)
@@ -161,14 +33,24 @@ const longAgoInEnglish = (timestamp) => {
   return `${years} years ago`
 }
 
-const longAgoInSeconds = (timestamp) => {
+const longAgoInSeconds = (timestamp: number) => {
   const now = new Date().getTime()
   const diff = now - new Date(timestamp).getTime()
   return Math.floor(diff / 1000) + ' seconds ago'
 }
 
-const Friend = ({name, phoneNumber, last_ping}) => {
-  const {theme} = useStore()
+const Friend = ({
+  name,
+  phoneNumber,
+  went_online,
+  expiry,
+}: {
+  name: string
+  phoneNumber: string
+  went_online?: FirebaseFirestoreTypes.Timestamp
+  expiry?: FirebaseFirestoreTypes.Timestamp
+}) => {
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   return (
     <View
       style={{
@@ -183,11 +65,14 @@ const Friend = ({name, phoneNumber, last_ping}) => {
         justifyContent: 'space-between',
         alignContent: 'center',
         alignItems: 'center',
-        borderRadius: 8,
       }}>
       <View style={{}}>
         <Text style={{fontSize: 32, color: themes[theme].text_emphasis, fontFamily: 'SFCompactRounded_Semibold'}}>@{name}</Text>
-        <Text style={{fontSize: 16, color: themes[theme].text_secondary}}>online {longAgoInEnglish(last_ping)}</Text>
+        {went_online ? (
+          <Text style={{fontSize: 16, color: themes[theme].text_secondary}}>
+            went online {longAgoInEnglish(went_online.toMillis())}
+          </Text>
+        ) : null}
       </View>
       <Text style={{fontSize: 36}} onPress={() => callNumber(phoneNumber)}>
         📞
@@ -196,27 +81,24 @@ const Friend = ({name, phoneNumber, last_ping}) => {
   )
 }
 
-const minsAgo = (mins) => new Date().getTime() - 1000 * 60 * mins
-const timestampWithinMins = (timestamp, nMins) => new Date(timestamp).getTime() > minsAgo(nMins)
+const minsAgo = (mins: number) => new Date().getTime() - 1000 * 60 * mins
+const timestampWithinMins = (timestamp: number, nMins: number) => new Date(timestamp).getTime() > minsAgo(nMins)
 
-export default function HomeScreen({navigation}) {
-  const {friends, setFriends} = React.useContext(GlobalContext)
-  const {phone, authToken} = React.useContext(GlobalContext)
-  const user = friends ? friends.find(({phone: theirPhone}) => theirPhone == phone) : null
-  const {address} = useStore()
+export default function HomeScreen({navigation}: {navigation: HomeScreenNavigationProp}) {
+  const {user, onlineFriends} = useStore((state: StoreState) => ({
+    user: state.user,
+    onlineFriends: state.onlineFriends,
+  })) as StoreState
+  // const [unexpiredFriends, setUnexpiredFriends] = React.useState<User[]>([])
+  const [location, setLocation] = React.useState<{city: string; region: string; country: string} | undefined>(undefined)
 
-  const onlineFriends = friends
-    ? friends
-        .filter(({status, phone: theirPhone}) => status == 'online' && theirPhone != phone)
-        .filter(({last_ping}) =>
-          timestampWithinMins(
-            last_ping,
-            setOfflineAfterNMins //+ 1 // the +1 is to account for the fact that the server might be a few seconds behind
-          )
-        )
-    : []
+  React.useEffect(() => {
+    if (user) {
+      setLocation(user.location)
+    }
+  }, [user, onlineFriends])
 
-  const {theme} = useStore()
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
 
   return (
     <View style={{...styles(theme).container, ...styles(theme).flexColumn}}>
@@ -247,12 +129,11 @@ export default function HomeScreen({navigation}) {
               color: themes[theme].text_emphasis,
               fontFamily: 'SFCompactRounded_Bold',
             }}>
-            {/* TODO: in the future, we'll store the whole user in the global state and fetch that rather than doing this messy thing of finding the user in the list of friends */}
-            {user && user.screen_name ? '@' + user.screen_name : formatPhone(phone)}
+            {user && user.name ? '@' + user.name : formatPhone(user?.phone ?? '')}
           </Text>
           !
         </Header>
-        {address?.city && (
+        {location?.city && (
           <Text
             style={{
               textAlign: 'center',
@@ -263,11 +144,11 @@ export default function HomeScreen({navigation}) {
               maxWidth: '80%',
               alignSelf: 'center',
             }}>
-            How's {address.city}?
+            How's {location.city}?
           </Text>
         )}
         <Spacer />
-        <OnlineOfflineToggle />
+        <StatusToggle />
 
         <Spacer />
 
@@ -275,7 +156,7 @@ export default function HomeScreen({navigation}) {
 
         {onlineFriends.length < 1 ? (
           <View>
-            <Header>No friends online right now</Header>
+            <Header style={{}}>No friends online right now</Header>
 
             <Text
               style={{
@@ -292,44 +173,20 @@ export default function HomeScreen({navigation}) {
             </Text>
           </View>
         ) : (
-          <Header>Friends online right now</Header>
+          <Header style={{}}>Friends online right now</Header>
         )}
         {onlineFriends == null && <DotAnimation style={{alignSelf: 'center', width: 60, marginTop: 12}} />}
         {onlineFriends.length > 0 &&
-          onlineFriends.map(({screen_name, phone, last_ping}, i) => (
-            <Friend name={screen_name} phoneNumber={phone} last_ping={last_ping} key={i} />
-          ))}
+          onlineFriends.map(({name, phone, status}, i) =>
+            status?.went_online ? (
+              <Friend name={name} phoneNumber={phone} went_online={status.went_online} key={i} />
+            ) : (
+              <Friend name={name} phoneNumber={phone} key={i} />
+            )
+          )}
       </View>
 
       <NavBtns navigation={navigation} />
     </View>
   )
 }
-
-const homeStyles = (theme) =>
-  StyleSheet.create({
-    toggleOuter: {
-      backgroundColor: themes[theme].text_input_bkgd,
-      padding: 6,
-      borderRadius: 100,
-      margin: 4,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-    },
-    toggleBtn: {flex: 1, borderRadius: 100, padding: 14, flexDirection: 'column', justifyContent: 'center'},
-    toggleBtnSelected: {
-      color: 'white',
-      shadowColor: '#000',
-      shadowOffset: {width: 1, height: 2},
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 1,
-    },
-    toggleBtnText: {
-      textAlign: 'center',
-      fontSize: 32,
-      fontFamily: 'SFCompactRounded_Semibold',
-      color: themes[theme].text_input_placeholder,
-    },
-    toggleBtnTextSelected: {color: 'white'},
-  })

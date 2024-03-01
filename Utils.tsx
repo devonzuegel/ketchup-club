@@ -97,7 +97,7 @@ TouchableOpacity.defaultProps = {activeOpacity: 0.8}
 if (Object.keys(themes.light).sort().join(',') != Object.keys(themes.dark).sort().join(','))
   throw new Error('themes.light and themes.dark must have the same keys')
 
-export const styles = (theme) =>
+export const styles = (theme: 'light' | 'dark') =>
   StyleSheet.create({
     appButtonContainer: {
       elevation: 8,
@@ -121,7 +121,7 @@ export const styles = (theme) =>
     container: {
       flex: 1,
       fontFamily: 'SFCompactRounded_Medium',
-      backgroundColor: themes[theme as 'light' | 'dark'].backgroundColor,
+      backgroundColor: themes[theme].backgroundColor,
       padding: containerPadding,
       paddingBottom: 0,
       paddingTop: 48,
@@ -190,7 +190,7 @@ export const Text = (props) => {
 }
 
 export const TextInput = forwardRef((props, ref) => {
-  const {theme} = useStore()
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   return (
     <RNTextInput
       ref={ref}

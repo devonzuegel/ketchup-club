@@ -2,30 +2,39 @@ import {useStore as use} from 'zustand'
 import {createStore} from 'zustand/vanilla'
 import {createJSONStorage, persist} from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {LocationGeocodedAddress, LocationObject} from 'expo-location'
+import {User} from './Firestore'
 
 export interface StoreState {
-  address: LocationGeocodedAddress
-  location: LocationObject
+  user: User | null
+  setUser: (u: User | null) => void
+  friends: User[]
+  setFriends: (f: User[]) => void
+  onlineFriends: User[]
+  setOnlineFriends: (f: User[]) => void
   locationPermissionGranted: boolean
-  theme: 'light' | 'dark'
-  setAddress: (a: LocationGeocodedAddress) => void
-  setLocation: (l: LocationObject) => void
   setLocationPermissionGranted: (lpg: boolean) => void
-  setTheme: (t: string) => void
+  theme: 'light' | 'dark'
+  setTheme: (t: 'light' | 'dark') => void
+  removeOnlineFriend: (id: string) => void
 }
 
-export const store = createStore(
+export const store = createStore<StoreState>()(
   persist(
     (set) => ({
       theme: 'light',
-      setTheme: (t: string) => set({theme: t}),
-      address: null,
-      setAddress: (a: LocationGeocodedAddress) => set({address: a}),
-      location: null,
-      setLocation: (l: LocationObject) => set({location: l}),
+      setTheme: (t: 'light' | 'dark') => set({theme: t}),
       locationPermissionGranted: false,
       setLocationPermissionGranted: (lpg: boolean) => set({locationPermissionGranted: lpg}),
+      user: null,
+      setUser: (u: User | null) => set({user: u}),
+      friends: [],
+      setFriends: (f: User[]) => set({friends: f}),
+      onlineFriends: [],
+      setOnlineFriends: (f: User[]) => set({onlineFriends: f}),
+      removeOnlineFriend: (id: string) =>
+        set((state: StoreState) => ({
+          onlineFriends: state.onlineFriends.filter((user: User) => user.uid !== id),
+        })),
     }),
     {
       name: 'global-storage', // unique name
@@ -52,7 +61,7 @@ In a React component:
 
       or possibly better:
 
-      const address = useStore((state: StoreState) => state.address)
+      const address = useStore((state: StoreState) => state.address) as string
 
 
     The component will be bound to value in the store, so the UI will update when the store updates.

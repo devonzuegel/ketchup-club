@@ -1,9 +1,11 @@
-import * as Location from 'expo-location'
+import * as ExpoLocation from 'expo-location'
 import {store, StoreState} from './Store'
 import {Platform} from 'react-native'
 import * as NativeLocation from './modules/native-location'
 import {Subscription} from 'expo-modules-core'
 import Constants, {ExecutionEnvironment} from 'expo-constants'
+import {fs} from './Firestore'
+import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth'
 
 /*
 
@@ -13,139 +15,172 @@ NativeLocation is not available on Expo or Android, but it can be imported becau
 
 */
 
-const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient
-const useNativeLocation = Platform.OS === 'ios' && !isExpoGo
-console.log('useNativeLocation:', useNativeLocation)
+// const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient
 
-let lastGeocodeTime = 0
-let locationSubscription: Subscription | null = null
+class Location {
+  private static instance: Location
+  private static isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient
+  private static useNativeLocation = Platform.OS === 'ios' && !this.isExpoGo
+  private lastGeocodeTime = 0
+  private lastPublishedLocation: {city: string; region: string; country: string} | null = null
+  private locationSubscription: Subscription | null = null
 
-init()
+  private constructor() {
+    console.log('useNativeLocation:', Location.useNativeLocation)
+    this.initializeSubscriptions()
+    this.initializeLocationServices()
+  }
 
-function init() {
-  initializeSubscriptions()
-  initializeLocationServices()
-}
+  public static getInstance(): Location {
+    if (!Location.instance) {
+      Location.instance = new Location()
+      console.log('Location instance created')
+    }
+    return Location.instance
+  }
 
-function initializeSubscriptions() {
-  if (useNativeLocation) {
-    const statusSubscription = NativeLocation.addAuthorizationChangeListener(({status: status}) => {
-      console.log('NativeLocation permission status changed', status)
+  private initializeSubscriptions() {
+    if (Location.useNativeLocation) {
+      const statusSubscription = NativeLocation.addAuthorizationChangeListener(({status: status}) => {
+        console.log('NativeLocation permission status changed', status)
 
-      // not determined = 0
-      // restricted = 1
-      // denied = 2
-      // authorizedAlways = 3
-      // authorizedWhenInUse = 4
+        // not determined = 0
+        // restricted = 1
+        // denied = 2
+        // authorizedAlways = 3
+        // authorizedWhenInUse = 4
 
-      if (status === 3 || status === 4) {
-        const {setLocationPermissionGranted} = store.getState() as StoreState
-        setLocationPermissionGranted(true)
-        startMonitoringLocation()
-      } else if (status === 1 || status === 2) {
-        const {setLocationPermissionGranted} = store.getState() as StoreState
-        setLocationPermissionGranted(false)
-        stopMonitoringLocation()
+        if (status === 3 || status === 4) {
+          const {setLocationPermissionGranted} = store.getState() as StoreState
+          setLocationPermissionGranted(true)
+          this.startMonitoringLocation()
+        } else if (status === 1 || status === 2) {
+          const {setLocationPermissionGranted} = store.getState() as StoreState
+          setLocationPermissionGranted(false)
+          this.stopMonitoringLocation()
+        }
+      })
+
+      const locationUpdateSubscription = NativeLocation.addLocationUpdateListener(({location: location}) => {
+        // console.log('NativeLocation updated', location)
+        this.receiveLocationUpdate(location)
+      })
+
+      const locationErrorSubscription = NativeLocation.addLocationErrorListener(({error: error}) => {
+        console.log('NativeLocation error', error)
+      })
+    } else {
+      console.log('NativeLocation module not in use')
+    }
+  }
+
+  // use this function to start monitoring location on app startup
+  private async initializeLocationServices() {
+    auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const {setLocationPermissionGranted} = store.getState() as StoreState
+          const {granted} = await ExpoLocation.getForegroundPermissionsAsync()
+          if (granted) {
+            this.startMonitoringLocation()
+            setLocationPermissionGranted(true)
+          }
+        } catch (error) {
+          console.error('Error occurred while getting foreground permissions:', error)
+        }
+      } else {
+        this.stopMonitoringLocation()
       }
     })
+  }
 
-    const locationUpdateSubscription = NativeLocation.addLocationUpdateListener(({location: location}) => {
-      console.log('NativeLocation updated', location)
-      receiveLocationUpdate(location)
-    })
+  public async requestLocationPermission() {
+    if (Location.useNativeLocation) {
+      NativeLocation.requestPermission()
+      return
+    } else {
+      // For now we are only getting background location permission on iOS not using Expo Go
+      var {granted} = await ExpoLocation.requestForegroundPermissionsAsync()
+      const fg = granted
+      const {setLocationPermissionGranted} = store.getState() as StoreState
+      setLocationPermissionGranted(fg)
+      if (fg) {
+        this.startMonitoringLocation()
+      }
+    }
+  }
+  public async startMonitoringLocation() {
+    if (Location.useNativeLocation) {
+      NativeLocation.startMonitoring()
+    } else {
+      // note that the timeInterval parameter only works on Android and seems to negate distanceInterval, so don't use it
+      // distanceInterval is definitely not working, so we may have to go with native code here to get the desired behavior
+      this.locationSubscription = await ExpoLocation.watchPositionAsync({distanceInterval: 500}, this.receiveLocationUpdate)
+    }
+  }
 
-    const locationErrorSubscription = NativeLocation.addLocationErrorListener(({error: error}) => {
-      console.log('NativeLocation error', error)
-    })
-  } else {
-    console.log('NativeLocation module not in use')
+  public stopMonitoringLocation() {
+    if (Location.useNativeLocation) {
+      NativeLocation.stopMonitoring()
+    } else {
+      this.locationSubscription?.remove()
+    }
+  }
+
+  private async receiveLocationUpdate(loc: ExpoLocation.LocationObject) {
+    // console.log('Location updated', loc)
+    if (loc == null) return
+
+    if (Location.useNativeLocation) {
+      locationService.performGeocode(loc)
+    } else {
+      // We need to conserve on-device geocoding resources. We have asked the Expo Location module to only send us updates every 500 meters, but it seems to give us updates more often than that. So we will only reverse geocode if at least two minutes have passed.
+      if (loc.timestamp - this.lastGeocodeTime > 120000) {
+        locationService.performGeocode(loc)
+      } else {
+        console.log('skipping reverse geocoding')
+      }
+    }
+  }
+
+  public async performGeocode(loc: ExpoLocation.LocationObject) {
+    console.log('reverse geocoding location')
+    this.lastGeocodeTime = loc.timestamp
+    const geocodeResult = await ExpoLocation.reverseGeocodeAsync(loc.coords)
+    console.log(geocodeResult[0])
+    locationService.publishLocation(loc, geocodeResult[0])
+  }
+
+  private async publishLocation(loc: ExpoLocation.LocationObject, address: ExpoLocation.LocationGeocodedAddress) {
+    const location = {
+      city: address.city!,
+      region: address.region!,
+      country: address.country!,
+    }
+    if (
+      location.city === this.lastPublishedLocation?.city &&
+      location.region === this.lastPublishedLocation?.region &&
+      location.country === this.lastPublishedLocation?.country
+    ) {
+      return
+    } else {
+      this.lastPublishedLocation = location
+      console.log('🌎 publishing location', location)
+      fs.publishLocation(location)
+    }
   }
 }
 
-// use this function to start monitoring location on app startup
-async function initializeLocationServices() {
-  const {setLocationPermissionGranted} = store.getState() as StoreState
-  const {granted} = await Location.getForegroundPermissionsAsync()
-  if (granted) {
-    startMonitoringLocation()
-    setLocationPermissionGranted(true)
-  }
-}
+export const locationService = Location.getInstance()
 
 // this function is triggered by the user on the settings page
-export async function enableLocation() {
+export const enableLocation = () => {
   const {locationPermissionGranted} = store.getState() as StoreState
   if (locationPermissionGranted) {
-    startMonitoringLocation()
+    locationService.startMonitoringLocation()
     return
   } else {
     // this function will start monitoring if permission is granted
-    requestLocationPermission()
+    locationService.requestLocationPermission()
   }
-}
-
-async function requestLocationPermission() {
-  if (useNativeLocation) {
-    NativeLocation.requestPermission()
-    return
-  } else {
-    // For now we are only getting background location permission on iOS not using Expo Go
-    var {granted} = await Location.requestForegroundPermissionsAsync()
-    const fg = granted
-    const {setLocationPermissionGranted} = store.getState() as StoreState
-    setLocationPermissionGranted(fg)
-    if (fg) {
-      startMonitoringLocation()
-    }
-  }
-}
-
-async function startMonitoringLocation() {
-  if (useNativeLocation) {
-    NativeLocation.startMonitoring()
-  } else {
-    // note that the timeInterval parameter only works on Android and seems to negate distanceInterval, so don't use it
-    // distanceInterval is definitely not working, so we may have to go with native code here to get the desired behavior
-    locationSubscription = await Location.watchPositionAsync({distanceInterval: 500}, receiveLocationUpdate)
-  }
-}
-
-function stopMonitoringLocation() {
-  if (useNativeLocation) {
-    NativeLocation.stopMonitoring()
-  } else {
-    locationSubscription?.remove()
-  }
-}
-
-async function receiveLocationUpdate(loc: Location.LocationObject) {
-  console.log('Location updated', loc)
-  if (loc == null) return
-
-  const {setLocation} = store.getState() as StoreState
-  setLocation(loc)
-  if (useNativeLocation) {
-    performGeocode(loc)
-  } else {
-    // We need to conserve on-device geocoding resources. We have asked the Expo Location module to only send us updates every 500 meters, but it seems to give us updates more often than that. So we will only reverse geocode if at least two minutes have passed.
-    if (loc.timestamp - lastGeocodeTime > 120000) {
-      performGeocode(loc)
-    } else {
-      console.log('skipping reverse geocoding')
-    }
-  }
-}
-
-async function performGeocode(loc: Location.LocationObject) {
-  const {setAddress} = store.getState() as StoreState
-  console.log('reverse geocoding location')
-  lastGeocodeTime = loc.timestamp
-  const geocodeResult = await Location.reverseGeocodeAsync(loc.coords)
-  console.log(geocodeResult[0])
-  setAddress(geocodeResult[0])
-  publishLocation(loc, geocodeResult[0])
-}
-
-async function publishLocation(loc: Location.LocationObject, address: Location.LocationGeocodedAddress) {
-  // We can use this function to publish location
 }

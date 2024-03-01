@@ -1,23 +1,33 @@
 import {NavigationContainer} from '@react-navigation/native'
-import {createNativeStackNavigator} from '@react-navigation/native-stack'
+import {View, Text} from 'react-native'
+import {createNativeStackNavigator, NativeStackNavigationProp} from '@react-navigation/native-stack'
 import {useFonts} from 'expo-font'
 import React from 'react'
-import {apiBaseURL} from './API'
-import AsyncStorage, {AUTH_TOKEN, PHONE, PUSH_TOKEN} from './AsyncStorage'
 import {FriendsScreen} from './Friends'
 import HomeScreen from './Home'
 import {LoginScreen} from './Login'
 import {SettingsScreen} from './Settings'
-import {StoreState, useStore} from './Store'
 import {GlobalContext, Pre, fonts} from './Utils'
+import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth'
+import {useStore, StoreState} from './Store'
 
 export const debug = false
 
 console.log('=================================================================')
 console.log('STARTING APP...')
 console.log('          mode: ' + (__DEV__ ? 'DEVELOPMENT  🛠️' : 'PRODUCTION 🚀'))
-console.log('  API base URL:', apiBaseURL)
+// console.log('  API base URL:', apiBaseURL)
 console.log('=================================================================')
+
+type RootStackParamList = {
+  Home: undefined
+  Settings: undefined
+  Friends: undefined
+}
+
+export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>
+export type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>
+export type FriendsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Friends'>
 
 const Stack = createNativeStackNavigator()
 
@@ -32,51 +42,34 @@ const LoggedInNavigator = () => (
 )
 
 export default function App() {
-  const [authToken, setAuthToken] = React.useState<string>()
-  const [friends, setFriends] = React.useState(null)
-  const [phone, setPhone] = React.useState<string>()
-  const theme = useStore((state: StoreState) => state.theme)
-  const [status, setStatus] = React.useState('offline')
-  const [pushToken, setPushToken] = React.useState<string>()
-  const globalContextVars = {
-    authToken,
-    setAuthToken,
-    friends,
-    setFriends,
-    phone,
-    setPhone,
-    status,
-    setStatus,
-    pushToken,
-    setPushToken,
+  const [initializing, setInitializing] = React.useState(true)
+  const [user, setUser] = React.useState<FirebaseAuthTypes.User | null>(null)
+  const [fontsLoaded] = useFonts(fonts)
+  const globalContextVars = {}
+
+  function onAuthStateChanged(user: FirebaseAuthTypes.User | null) {
+    setUser(user)
+    console.log('🔒 user:', user?.phoneNumber || 'null')
+    if (initializing) setInitializing(false)
   }
 
   React.useEffect(() => {
-    async function fetchFromLocalStorage() {
-      const authToken = await AsyncStorage.getItem(AUTH_TOKEN)
-      const phone = await AsyncStorage.getItem(PHONE)
-      const pushToken = await AsyncStorage.getItem(PUSH_TOKEN)
-      console.log('🗄️ authToken from async storage: ', authToken || 'null')
-      console.log('🗄️     phone from async storage: ', phone || 'null')
-      console.log('🗄️     theme from Zustand store: ', theme || 'null')
-      console.log('🗄️ pushToken from async storage: ', pushToken || 'null')
-
-      // WARNING: storing in the component state AND in AsyncStorage may cause confusion in the future...
-      //          ... but it's the best solution we have for now, so let's stick with it
-      if (authToken) setAuthToken(authToken)
-      if (phone) setPhone(phone)
-      if (pushToken) setPushToken(pushToken)
-    }
-    fetchFromLocalStorage()
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged)
+    return subscriber
   }, [])
 
-  const [fontsLoaded] = useFonts(fonts)
-  if (!fontsLoaded) return null
+  if (initializing || !fontsLoaded) {
+    return (
+      <View style={{}}>
+        <Text>Loading...</Text>
+      </View>
+    )
+  }
 
   return (
     <GlobalContext.Provider value={globalContextVars}>
-      {authToken ? <LoggedInNavigator /> : <LoginScreen />}
-      {debug && <Pre data={{...globalContextVars, friends: friends && friends.length}} children={null} />}
+      {user ? <LoggedInNavigator /> : <LoginScreen />}
+      {debug && <Pre data={{}} children={null} />}
     </GlobalContext.Provider>
   )
 }

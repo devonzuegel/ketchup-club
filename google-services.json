@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "914857132002",
+    "project_id": "small-world-dev",
+    "storage_bucket": "small-world-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:914857132002:android:3f1349cd25e3b5bf1bc3bb",
+        "android_client_info": {
+          "package_name": "com.devonzuegel.ketchupclub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQuFCusTDAjIjZ8tYSmCgKQBgyco4ocUY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
