@@ -1,6 +1,7 @@
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth'
 import firestore, {FirebaseFirestoreTypes} from '@react-native-firebase/firestore'
 import {store, StoreState} from './Store'
+import {setStatusOffline} from './API'
 
 type Unsubscribe = () => void
 
@@ -13,20 +14,20 @@ export interface RenderedUser {
     went_online?: FirebaseFirestoreTypes.Timestamp
     oncall?: boolean
     expiry: FirebaseFirestoreTypes.Timestamp
-  }
+  } | null
   location?: {
     city: string
     region: string
     country: string
-  }
+  } | null
 }
 
 export interface User {
   uid: string
   name: string
   phone: string
-  // location?: FirebaseFirestoreTypes.DocumentReference
-  // status?: FirebaseFirestoreTypes.DocumentReference
+  location?: Location | null
+  status?: Status | null
 }
 
 export interface Location {
@@ -57,7 +58,6 @@ interface statusForPublishing {
 class Firestore {
   private static instance: Firestore
   private friendsUnsubscriber: Unsubscribe | null = null
-  // private onlineFriendsUnsubscriber: Unsubscribe | null = null
   private statusesUnsubscriber: Unsubscribe | null = null
   private locationsUnsubscriber: Unsubscribe | null = null
   private userUnsubsriber: Unsubscribe | null = null
@@ -85,7 +85,7 @@ class Firestore {
       removeStatus(status.uid)
       const {user} = store.getState() as StoreState
       if (status.uid == user?.uid) {
-        fs.setStatusOffline()
+        setStatusOffline()
       }
     }
   }
@@ -100,7 +100,6 @@ class Firestore {
         this.friendsUnsubscriber = this.subscribeToFriendsInFirestore()
         this.statusesUnsubscriber = this.subscribeToFriendStatusesInFirestore()
         this.locationsUnsubscriber = this.subscribeToLocationsInFirestore()
-        // this.onlineFriendsUnsubscriber = this.subscribeToOnlineFriendsInFirestore()
       } else {
         // No user is signed in.
         // destroy database subscriptions
@@ -109,7 +108,6 @@ class Firestore {
           state.setLocation(null)
           state.setStatus(null)
           state.setFriends([])
-          // state.setOnlineFriends([])
           state.setStatuses([])
           state.setLocations([])
           for (const t of this.timers.values()) {
@@ -129,9 +127,6 @@ class Firestore {
         if (this.statusUnsubscriber) {
           this.statusUnsubscriber()
         }
-        // if (this.onlineFriendsUnsubscriber) {
-        //   this.onlineFriendsUnsubscriber()
-        // }
         if (this.statusesUnsubscriber) {
           this.statusesUnsubscriber()
         }
@@ -186,7 +181,6 @@ class Firestore {
     const subscriber = firestore()
       .collection('statuses')
       .where('online', '==', true)
-      // .where('expiry', '>', firestore.Timestamp.now()) // this doesn't work well
       .where('visibility', '==', 'public')
       .onSnapshot((querySnapshot) => {
         if (!querySnapshot) {
@@ -284,66 +278,6 @@ class Firestore {
         store.setState({status: s})
       })
     return subscriber
-  }
-
-  public publishLocation(location: {city: string; region: string; country: string; visibility?: string}): void {
-    // console.log('publishLocation in firestore:', location)
-    const {user} = store.getState() as StoreState
-    // console.log('user:', user)
-    if (user) {
-      firestore()
-        .collection('locations')
-        .doc(user.uid)
-        .set({
-          city: location.city,
-          region: location.region,
-          country: location.country,
-          visibility: location.visibility ? location.visibility : 'public',
-        })
-    }
-  }
-
-  public removeLocation(): void {
-    const {user} = store.getState() as StoreState
-    if (user) {
-      firestore().collection('locations').doc(user.uid).delete()
-    }
-  }
-
-  public follow(uid: string): void {
-    const {user} = store.getState() as StoreState
-    if (user) {
-      firestore().collection('users').doc(user.uid).collection('following').doc(uid).set({})
-    }
-  }
-
-  public unfollow(uid: string): void {
-    const {user} = store.getState() as StoreState
-    if (user) {
-      firestore().collection('users').doc(user.uid).collection('following').doc(uid).delete()
-    }
-  }
-
-  public setStatusOnline(expiry?: FirebaseFirestoreTypes.Timestamp, visibility?: string): void {
-    const {user} = store.getState() as StoreState
-    if (user) {
-      firestore()
-        .collection('statuses')
-        .doc(user.uid)
-        .set({
-          online: true,
-          went_online: firestore.FieldValue.serverTimestamp(),
-          expiry: expiry,
-          visibility: visibility ? visibility : 'public',
-        })
-    }
-  }
-
-  public setStatusOffline(): void {
-    const {user} = store.getState() as StoreState
-    if (user) {
-      firestore().collection('statuses').doc(user.uid).delete()
-    }
   }
 }
 

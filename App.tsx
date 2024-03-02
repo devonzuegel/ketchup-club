@@ -10,6 +10,7 @@ import {SettingsScreen} from './Settings'
 import {GlobalContext, Pre, fonts} from './Utils'
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth'
 import {useStore, StoreState} from './Store'
+import * as loadFirestore from './Firestore'
 
 export const debug = false
 
@@ -46,6 +47,7 @@ export default function App() {
   const [user, setUser] = React.useState<FirebaseAuthTypes.User | null>(null)
   const [fontsLoaded] = useFonts(fonts)
   const globalContextVars = {}
+  const fs = loadFirestore.fs
 
   function onAuthStateChanged(user: FirebaseAuthTypes.User | null) {
     setUser(user)
@@ -58,7 +60,7 @@ export default function App() {
     return subscriber
   }, [])
 
-  if (initializing || !fontsLoaded) {
+  if (initializing || !fontsLoaded || !fs) {
     return (
       <View style={{}}>
         <Text>Loading...</Text>

@@ -1,15 +1,15 @@
 import React from 'react'
 import {View, Text} from 'react-native'
-import {useStore, StoreState} from './Store'
-import {fs, Status} from './Firestore'
-import {themes, Header} from './Utils'
+import {useStore, StoreState} from '../Store'
+import {fs, Status} from '../Firestore'
+import {themes, Header} from '../Utils'
 import {StyleSheet} from 'react-native'
 import firestore from '@react-native-firebase/firestore'
-import {hasPlatformFeatureAsync} from 'expo-device'
+import {setStatusOnline, setStatusOffline} from '../API'
 
 const setOfflineAfterNMins = __DEV__ ? 0.1 : 15
 
-export function StatusToggle() {
+export const StatusToggle = () => {
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   const status = useStore((state: StoreState) => state.status) as Status | null
 
@@ -49,7 +49,7 @@ export function StatusToggle() {
           }}>
           <Text
             onPress={() => {
-              fs.setStatusOffline()
+              setStatusOffline()
             }}
             style={{
               ...homeStyles(theme).toggleBtnText,
@@ -67,7 +67,7 @@ export function StatusToggle() {
           <Text
             onPress={() => {
               const expiry = firestore.Timestamp.fromMillis(Date.now() + setOfflineAfterNMins * 60 * 1000)
-              fs.setStatusOnline(expiry)
+              setStatusOnline(expiry)
             }}
             style={{
               ...homeStyles(theme).toggleBtnText,
@@ -144,3 +144,5 @@ const soonInEnglish = (expiry: number) => {
   if (days == 1) return 'in about a day'
   return `in ${days} days`
 }
+
+export default StatusToggle

@@ -2,15 +2,18 @@ import {useStore as use} from 'zustand'
 import {createStore} from 'zustand/vanilla'
 import {createJSONStorage, persist} from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {User, Status, Location} from './Firestore'
+import {User, Status, Location, RenderedUser} from './Firestore'
 
 export interface StoreState {
+  theme: 'light' | 'dark'
+  setTheme: (t: 'light' | 'dark') => void
   user: User | null
   setUser: (u: User | null) => void
   status: Status | null
   setStatus: (s: Status | null) => void
   location: Location | null
   setLocation: (l: Location | null) => void
+  renderedUser: () => RenderedUser | null
   friends: User[]
   setFriends: (f: User[]) => void
   statuses: Status[]
@@ -18,28 +21,39 @@ export interface StoreState {
   removeStatus: (id: string) => void
   locations: Location[]
   setLocations: (l: Location[]) => void
-  // onlineFriends: User[]
-  // setOnlineFriends: (f: User[]) => void
+  renderedFriends: () => RenderedUser[]
+  onlineFriends: () => RenderedUser[]
   locationPermissionGranted: boolean
   setLocationPermissionGranted: (lpg: boolean) => void
-  theme: 'light' | 'dark'
-  setTheme: (t: 'light' | 'dark') => void
-  // removeOnlineFriend: (id: string) => void
+  locationEnabled: boolean
+  setLocationEnabled: (le: boolean) => void
 }
 
 export const store = createStore<StoreState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       theme: 'light',
       setTheme: (t: 'light' | 'dark') => set({theme: t}),
       locationPermissionGranted: false,
       setLocationPermissionGranted: (lpg: boolean) => set({locationPermissionGranted: lpg}),
+      locationEnabled: false,
+      setLocationEnabled: (le: boolean) => set({locationEnabled: le}),
       user: null,
       setUser: (u: User | null) => set({user: u}),
       status: null,
       setStatus: (s: Status | null) => set({status: s}),
       location: null,
       setLocation: (l: Location | null) => set({location: l}),
+      renderedUser: () => {
+        const user = get().user
+        const status = get().status
+        const location = get().location
+        if (!user) return null
+        let u = user as RenderedUser
+        u.status = status || undefined
+        u.location = location || undefined
+        return user
+      },
       friends: [],
       setFriends: (f: User[]) => set({friends: f}),
       statuses: [],
@@ -50,12 +64,26 @@ export const store = createStore<StoreState>()(
         })),
       locations: [],
       setLocations: (l: Location[]) => set({locations: l}),
-      // onlineFriends: [],
-      // setOnlineFriends: (f: User[]) => set({onlineFriends: f}),
-      // removeOnlineFriend: (id: string) =>
-      //   set((state: StoreState) => ({
-      //     onlineFriends: state.onlineFriends.filter((user: User) => user.uid !== id),
-      //   })),
+      renderedFriends: () => {
+        const friends = get().friends
+        const statuses = get().statuses //.filter((s: Status) => !s.expiry || s.expiry.toMillis() > Date.now())
+        const locations = get().locations
+        if (friends.length === 0) return []
+        return friends.map((friend: User) => {
+          const status = statuses.find((s: Status) => s.uid === friend.uid)
+          const location = locations.find((l: Location) => l.uid === friend.uid)
+          return {
+            ...friend,
+            status: status,
+            location: location,
+          }
+        })
+      },
+      onlineFriends: () => {
+        const renderedFriends = get().renderedFriends()
+        if (renderedFriends.length === 0) return []
+        return renderedFriends.filter((user: RenderedUser) => user.status?.online)
+      },
     }),
     {
       name: 'global-storage', // unique name

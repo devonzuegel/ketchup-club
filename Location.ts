@@ -6,6 +6,7 @@ import {Subscription} from 'expo-modules-core'
 import Constants, {ExecutionEnvironment} from 'expo-constants'
 import {fs} from './Firestore'
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth'
+import {publishLocation, removeLocation} from './API'
 
 /*
 
@@ -23,6 +24,7 @@ class LocationController {
   private static useNativeLocation = Platform.OS === 'ios' && !this.isExpoGo
   private lastGeocodeTime = 0
   private lastPublishedLocation: {city: string; region: string; country: string} | null = null
+  private lastGeocodedLocation: ExpoLocation.LocationObject | null = null
   private locationSubscription: Subscription | null = null
 
   private constructor() {
@@ -130,6 +132,7 @@ class LocationController {
   private async receiveLocationUpdate(loc: ExpoLocation.LocationObject) {
     // console.log('Location updated', loc)
     if (loc == null) return
+    if (loc === this.lastGeocodedLocation) return
 
     if (LocationController.useNativeLocation) {
       locationService.performGeocode(loc)
@@ -145,13 +148,14 @@ class LocationController {
 
   public async performGeocode(loc: ExpoLocation.LocationObject) {
     console.log('reverse geocoding location')
+    this.lastGeocodedLocation = loc
     this.lastGeocodeTime = loc.timestamp
     const geocodeResult = await ExpoLocation.reverseGeocodeAsync(loc.coords)
     console.log(geocodeResult[0])
-    locationService.publishLocation(loc, geocodeResult[0])
+    locationService.pushLocation(loc, geocodeResult[0])
   }
 
-  private async publishLocation(loc: ExpoLocation.LocationObject, address: ExpoLocation.LocationGeocodedAddress) {
+  private async pushLocation(loc: ExpoLocation.LocationObject, address: ExpoLocation.LocationGeocodedAddress) {
     const location = {
       city: address.city!,
       region: address.region!,
@@ -166,7 +170,7 @@ class LocationController {
     } else {
       this.lastPublishedLocation = location
       console.log('🌎 publishing location', location)
-      fs.publishLocation(location)
+      publishLocation(location)
     }
   }
 }
@@ -175,7 +179,8 @@ export const locationService = LocationController.getInstance()
 
 // this function is triggered by the user on the settings page
 export const enableLocation = () => {
-  const {locationPermissionGranted} = store.getState() as StoreState
+  const {locationPermissionGranted, setLocationEnabled} = store.getState() as StoreState
+  setLocationEnabled(true)
   if (locationPermissionGranted) {
     locationService.startMonitoringLocation()
     return
@@ -183,4 +188,11 @@ export const enableLocation = () => {
     // this function will start monitoring if permission is granted
     locationService.requestLocationPermission()
   }
+}
+
+export const disableLocation = () => {
+  locationService.stopMonitoringLocation()
+  const {setLocationEnabled} = store.getState() as StoreState
+  setLocationEnabled(false)
+  removeLocation()
 }
