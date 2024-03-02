@@ -9,7 +9,6 @@ import {LoginScreen} from './Login'
 import {SettingsScreen} from './Settings'
 import {GlobalContext, Pre, fonts} from './Utils'
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth'
-import {useStore, StoreState} from './Store'
 import * as loadFirestore from './Firestore'
 
 export const debug = false

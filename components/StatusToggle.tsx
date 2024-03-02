@@ -1,7 +1,7 @@
 import React from 'react'
 import {View, Text} from 'react-native'
 import {useStore, StoreState} from '../Store'
-import {fs, Status} from '../Firestore'
+import {Status} from '../Firestore'
 import {themes, Header} from '../Utils'
 import {StyleSheet} from 'react-native'
 import firestore from '@react-native-firebase/firestore'

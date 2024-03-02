@@ -4,9 +4,9 @@ import {Platform} from 'react-native'
 import * as NativeLocation from './modules/native-location'
 import {Subscription} from 'expo-modules-core'
 import Constants, {ExecutionEnvironment} from 'expo-constants'
-import {fs} from './Firestore'
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth'
 import {publishLocation, removeLocation} from './API'
+import {throttle} from 'lodash'
 
 /*
 
@@ -26,6 +26,7 @@ class LocationController {
   private lastPublishedLocation: {city: string; region: string; country: string} | null = null
   private lastGeocodedLocation: ExpoLocation.LocationObject | null = null
   private locationSubscription: Subscription | null = null
+  private throttledReceiveLocationUpdate = throttle(this.receiveLocationUpdate, 2000)
 
   private constructor() {
     console.log('useNativeLocation:', LocationController.useNativeLocation)
@@ -65,7 +66,7 @@ class LocationController {
 
       const locationUpdateSubscription = NativeLocation.addLocationUpdateListener(({location: location}) => {
         // console.log('NativeLocation updated', location)
-        this.receiveLocationUpdate(location)
+        this.throttledReceiveLocationUpdate(location)
       })
 
       const locationErrorSubscription = NativeLocation.addLocationErrorListener(({error: error}) => {
@@ -117,7 +118,10 @@ class LocationController {
     } else {
       // note that the timeInterval parameter only works on Android and seems to negate distanceInterval, so don't use it
       // distanceInterval is definitely not working, so we may have to go with native code here to get the desired behavior
-      this.locationSubscription = await ExpoLocation.watchPositionAsync({distanceInterval: 500}, this.receiveLocationUpdate)
+      this.locationSubscription = await ExpoLocation.watchPositionAsync(
+        {distanceInterval: 500},
+        this.throttledReceiveLocationUpdate
+      )
     }
   }
 
@@ -129,10 +133,10 @@ class LocationController {
     }
   }
 
-  private async receiveLocationUpdate(loc: ExpoLocation.LocationObject) {
+  private receiveLocationUpdate(loc: ExpoLocation.LocationObject) {
     // console.log('Location updated', loc)
     if (loc == null) return
-    if (loc === this.lastGeocodedLocation) return
+    if (loc === this.lastGeocodedLocation) return // trying to prevent multiple callbacks in quick succession
 
     if (LocationController.useNativeLocation) {
       locationService.performGeocode(loc)

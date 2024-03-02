@@ -6,7 +6,6 @@ import {RenderedUser} from './Firestore'
 import {FriendsScreenNavigationProp} from './App'
 import UserListItem from './components/UserListItem'
 import SearchBar from './components/SearchBar'
-import * as api from './API'
 
 export function FriendsScreen({navigation}: {navigation: FriendsScreenNavigationProp}) {
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
