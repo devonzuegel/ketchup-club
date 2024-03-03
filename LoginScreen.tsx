@@ -62,12 +62,12 @@ export const LoginScreen = () => {
     }
   }
 
-  // const checkForErrors = async () => {
-  //   if (phone === '' && smsCode === '') return setError("Oops, phone number and SMS code can't be blank!")
-  //   if (phone === '') return setError("Oops, phone number can't be blank!")
-  //   if (smsCode === '') return setError("Oops, SMS code can't be blank!")
-  //   setError('') // clear error messages from screen
-  // }
+  const checkForErrors = async () => {
+    if (phone === '' && smsCode === '') return setError("Oops, phone number and SMS code can't be blank!")
+    if (phone === '') return setError("Oops, phone number can't be blank!")
+    if (smsCode === '') return setError("Oops, SMS code can't be blank!")
+    setError('') // clear error messages from screen
+  }
 
   const phoneInputView = () => {
     return (

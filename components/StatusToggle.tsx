@@ -1,11 +1,10 @@
 import React from 'react'
 import {View, Text} from 'react-native'
 import {useStore, StoreState} from '../Store'
-import {Status} from '../Firestore'
 import {themes, Header} from '../Utils'
 import {StyleSheet} from 'react-native'
 import firestore from '@react-native-firebase/firestore'
-import {setStatusOnline, setStatusOffline} from '../API'
+import {Status, setStatusOnline, setStatusOffline} from '../API'
 
 const setOfflineAfterNMins = __DEV__ ? 0.1 : 15
 

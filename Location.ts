@@ -23,7 +23,7 @@ class LocationController {
   private static isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient
   private static useNativeLocation = Platform.OS === 'ios' && !this.isExpoGo
   private lastGeocodeTime = 0
-  private lastPublishedLocation: {city: string; region: string; country: string} | null = null
+  public lastPublishedLocation: {city: string; region: string; country: string} | null = null
   private lastGeocodedLocation: ExpoLocation.LocationObject | null = null
   private locationSubscription: Subscription | null = null
   private throttledReceiveLocationUpdate = throttle(this.receiveLocationUpdate, 2000)
@@ -186,6 +186,9 @@ export const enableLocation = () => {
   const {locationPermissionGranted, setLocationEnabled} = store.getState() as StoreState
   setLocationEnabled(true)
   if (locationPermissionGranted) {
+    if (locationService.lastPublishedLocation != null) {
+      publishLocation(locationService.lastPublishedLocation)
+    }
     locationService.startMonitoringLocation()
     return
   } else {

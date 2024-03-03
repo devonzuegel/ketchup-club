@@ -3,7 +3,7 @@ import React, {forwardRef, useEffect, useState} from 'react'
 import {Text as RNText, TextInput as RNTextInput, StyleSheet, TouchableOpacity, View} from 'react-native'
 import {StoreState, useStore} from './Store'
 
-export const GlobalContext = React.createContext()
+export const GlobalContext = React.createContext({})
 
 const containerPadding = 16
 
@@ -46,14 +46,14 @@ export const themes = {
   },
 }
 
-const navBtnTextColor = (name_of_screen, current_screen, theme) =>
+const navBtnTextColor = (name_of_screen: string, current_screen: string, theme: 'light' | 'dark'): string =>
   name_of_screen == current_screen ? themes[theme].text_emphasis : themes[theme].text_input_placeholder
 
-const navBtnBorderColor = (name_of_screen, current_screen, theme) =>
+const navBtnBorderColor = (name_of_screen: string, current_screen: string, theme: 'light' | 'dark'): string =>
   name_of_screen == current_screen ? themes[theme].text_emphasis : themes[theme].text_input_placeholder
 
 export const NavBtns = ({navigation}) => {
-  const {theme} = useStore()
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
 
   const getCurrentScreen = () => {
     const {routes, index} = navigation.getState()
@@ -181,7 +181,7 @@ export const Header = ({children, style}) => {
 }
 
 export const Text = (props) => {
-  const {theme} = useStore()
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   return (
     <RNText {...props} style={{fontFamily: 'SFCompactRounded_Medium', color: themes[theme].text_primary, ...props.style}}>
       {props.children}
@@ -202,7 +202,7 @@ export const TextInput = forwardRef((props, ref) => {
 })
 
 export const Button = ({onPress, title, btnStyle, textStyle}) => {
-  const {theme} = useStore()
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   return (
     <TouchableOpacity
       onPress={onPress}

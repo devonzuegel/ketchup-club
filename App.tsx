@@ -3,13 +3,18 @@ import {View, Text} from 'react-native'
 import {createNativeStackNavigator, NativeStackNavigationProp} from '@react-navigation/native-stack'
 import {useFonts} from 'expo-font'
 import React from 'react'
-import {FriendsScreen} from './Friends'
-import HomeScreen from './Home'
-import {LoginScreen} from './Login'
-import {SettingsScreen} from './Settings'
+import {FriendsScreen} from './FriendsScreen'
+import HomeScreen from './HomeScreen'
+import {LoginScreen} from './LoginScreen'
+import {SettingsScreen} from './SettingsScreen'
+import {ProfileScreen} from './ProfileScreen'
 import {GlobalContext, Pre, fonts} from './Utils'
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth'
 import * as loadFirestore from './Firestore'
+import {Alert} from 'react-native'
+import messaging from '@react-native-firebase/messaging'
+import {LoadingScreen} from './LoadingScreen'
+import {handleBackgroundNotification, handleForegroundNotification} from './Push'
 
 export const debug = false
 
@@ -23,13 +28,15 @@ type RootStackParamList = {
   Home: undefined
   Settings: undefined
   Friends: undefined
+  Profile: {uid: string}
 }
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>
 export type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>
 export type FriendsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Friends'>
+export type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>
 
-const Stack = createNativeStackNavigator()
+export const Stack = createNativeStackNavigator()
 
 const LoggedInNavigator = () => (
   <NavigationContainer>
@@ -37,9 +44,14 @@ const LoggedInNavigator = () => (
       <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}} initialParams={{itemId: 10}} />
       <Stack.Screen name="Settings" component={SettingsScreen} options={{headerShown: false}} />
       <Stack.Screen name="Friends" component={FriendsScreen} options={{headerShown: false}} />
+      <Stack.Screen name="Profile" component={ProfileScreen} options={{headerShown: true}} />
     </Stack.Navigator>
   </NavigationContainer>
 )
+
+messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+  handleBackgroundNotification(remoteMessage)
+})
 
 export default function App() {
   const [initializing, setInitializing] = React.useState(true)
@@ -55,16 +67,19 @@ export default function App() {
   }
 
   React.useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged)
-    return subscriber
+    const authSubscriber = auth().onAuthStateChanged(onAuthStateChanged)
+    const foregroundMessageSubscriber = messaging().onMessage(async (remoteMessage) => {
+      handleForegroundNotification(remoteMessage)
+    })
+
+    return () => {
+      authSubscriber()
+      foregroundMessageSubscriber()
+    }
   }, [])
 
   if (initializing || !fontsLoaded || !fs) {
-    return (
-      <View style={{}}>
-        <Text>Loading...</Text>
-      </View>
-    )
+    return LoadingScreen
   }
 
   return (

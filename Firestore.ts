@@ -2,58 +2,9 @@ import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth'
 import firestore, {FirebaseFirestoreTypes} from '@react-native-firebase/firestore'
 import {store, StoreState} from './Store'
 import {setStatusOffline} from './API'
+import {User, Status, Location} from './API'
 
 type Unsubscribe = () => void
-
-export interface RenderedUser {
-  uid: string
-  name: string
-  phone: string
-  status?: {
-    online: boolean
-    went_online?: FirebaseFirestoreTypes.Timestamp
-    oncall?: boolean
-    expiry: FirebaseFirestoreTypes.Timestamp
-  } | null
-  location?: {
-    city: string
-    region: string
-    country: string
-  } | null
-}
-
-export interface User {
-  uid: string
-  name: string
-  phone: string
-  location?: Location | null
-  status?: Status | null
-}
-
-export interface Location {
-  uid: string
-  city: string
-  region: string
-  country: string
-  visibility: string
-}
-
-export interface Status {
-  uid: string
-  online: boolean
-  went_online?: FirebaseFirestoreTypes.Timestamp
-  oncall?: boolean
-  expiry: FirebaseFirestoreTypes.Timestamp
-  visibility?: string
-}
-
-interface statusForPublishing {
-  online: boolean
-  went_online?: FirebaseFirestoreTypes.FieldValue
-  oncall?: boolean
-  expiry: FirebaseFirestoreTypes.FieldValue
-  visibility?: string
-}
 
 class Firestore {
   private static instance: Firestore
@@ -64,6 +15,7 @@ class Firestore {
   private locationUnsubscriber: Unsubscribe | null = null
   private statusUnsubscriber: Unsubscribe | null = null
   private timers = new Map<string, NodeJS.Timeout>()
+  private uid: string | null = null
 
   private constructor() {
     console.log('firestore controller constructed')
@@ -93,6 +45,7 @@ class Firestore {
   private subscribeToFirestore(): void {
     auth().onAuthStateChanged((user) => {
       if (user) {
+        this.uid = user.uid
         // User is signed in.
         this.userUnsubsriber = this.subscribeToLoggedInUserInFirestore(user)
         this.statusUnsubscriber = this.subscribeToStatusInFirestore(user)
@@ -140,6 +93,7 @@ class Firestore {
   private subscribeToFriendsInFirestore(): Unsubscribe {
     const subscriber = firestore()
       .collection('users')
+      .where(firestore.FieldPath.documentId(), '!=', this.uid) // subbing for friends-only query
       .onSnapshot((querySnapshot) => {
         if (!querySnapshot) {
           // console.log('no Friends querySnapshot')
@@ -149,9 +103,6 @@ class Firestore {
         const users = querySnapshot.docs.map((doc) => ({
           ...(doc.data() as User),
           uid: doc.id,
-          // remove location and status from user object because they are doc references and can't be stored in JSON
-          location: undefined,
-          status: undefined,
         }))
         store.setState({friends: users})
       })
@@ -159,19 +110,26 @@ class Firestore {
   }
 
   private subscribeToLocationsInFirestore(): Unsubscribe {
+    console.log('subscribing to locations using uid:', this.uid)
     const subscriber = firestore()
       .collection('locations')
-      .where('visibility', '==', 'public')
+      .where(firestore.FieldPath.documentId(), '!=', this.uid) // subbing for friends-only query
+      .where('visibility', 'array-contains-any', [this.uid, 'public'])
+      // .where('visibility', 'array-contains', 'public')
       .onSnapshot((querySnapshot) => {
+        console.log('query snapshot:', querySnapshot)
         if (!querySnapshot) {
-          // console.log('no Friends querySnapshot')
+          console.log('no locations querySnapshot')
           return
         }
-        // console.log('getting data about locations:', querySnapshot.docs.length)
+        console.log('getting data about locations:', querySnapshot.docs.length)
         const locations = querySnapshot.docs.map((doc) => ({
           ...(doc.data() as Location),
           uid: doc.id,
         }))
+        querySnapshot.docs.forEach((doc) => {
+          console.log('location:', doc.data())
+        })
         store.setState({locations: locations})
       })
     return subscriber
@@ -180,9 +138,12 @@ class Firestore {
   private subscribeToFriendStatusesInFirestore(): Unsubscribe {
     const subscriber = firestore()
       .collection('statuses')
+      .where(firestore.FieldPath.documentId(), '!=', this.uid) // subbing for friends-only query
       .where('online', '==', true)
-      .where('visibility', '==', 'public')
+      // .where('visibility', 'array-contains', 'public')
+      .where('visibility', 'array-contains-any', [this.uid, 'public'])
       .onSnapshot((querySnapshot) => {
+        console.log('query snapshot:', querySnapshot)
         if (!querySnapshot) {
           console.log('no statuses querySnapshot')
           return
@@ -192,6 +153,9 @@ class Firestore {
           ...(doc.data() as Status),
           uid: doc.id,
         }))
+        querySnapshot.docs.forEach((doc) => {
+          console.log('status:', doc.data())
+        })
         statuses = statuses.filter((status) => status.expiry.toMillis() > Date.now())
         for (const status of statuses) {
           if (status.expiry && status.expiry.toMillis() > Date.now()) {
@@ -224,8 +188,8 @@ class Firestore {
           ...(doc.data() as User),
           uid: doc.id,
           // remove location and status from user object
-          location: undefined,
-          status: undefined,
+          // location: undefined,
+          // status: undefined,
         }
         store.setState({user: u})
       })

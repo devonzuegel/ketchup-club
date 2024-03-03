@@ -2,7 +2,7 @@ import {useStore as use} from 'zustand'
 import {createStore} from 'zustand/vanilla'
 import {createJSONStorage, persist} from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {User, Status, Location, RenderedUser} from './Firestore'
+import {User, Status, Location, RenderedUser} from './API'
 
 export interface StoreState {
   theme: 'light' | 'dark'
@@ -27,6 +27,15 @@ export interface StoreState {
   setLocationPermissionGranted: (lpg: boolean) => void
   locationEnabled: boolean
   setLocationEnabled: (le: boolean) => void
+  notificationPermissionGranted: boolean
+  setNotificationPermissionGranted: (npg: boolean) => void
+  notificationsEnabled: boolean
+  setNotificationsEnabled: (ne: boolean) => void
+  getUserForUID: (uid: string) => RenderedUser | null
+  locationVisibility: string
+  setLocationVisibility: (lv: string) => void
+  statusVisibility: string
+  setStatusVisibility: (sv: string) => void
 }
 
 export const store = createStore<StoreState>()(
@@ -66,7 +75,7 @@ export const store = createStore<StoreState>()(
       setLocations: (l: Location[]) => set({locations: l}),
       renderedFriends: () => {
         const friends = get().friends
-        const statuses = get().statuses //.filter((s: Status) => !s.expiry || s.expiry.toMillis() > Date.now())
+        const statuses = get().statuses.filter((s: Status) => !s.expiry || s.expiry.toMillis() > Date.now())
         const locations = get().locations
         if (friends.length === 0) return []
         return friends.map((friend: User) => {
@@ -84,6 +93,20 @@ export const store = createStore<StoreState>()(
         if (renderedFriends.length === 0) return []
         return renderedFriends.filter((user: RenderedUser) => user.status?.online)
       },
+      notificationPermissionGranted: false,
+      setNotificationPermissionGranted: (npg: boolean) => set({notificationPermissionGranted: npg}),
+      notificationsEnabled: false,
+      setNotificationsEnabled: (ne: boolean) => set({notificationsEnabled: ne}),
+      getUserForUID: (uid: string) => {
+        const friend = get()
+          .renderedFriends()
+          .filter((u: RenderedUser) => u.uid === uid)[0]
+        return friend || null
+      },
+      locationVisibility: 'public',
+      setLocationVisibility: (lv: string) => set({locationVisibility: lv}),
+      statusVisibility: 'public',
+      setStatusVisibility: (sv: string) => set({statusVisibility: sv}),
     }),
     {
       name: 'global-storage', // unique name
