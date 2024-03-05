@@ -2,42 +2,50 @@ import {EventEmitter, Subscription} from 'expo-modules-core'
 import NativeLocationModule from './src/NativeLocationModule'
 import {LocationUpdatePayload, AuthorizationPayload, LocationErrorPayload} from './src/NativeLocation.types'
 
-export async function startMonitoring() {
-  NativeLocationModule.startMonitoring()
-}
+class LocationManager {
+  private emitter: EventEmitter | null
 
-export async function stopMonitoring() {
-  NativeLocationModule.stopMonitoring()
-}
-
-export async function requestPermission() {
-  NativeLocationModule.requestPermission()
-}
-
-const emitter = NativeLocationModule ? new EventEmitter(NativeLocationModule) : null
-
-export function addLocationUpdateListener(listener: (event: LocationUpdatePayload) => void): Subscription {
-  if (emitter == null) {
-    console.log('emitter is null')
-    return {remove: () => {}}
+  constructor() {
+    this.emitter = NativeLocationModule ? new EventEmitter(NativeLocationModule) : null
   }
-  return emitter.addListener<LocationUpdatePayload>('onLocationUpdate', listener)
-}
 
-export function addAuthorizationChangeListener(listener: (event: AuthorizationPayload) => void): Subscription {
-  if (emitter == null) {
-    console.log('emitter is null')
-    return {remove: () => {}}
+  public async startMonitoring() {
+    NativeLocationModule.startMonitoring()
   }
-  return emitter.addListener<AuthorizationPayload>('onAuthorizationChange', listener)
-}
 
-export function addLocationErrorListener(listener: (event: LocationErrorPayload) => void): Subscription {
-  if (emitter == null) {
-    console.log('emitter is null')
-    return {remove: () => {}}
+  public async stopMonitoring() {
+    NativeLocationModule.stopMonitoring()
   }
-  return emitter.addListener<LocationErrorPayload>('onLocationError', listener)
+
+  public async requestPermission() {
+    NativeLocationModule.requestPermission()
+  }
+
+  public addLocationUpdateListener(listener: (event: LocationUpdatePayload) => void): Subscription {
+    if (this.emitter == null) {
+      console.log('emitter is null')
+      return {remove: () => {}}
+    }
+    return this.emitter.addListener<LocationUpdatePayload>('onLocationUpdate', listener)
+  }
+
+  public addAuthorizationChangeListener(listener: (event: AuthorizationPayload) => void): Subscription {
+    if (this.emitter == null) {
+      console.log('emitter is null')
+      return {remove: () => {}}
+    }
+    return this.emitter.addListener<AuthorizationPayload>('onAuthorizationChange', listener)
+  }
+
+  public addLocationErrorListener(listener: (event: LocationErrorPayload) => void): Subscription {
+    if (this.emitter == null) {
+      console.log('emitter is null')
+      return {remove: () => {}}
+    }
+    return this.emitter.addListener<LocationErrorPayload>('onLocationError', listener)
+  }
 }
 
-export {LocationUpdatePayload, AuthorizationPayload, LocationErrorPayload}
+const nativeLocationManager = new LocationManager()
+
+export default nativeLocationManager

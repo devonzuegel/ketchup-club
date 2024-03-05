@@ -1,7 +1,8 @@
 import * as ExpoLocation from 'expo-location'
 import {store, StoreState} from './Store'
 import {Platform} from 'react-native'
-import * as NativeLocation from './modules/native-location'
+// import * as NativeLocation from './modules/native-location'
+import nativeLocationManager from './modules/native-location'
 import {Subscription} from 'expo-modules-core'
 import Constants, {ExecutionEnvironment} from 'expo-constants'
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth'
@@ -44,7 +45,7 @@ class LocationController {
 
   private initializeSubscriptions() {
     if (LocationController.useNativeLocation) {
-      const statusSubscription = NativeLocation.addAuthorizationChangeListener(({status: status}) => {
+      const statusSubscription = nativeLocationManager.addAuthorizationChangeListener(({status: status}) => {
         console.log('NativeLocation permission status changed', status)
 
         // not determined = 0
@@ -64,12 +65,12 @@ class LocationController {
         }
       })
 
-      const locationUpdateSubscription = NativeLocation.addLocationUpdateListener(({location: location}) => {
+      const locationUpdateSubscription = nativeLocationManager.addLocationUpdateListener(({location: location}) => {
         // console.log('NativeLocation updated', location)
         this.throttledReceiveLocationUpdate(location)
       })
 
-      const locationErrorSubscription = NativeLocation.addLocationErrorListener(({error: error}) => {
+      const locationErrorSubscription = nativeLocationManager.addLocationErrorListener(({error: error}) => {
         console.log('NativeLocation error', error)
       })
     } else {
@@ -99,7 +100,7 @@ class LocationController {
 
   public async requestLocationPermission() {
     if (LocationController.useNativeLocation) {
-      NativeLocation.requestPermission()
+      nativeLocationManager.requestPermission()
       return
     } else {
       // For now we are only getting background location permission on iOS not using Expo Go
@@ -114,7 +115,7 @@ class LocationController {
   }
   public async startMonitoringLocation() {
     if (LocationController.useNativeLocation) {
-      NativeLocation.startMonitoring()
+      nativeLocationManager.startMonitoring()
     } else {
       // note that the timeInterval parameter only works on Android and seems to negate distanceInterval, so don't use it
       // distanceInterval is definitely not working, so we may have to go with native code here to get the desired behavior
@@ -127,7 +128,7 @@ class LocationController {
 
   public stopMonitoringLocation() {
     if (LocationController.useNativeLocation) {
-      NativeLocation.stopMonitoring()
+      nativeLocationManager.stopMonitoring()
     } else {
       this.locationSubscription?.remove()
     }

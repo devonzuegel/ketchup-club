@@ -1,4 +1,4 @@
-import {NavigationContainer} from '@react-navigation/native'
+import {NavigationContainer, RouteProp} from '@react-navigation/native'
 import {View, Text} from 'react-native'
 import {createNativeStackNavigator, NativeStackNavigationProp} from '@react-navigation/native-stack'
 import {useFonts} from 'expo-font'
@@ -24,7 +24,7 @@ console.log('          mode: ' + (__DEV__ ? 'DEVELOPMENT  🛠️' : 'PRODUCTION
 // console.log('  API base URL:', apiBaseURL)
 console.log('=================================================================')
 
-type RootStackParamList = {
+export type RootStackParamList = {
   Home: undefined
   Settings: undefined
   Friends: undefined
@@ -34,7 +34,12 @@ type RootStackParamList = {
 export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>
 export type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>
 export type FriendsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Friends'>
-export type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>
+// type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>
+// type ProfileScreenRouteProp = RouteProp<RootStackParamList, 'Profile'>
+export type ProfileScreenProps = {
+  route: RouteProp<RootStackParamList, 'Profile'>
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Profile'>
+}
 
 export const Stack = createNativeStackNavigator()
 

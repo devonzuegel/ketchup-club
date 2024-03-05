@@ -45,6 +45,9 @@ class Firestore {
   private subscribeToFirestore(): void {
     auth().onAuthStateChanged((user) => {
       if (user) {
+        if (this.uid == user.uid) {
+          return // sometimes this function fires more than once, but we don't want multiple subscribers for each query type
+        }
         this.uid = user.uid
         // User is signed in.
         this.userUnsubsriber = this.subscribeToLoggedInUserInFirestore(user)
@@ -57,6 +60,7 @@ class Firestore {
         // No user is signed in.
         // destroy database subscriptions
         store.setState((state: StoreState) => {
+          this.uid = null
           state.setUser(null)
           state.setLocation(null)
           state.setStatus(null)
@@ -110,25 +114,25 @@ class Firestore {
   }
 
   private subscribeToLocationsInFirestore(): Unsubscribe {
-    console.log('subscribing to locations using uid:', this.uid)
+    // console.log('subscribing to locations using uid:', this.uid)
     const subscriber = firestore()
       .collection('locations')
       .where(firestore.FieldPath.documentId(), '!=', this.uid) // subbing for friends-only query
       .where('visibility', 'array-contains-any', [this.uid, 'public'])
       // .where('visibility', 'array-contains', 'public')
       .onSnapshot((querySnapshot) => {
-        console.log('query snapshot:', querySnapshot)
+        // console.log('query snapshot:', querySnapshot)
         if (!querySnapshot) {
-          console.log('no locations querySnapshot')
+          // console.log('no locations querySnapshot')
           return
         }
-        console.log('getting data about locations:', querySnapshot.docs.length)
+        // console.log('getting data about locations:', querySnapshot.docs.length)
         const locations = querySnapshot.docs.map((doc) => ({
           ...(doc.data() as Location),
           uid: doc.id,
         }))
         querySnapshot.docs.forEach((doc) => {
-          console.log('location:', doc.data())
+          // console.log('location:', doc.data())
         })
         store.setState({locations: locations})
       })
@@ -143,19 +147,16 @@ class Firestore {
       // .where('visibility', 'array-contains', 'public')
       .where('visibility', 'array-contains-any', [this.uid, 'public'])
       .onSnapshot((querySnapshot) => {
-        console.log('query snapshot:', querySnapshot)
+        // console.log('query snapshot:', querySnapshot)
         if (!querySnapshot) {
-          console.log('no statuses querySnapshot')
+          // console.log('no statuses querySnapshot')
           return
         }
-        console.log('getting data about statuses:', querySnapshot.docs.length)
+        // console.log('getting data about statuses:', querySnapshot.docs.length)
         let statuses = querySnapshot.docs.map((doc) => ({
           ...(doc.data() as Status),
           uid: doc.id,
         }))
-        querySnapshot.docs.forEach((doc) => {
-          console.log('status:', doc.data())
-        })
         statuses = statuses.filter((status) => status.expiry.toMillis() > Date.now())
         for (const status of statuses) {
           if (status.expiry && status.expiry.toMillis() > Date.now()) {

@@ -1,21 +1,13 @@
 import * as React from 'react'
 // import {RenderedUser} from './Firestore'
 import {Button, Text} from './Utils'
-import {ProfileScreenNavigationProp} from './App'
+import {ProfileScreenProps} from './App'
 import {useStore, StoreState} from './Store'
 import {RenderedUser} from './API'
-import {RouteProp} from '@react-navigation/native'
 import {View} from 'react-native'
 import * as api from './API'
 
-type RootStackParamList = {
-  Home: undefined
-  Settings: undefined
-  Friends: undefined
-  Profile: {uid: string}
-}
-
-export const ProfileScreen = ({route}: RouteProp<RootStackParamList, 'Profile'>) => {
+export const ProfileScreen: React.FC<ProfileScreenProps> = ({route}) => {
   const {uid} = route.params
   console.log('ProfileScreen: uid:', uid)
   const self = useStore((state: StoreState) => state.renderedUser) as RenderedUser
