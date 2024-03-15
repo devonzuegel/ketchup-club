@@ -1,34 +1,38 @@
 import * as React from 'react'
-// import {RenderedUser} from './Firestore'
-import {Button, Text} from './Utils'
-import {ProfileScreenProps} from './App'
-import {useStore, StoreState} from './Store'
-import {RenderedUser} from './API'
 import {View} from 'react-native'
 import * as api from './API'
+import {RenderedUser} from './API'
+import {StoreState, useStore} from './Store'
+import {Button, Text} from './Utils'
+import {ProfileScreenProps} from './components/LoggedInNavigator'
 
-export const ProfileScreen: React.FC<ProfileScreenProps> = ({route}) => {
-  const {uid} = route.params
+export const ProfileScreen: React.FC<ProfileScreenProps> = ({route, navigation}) => {
+  const {uid} = route?.params ?? {}
   console.log('ProfileScreen: uid:', uid)
   const self = useStore((state: StoreState) => state.renderedUser) as RenderedUser
-  const uFromStore = useStore((state: StoreState) => state.getUserForUID(uid)) as RenderedUser | null
+  const uFromStore = useStore((state: StoreState) => (uid ? (state.getUserForUID(uid) as RenderedUser | null) : null))
   const [user, setUser] = React.useState<RenderedUser | null>(null)
   const [followerCount, setFollowerCount] = React.useState<number>(0)
   const [followingCount, setFollowingCount] = React.useState<number>(0)
 
   React.useEffect(() => {
+    if (uid == null) {
+      return
+    }
     console.log('uid:', uid)
     if (uid === self.uid) {
       console.log('ProfileScreen: setting user to self')
       setUser(self)
     } else if (uFromStore != null) {
-      setUser(uFromStore)
+      setUser(uFromStore as RenderedUser)
     } else {
       const getUser = async (uid: string) => {
         console.log('ProfileScreen: fetching user from server for uid:', uid)
         const u = await api.getUserForUID(uid)
         if (u != null) {
-          setUser(u)
+          setUser(u as RenderedUser)
+        } else {
+          setUser(null)
         }
       }
       getUser(uid)

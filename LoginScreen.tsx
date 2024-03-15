@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react'
-import {View, Keyboard} from 'react-native'
+import {View, Keyboard, FlexAlignType} from 'react-native'
 import {Button, Text, TextInput, styles, GlobalContext, countryCode, removeCountryCode, themes} from './Utils'
 import PhoneInput from './PhoneInput'
 import {store, useStore, StoreState} from './Store'
@@ -10,8 +10,15 @@ const debug = false
 const stylesheet = {
   wrapper: {
     padding: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center' as FlexAlignType, // not sure why typescript is not inferring the type automatically here
+    justifyContent: 'center' as
+      | 'center'
+      | 'flex-start'
+      | 'flex-end'
+      | 'space-between'
+      | 'space-around'
+      | 'space-evenly'
+      | undefined,
   },
 }
 
@@ -24,7 +31,7 @@ export const LoginScreen = () => {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
-  const smsCodeFieldRef = useRef()
+  const smsCodeFieldRef = useRef<TextInput | null>(null)
 
   React.useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged)

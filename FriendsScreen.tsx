@@ -1,13 +1,13 @@
 import {View, Keyboard, Dimensions, FlatList} from 'react-native'
-import {Text, TextInput, styles, NavBtns, Header, DotAnimation, themes, formatPhone, Spacer} from './Utils'
+import {Text, TextInput, styles, Header, DotAnimation, themes, formatPhone, Spacer} from './Utils'
 import React from 'react'
 import {StoreState, useStore} from './Store'
 import {RenderedUser} from './API'
-import {FriendsScreenNavigationProp} from './App'
+import {FriendsScreenProps} from './components/LoggedInNavigator'
 import UserListItem from './components/UserListItem'
 import SearchBar from './components/SearchBar'
 
-export const FriendsScreen = ({navigation}: {navigation: FriendsScreenNavigationProp}) => {
+export const FriendsScreen: React.FC<FriendsScreenProps> = ({navigation}) => {
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   const friends = useStore((state: StoreState) => state.renderedFriends()) as RenderedUser[]
 
@@ -36,7 +36,7 @@ export const FriendsScreen = ({navigation}: {navigation: FriendsScreenNavigation
         )}
       </View>
 
-      <NavBtns navigation={navigation} />
+      {/* <NavBtns navigation={navigation} /> */}
     </View>
   )
 }

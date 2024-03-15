@@ -1,14 +1,15 @@
 import React from 'react'
 import {StyleSheet, View, AppState, TouchableOpacity} from 'react-native'
-import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone, themes, Spacer} from '../Utils'
+import {Text, styles, Header, DotAnimation, GlobalContext, formatPhone, themes, Spacer} from '../Utils'
 import {RenderedUser} from '../API'
 import {useStore, StoreState} from '../Store'
 import {callNumber} from '../Phone'
-import {useNavigation} from '@react-navigation/native'
+// import {NavigationProp, useNavigation} from '@react-navigation/native'
+import {NativeStackNavigationProp} from '@react-navigation/native-stack'
+import {RootStackParamList, ProfileScreenProps} from './LoggedInNavigator'
 
-export const UserListItem = (user: RenderedUser) => {
+export const UserListItem = (user: RenderedUser, navigation: NativeStackNavigationProp<RootStackParamList, 'Profile'>) => {
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
-  const navigation = useNavigation()
 
   return (
     <TouchableOpacity

@@ -1,16 +1,15 @@
 import React from 'react'
 import {View} from 'react-native'
-import {styles, NavBtns, Header, formatPhone, themes} from './Utils'
+import {styles, Header, formatPhone, themes} from './Utils'
 import {disableLocation, enableLocation} from './Location'
 import {useStore, StoreState} from './Store'
 import auth from '@react-native-firebase/auth'
 import {User, updateLocationVisibility, updateStatusVisibility} from './API'
-import {SettingsScreenNavigationProp} from './App'
+import {SettingsScreenProps} from './components/LoggedInNavigator'
 import SettingItem from './components/SettingItem'
 import {enableNotifications, disableNotifications} from './Push'
-import {update} from 'lodash'
 
-export const SettingsScreen = ({navigation}: {navigation: SettingsScreenNavigationProp}) => {
+export const SettingsScreen: React.FC<SettingsScreenProps> = ({navigation}) => {
   const user = useStore((state: StoreState) => state.user) as User | null
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   const setTheme = useStore((state: StoreState) => state.setTheme) as (theme: 'light' | 'dark') => void
@@ -131,8 +130,6 @@ export const SettingsScreen = ({navigation}: {navigation: SettingsScreenNavigati
           }}
         />
       </View>
-
-      <NavBtns navigation={navigation} />
     </View>
   )
 }

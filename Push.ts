@@ -2,6 +2,20 @@ import messaging, {FirebaseMessagingTypes} from '@react-native-firebase/messagin
 import {Alert} from 'react-native'
 import {store, StoreState} from './Store'
 
+export const registerFCMToken = async () => {
+  const notificationsEnabled = store.getState().notificationsEnabled as boolean
+  console.log('notifications enabled:', notificationsEnabled)
+  const token = await messaging() // registration may not be happening because we don't have an APN key set up
+    .getToken()
+    .catch((e) => console.log('Failed to get FCM token:', e))
+  if (token) {
+    console.log('Device is registered with FCM.')
+    console.log('🔒 token:', token)
+  } else {
+    console.log('Failed to get FCM token. Device might not be registered.')
+  }
+}
+
 const requestUserPermission = async () => {
   const {setNotificationPermissionGranted, setNotificationsEnabled} = store.getState() as StoreState
   const authStatus = await messaging().requestPermission()

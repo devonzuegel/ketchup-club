@@ -1,13 +1,13 @@
 import React from 'react'
 import {StyleSheet, View, AppState, FlatList} from 'react-native'
-import {Text, styles, NavBtns, Header, DotAnimation, GlobalContext, formatPhone, themes, Spacer} from './Utils'
+import {Text, styles, Header, DotAnimation, GlobalContext, formatPhone, themes, Spacer} from './Utils'
 import {useStore, StoreState} from './Store'
 import {RenderedUser} from './API'
-import {HomeScreenNavigationProp} from './App'
+import {HomeScreenProps} from './components/LoggedInNavigator'
 import StatusToggle from './components/StatusToggle'
 import UserListItem from './components/UserListItem'
 
-export default function HomeScreen({navigation}: {navigation: HomeScreenNavigationProp}) {
+const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   const user = useStore((state: StoreState) => state.renderedUser()) as RenderedUser | null
   const onlineFriends = useStore((state: StoreState) => state.onlineFriends()) as RenderedUser[]
@@ -97,7 +97,9 @@ export default function HomeScreen({navigation}: {navigation: HomeScreenNavigati
         </View>
       </View>
 
-      <NavBtns navigation={navigation} />
+      {/* <NavBtns navigation={navigation} /> */}
     </View>
   )
 }
+
+export default HomeScreen
