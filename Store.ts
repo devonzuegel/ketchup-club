@@ -2,30 +2,111 @@ import {useStore as use} from 'zustand'
 import {createStore} from 'zustand/vanilla'
 import {createJSONStorage, persist} from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {LocationGeocodedAddress, LocationObject} from 'expo-location'
+import {User, Status, Location, RenderedUser} from './API'
 
 export interface StoreState {
-  address: LocationGeocodedAddress
-  location: LocationObject
-  locationPermissionGranted: boolean
   theme: 'light' | 'dark'
-  setAddress: (a: LocationGeocodedAddress) => void
-  setLocation: (l: LocationObject) => void
+  setTheme: (t: 'light' | 'dark') => void
+  user: User | null
+  setUser: (u: User | null) => void
+  status: Status | null
+  setStatus: (s: Status | null) => void
+  location: Location | null
+  setLocation: (l: Location | null) => void
+  renderedUser: () => RenderedUser | null
+  friends: User[]
+  setFriends: (f: User[]) => void
+  statuses: Status[]
+  setStatuses: (s: Status[]) => void
+  removeStatus: (id: string) => void
+  locations: Location[]
+  setLocations: (l: Location[]) => void
+  renderedFriends: () => RenderedUser[]
+  onlineFriends: () => RenderedUser[]
+  locationPermissionGranted: boolean
   setLocationPermissionGranted: (lpg: boolean) => void
-  setTheme: (t: string) => void
+  locationEnabled: boolean
+  setLocationEnabled: (le: boolean) => void
+  notificationPermissionGranted: boolean
+  setNotificationPermissionGranted: (npg: boolean) => void
+  notificationsEnabled: boolean
+  setNotificationsEnabled: (ne: boolean) => void
+  getUserForUID: (uid: string) => RenderedUser | null
+  locationVisibility: string
+  setLocationVisibility: (lv: string) => void
+  statusVisibility: string
+  setStatusVisibility: (sv: string) => void
 }
 
-export const store = createStore(
+export const store = createStore<StoreState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       theme: 'light',
-      setTheme: (t: string) => set({theme: t}),
-      address: null,
-      setAddress: (a: LocationGeocodedAddress) => set({address: a}),
-      location: null,
-      setLocation: (l: LocationObject) => set({location: l}),
+      setTheme: (t: 'light' | 'dark') => set({theme: t}),
       locationPermissionGranted: false,
       setLocationPermissionGranted: (lpg: boolean) => set({locationPermissionGranted: lpg}),
+      locationEnabled: false,
+      setLocationEnabled: (le: boolean) => set({locationEnabled: le}),
+      user: null,
+      setUser: (u: User | null) => set({user: u}),
+      status: null,
+      setStatus: (s: Status | null) => set({status: s}),
+      location: null,
+      setLocation: (l: Location | null) => set({location: l}),
+      renderedUser: () => {
+        const user = get().user
+        const status = get().status
+        const location = get().location
+        if (!user) return null
+        let u = user as RenderedUser
+        u.status = status || undefined
+        u.location = location || undefined
+        return user
+      },
+      friends: [],
+      setFriends: (f: User[]) => set({friends: f}),
+      statuses: [],
+      setStatuses: (s: Status[]) => set({statuses: s}),
+      removeStatus: (id: string) =>
+        set((state: StoreState) => ({
+          statuses: state.statuses.filter((status: Status) => status.uid !== id),
+        })),
+      locations: [],
+      setLocations: (l: Location[]) => set({locations: l}),
+      renderedFriends: () => {
+        const friends = get().friends
+        const statuses = get().statuses.filter((s: Status) => !s.expiry || s.expiry.toMillis() > Date.now())
+        const locations = get().locations
+        if (friends.length === 0) return []
+        return friends.map((friend: User) => {
+          const status = statuses.find((s: Status) => s.uid === friend.uid)
+          const location = locations.find((l: Location) => l.uid === friend.uid)
+          return {
+            ...friend,
+            status: status,
+            location: location,
+          }
+        })
+      },
+      onlineFriends: () => {
+        const renderedFriends = get().renderedFriends()
+        if (renderedFriends.length === 0) return []
+        return renderedFriends.filter((user: RenderedUser) => user.status?.online)
+      },
+      notificationPermissionGranted: false,
+      setNotificationPermissionGranted: (npg: boolean) => set({notificationPermissionGranted: npg}),
+      notificationsEnabled: false,
+      setNotificationsEnabled: (ne: boolean) => set({notificationsEnabled: ne}),
+      getUserForUID: (uid: string) => {
+        const friend = get()
+          .renderedFriends()
+          .filter((u: RenderedUser) => u.uid === uid)[0]
+        return friend || null
+      },
+      locationVisibility: 'public',
+      setLocationVisibility: (lv: string) => set({locationVisibility: lv}),
+      statusVisibility: 'public',
+      setStatusVisibility: (sv: string) => set({statusVisibility: sv}),
     }),
     {
       name: 'global-storage', // unique name
@@ -52,7 +133,7 @@ In a React component:
 
       or possibly better:
 
-      const address = useStore((state: StoreState) => state.address)
+      const address = useStore((state: StoreState) => state.address) as string
 
 
     The component will be bound to value in the store, so the UI will update when the store updates.

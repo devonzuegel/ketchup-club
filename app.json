@@ -20,6 +20,24 @@
           "isIosBackgroundLocationEnabled": true,
           "isAndroidBackgroundLocationEnabled": true
         }
+      ],
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Allow $(PRODUCT_NAME) to access your contacts."
+        }
+      ],
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/messaging",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "deploymentTarget": "17.2"
+          }
+        }
       ]
     ],
     "ios": {
@@ -28,6 +46,7 @@
         "ITSAppUsesNonExemptEncryption": false,
         "UIBackgroundModes": ["location"]
       },
+      "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.adventurelandinstitute.ketchupclub"
     },
     "android": {
@@ -40,6 +59,7 @@
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE"
       ],
+      "googleServicesFile": "./google-services.json",
       "package": "com.devonzuegel.ketchupclub"
     },
     "web": {

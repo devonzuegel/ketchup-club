@@ -1,9 +1,26 @@
 import {PhoneNumberFormat, PhoneNumberUtil} from 'google-libphonenumber'
-import React, {forwardRef, useEffect, useState} from 'react'
-import {Text as RNText, TextInput as RNTextInput, StyleSheet, TouchableOpacity, View} from 'react-native'
+import React, {ReactNode, forwardRef, useEffect, useState, CSSProperties} from 'react'
+import {
+  Text as RNText,
+  TextProps as RNTextProps,
+  TextInput as RNTextInput,
+  TextInputProps as RNTextInputProps,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import {StoreState, useStore} from './Store'
 
-export const GlobalContext = React.createContext()
+interface TextProps extends RNTextProps {
+  children: ReactNode
+}
+
+interface HeaderProps {
+  children: any // fix
+  style?: CSSProperties
+}
+
+export const GlobalContext = React.createContext({})
 
 const containerPadding = 16
 
@@ -46,58 +63,59 @@ export const themes = {
   },
 }
 
-const navBtnTextColor = (name_of_screen, current_screen, theme) =>
-  name_of_screen == current_screen ? themes[theme].text_emphasis : themes[theme].text_input_placeholder
+// const navBtnTextColor = (name_of_screen: string, current_screen: string, theme: 'light' | 'dark'): string =>
+//   name_of_screen == current_screen ? themes[theme].text_emphasis : themes[theme].text_input_placeholder
 
-const navBtnBorderColor = (name_of_screen, current_screen, theme) =>
-  name_of_screen == current_screen ? themes[theme].text_emphasis : themes[theme].text_input_placeholder
+// const navBtnBorderColor = (name_of_screen: string, current_screen: string, theme: 'light' | 'dark'): string =>
+//   name_of_screen == current_screen ? themes[theme].text_emphasis : themes[theme].text_input_placeholder
 
-export const NavBtns = ({navigation}) => {
-  const {theme} = useStore()
+// export const NavBtns = ({navigation}) => {
+//   const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
 
-  const getCurrentScreen = () => {
-    const {routes, index} = navigation.getState()
-    return routes[index].name
-  }
-  const current_screen = getCurrentScreen()
+//   const getCurrentScreen = () => {
+//     const {routes, index} = navigation.getState()
+//     return routes[index].name
+//   }
+//   const current_screen = getCurrentScreen()
 
-  return (
-    <View>
-      {/* <Pre data={AsyncStorage.getAllKeys()} /> */}
+//   return (
+//     <View>
+//       {/* <Pre data={AsyncStorage.getAllKeys()} /> */}
 
-      {/* clear every key set in AsyncStorage: */}
-      {/* <Button title="reset AsyncStorage" onPress={() => AsyncStorage.clear()} /> */}
+//       {/* clear every key set in AsyncStorage: */}
+//       {/* <Button title="reset AsyncStorage" onPress={() => AsyncStorage.clear()} /> */}
 
-      <View flexDirection="row" justifyContent="space-around" style={{marginBottom: 40}}>
-        <Button
-          title="Friends"
-          btnStyle={{borderColor: navBtnBorderColor('Friends', current_screen, theme)}}
-          textStyle={{fontSize: 16, color: navBtnTextColor('Friends', current_screen, theme)}}
-          onPress={() => navigation.navigate('Friends')}
-        />
-        <Button
-          title="Home"
-          btnStyle={{borderColor: navBtnBorderColor('Home', current_screen, theme)}}
-          textStyle={{fontSize: 16, color: navBtnTextColor('Home', current_screen, theme)}}
-          onPress={() => navigation.push('Home', {itemId: Math.floor(Math.random() * 100)})}
-        />
-        <Button
-          title="Settings"
-          btnStyle={{borderColor: navBtnBorderColor('Settings', current_screen, theme)}}
-          textStyle={{fontSize: 16, color: navBtnTextColor('Settings', current_screen, theme)}}
-          onPress={() => navigation.navigate('Settings')}
-        />
-      </View>
-    </View>
-  )
-}
+//       <View flexDirection="row" justifyContent="space-around" style={{marginBottom: 40}}>
+//         <Button
+//           title="Friends"
+//           btnStyle={{borderColor: navBtnBorderColor('Friends', current_screen, theme)}}
+//           textStyle={{fontSize: 16, color: navBtnTextColor('Friends', current_screen, theme)}}
+//           onPress={() => navigation.navigate('Friends')}
+//         />
+//         <Button
+//           title="Home"
+//           btnStyle={{borderColor: navBtnBorderColor('Home', current_screen, theme)}}
+//           textStyle={{fontSize: 16, color: navBtnTextColor('Home', current_screen, theme)}}
+//           onPress={() => navigation.push('Home', {itemId: Math.floor(Math.random() * 100)})}
+//         />
+//         <Button
+//           title="Settings"
+//           btnStyle={{borderColor: navBtnBorderColor('Settings', current_screen, theme)}}
+//           textStyle={{fontSize: 16, color: navBtnTextColor('Settings', current_screen, theme)}}
+//           onPress={() => navigation.navigate('Settings')}
+//         />
+//       </View>
+//     </View>
+//   )
+// }
+
 TouchableOpacity.defaultProps = {activeOpacity: 0.8}
 
 // Throw an error if themes.light and themes.dark don't have the same keys
 if (Object.keys(themes.light).sort().join(',') != Object.keys(themes.dark).sort().join(','))
   throw new Error('themes.light and themes.dark must have the same keys')
 
-export const styles = (theme) =>
+export const styles = (theme: 'light' | 'dark') =>
   StyleSheet.create({
     appButtonContainer: {
       elevation: 8,
@@ -106,8 +124,8 @@ export const styles = (theme) =>
       paddingHorizontal: 12,
       marginTop: 10,
       marginBottom: 10,
-      borderColor: '#007aff',
-      borderWidth: 1,
+      // borderColor: '#007aff',
+      // borderWidth: 1,
       borderColor: themes.light.text_secondary,
       borderWidth: 2,
     },
@@ -121,7 +139,7 @@ export const styles = (theme) =>
     container: {
       flex: 1,
       fontFamily: 'SFCompactRounded_Medium',
-      backgroundColor: themes[theme as 'light' | 'dark'].backgroundColor,
+      backgroundColor: themes[theme].backgroundColor,
       padding: containerPadding,
       paddingBottom: 0,
       paddingTop: 48,
@@ -153,7 +171,7 @@ export const debugStyles = (theme: 'light' | 'dark') =>
       backgroundColor: '#222',
       color: themes[theme].text_secondary,
       borderRadius: 4,
-      justifyContent: 'left',
+      justifyContent: 'flex-start',
       width: 300,
       marginBottom: 12,
     },
@@ -163,8 +181,8 @@ export const debugStyles = (theme: 'light' | 'dark') =>
     },
   })
 
-export const Header = ({children, style}) => {
-  const theme = useStore((state: StoreState) => state.theme)
+export const Header = ({children, style}: HeaderProps) => {
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   return (
     <Text
       style={{
@@ -180,8 +198,8 @@ export const Header = ({children, style}) => {
   )
 }
 
-export const Text = (props) => {
-  const {theme} = useStore()
+export const Text = (props: TextProps) => {
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   return (
     <RNText {...props} style={{fontFamily: 'SFCompactRounded_Medium', color: themes[theme].text_primary, ...props.style}}>
       {props.children}
@@ -189,8 +207,8 @@ export const Text = (props) => {
   )
 }
 
-export const TextInput = forwardRef((props, ref) => {
-  const {theme} = useStore()
+export const TextInput = forwardRef<RNTextInput, RNTextInputProps>((props, ref) => {
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   return (
     <RNTextInput
       ref={ref}
@@ -202,7 +220,7 @@ export const TextInput = forwardRef((props, ref) => {
 })
 
 export const Button = ({onPress, title, btnStyle, textStyle}) => {
-  const {theme} = useStore()
+  const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -287,7 +305,7 @@ export const removeCountryCode = (fullPhoneNumber: string) => {
   }
 }
 
-export const countryCode = (fullPhoneNumber) => {
+export const countryCode = (fullPhoneNumber: string) => {
   if (fullPhoneNumber == null) return null
   try {
     const phoneUtil = PhoneNumberUtil.getInstance()
