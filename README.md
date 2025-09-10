@@ -87,13 +87,11 @@ bin/submit-ios.sh
   - when the app goes to the background, it should stop the ping interval
   - when the app comes back to the foreground, if the user is ONLINE, it should start the ping interval again
   - if the user is OFFLINE, it should not start the ping interval
-- [ ] Test push notifications:
+- [ ] Test push notifications: (NOTE: This requires testing on a real device, not a simulator)
   - [ ] Figure out how to reset the push notification token for testing purposes
   - [ ] Do they work when the app is in the foreground?
   - [ ] Do they work when the app is in the background?
   - [ ] Do they work when the app is killed?
-  - [ ] Do they work in the simulator?
-  - [ ] Do they work on a real device?
 - [ ] Store `push notifications` & `theme` in AsyncStorage so they don't get reset every time they open the app
 - [ ] Only show YOUR friends. Currently the app shows all users
 - [ ] Dark theme improvements
