@@ -129,9 +129,6 @@ class PhoneInput extends PureComponent {
   }
 
   render() {
-    // const {theme} = React.useContext(GlobalContext)
-    const theme = useStore((state: StoreState) => state.theme) as 'light' | 'dark'
-
     interface PhoneInputProps {
       withDarkTheme: boolean
       codeTextStyle: object
@@ -148,7 +145,10 @@ class PhoneInput extends PureComponent {
       filterProps: object
       countryPickerButtonStyle: object
       layout: string
+      theme: 'light' | 'dark'
     }
+
+    const theme = this.props.theme || 'light'
 
     const {
       withDarkTheme,
@@ -275,6 +275,7 @@ const PhoneInputComponent = ({
           defaultValue={phone}
           defaultCode={defaultCountryCode || 'US'}
           layout="first"
+          theme={theme}
           onChangeFormattedText={(formatted) => {
             const checkValid = ref.current?.isValidNumber(formatted)
             setValidPhone(checkValid)
